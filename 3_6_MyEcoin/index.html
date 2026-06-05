@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyE Coin - Cổng Nạp Chính Thức</title>
+    <!-- Nhúng thư viện Tailwind CSS qua link CDN tốc độ cao -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Liên kết với file hiệu ứng CSS riêng của dự án -->
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body class="bg-[#F5F7FA] font-sans antialiased text-slate-800">
+
+    <div id="global-header" class="sticky top-0 z-50"></div>
+
+    <!-- ==================== THANH BREADCRUMB (NẰM NGOÀI, CỐ ĐỊNH THEO FIGMA) ==================== -->
+    <div class="w-full bg-white border-b border-slate-200/60 shadow-sm">
+        <div class="max-w-4xl mx-auto px-4 py-3">
+            <div class="text-[11px] flex items-center gap-1.5 font-bold">
+                <span class="text-[#0a2e5c] hover:text-[#ff6b00] hover:underline cursor-pointer transition-colors">Nạp
+    Game</span>
+                <span class="text-slate-400">&gt;</span>
+                <span class="text-[#ff6b00]">MyE Coin</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== KHU VỰC BANNER ĐẦU TRANG ==================== -->
+    <div
+        class="w-full bg-[#031533] py-4 shadow-[0_10px_30px_rgba(255,255,255,0.15),0_10px_20px_rgba(0,0,0,0.05)] relative z-10">
+        <div class="max-w-5xl mx-auto px-4">
+
+            <!-- Khung chứa ảnh Banner chính thức -->
+            <div
+                class="w-full rounded-xl overflow-hidden border border-blue-500/40 shadow-[0_0_20px_rgba(59,130,246,0.25)] relative group">
+                <img src="./images/banner đầu trang.png" alt="Cổng Nạp Chính Thức"
+    class="w-full h-auto object-cover block" />
+
+                <!-- Nút bật Popup Lịch sử giao dịch đặt ở góc dưới bên phải banner -->
+                <button onclick="openHistory()"
+                    class="absolute bottom-4 right-4 border border-blue-500 bg-blue-950/60 hover:bg-blue-900/80 text-white text-[11px] font-medium px-4 py-1.5 rounded-md transition-all z-20 shadow-md">
+                    Lịch sử giao dịch
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== KHU VỰC THÂN TRANG (TỶ LỆ CHUẨN ĐÉT FIGMA) ==================== -->
+    <main
+        class="max-w-4xl mx-auto px-4 py-4 space-y-6 md:space-y-8">
+
+        <!-- KHỐI THÔNG TIN TÀI KHOẢN (Độ rộng max-w-4xl nhỏ gọn thụt lùi hai đầu so với banner) -->
+        <div
+            class="bg-white rounded-xl shadow-sm border border-slate-200/50 py-6 px-8 grid grid-cols-1 md:grid-cols-3 text-center gap-y-5 md:gap-y-0 divide-y md:divide-y-0 md:divide-x divide-slate-100">
+            <div>
+                <p class="text-xs text-[#004aad] font-bold uppercase tracking-wider">Tài khoản</p>
+                <p class="font-extrabold text-slate-700 text-2xl md:text-3xl mt-1.5">myepro123</p>
+            </div>
+            <div>
+                <p class="text-xs text-[#004aad] font-bold uppercase tracking-wider">MyE ID</p>
+                <p class="font-extrabold text-slate-700 text-2xl md:text-3xl mt-1.5">12233548</p>
+            </div>
+            <div class="flex flex-col items-center justify-center">
+                <p class="text-xs text-[#004aad] font-bold uppercase tracking-wider">Số dư</p>
+                <p id="user-balance-display"
+                    class="font-extrabold text-slate-700 text-2xl md:text-3xl mt-1.5 flex items-center gap-2 justify-center">
+                    1.200 <img src="./images/coin M.png"
+                        class="w-7 h-7 md:w-8 h-8 object-contain inline" />
+                </p>
+            </div>
+        </div>
+
+        <!-- KHỐI CHỌN HÌNH THỨC NẠP -->
+        <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200/40">
+            <h2 class="text-xl font-black text-[#004aad] uppercase tracking-wide mb-5">
+                CHỌN HÌNH THỨC NẠP
+            </h2>
+            <div id="methods-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-5"></div>
+        </div>
+
+        <!-- KHỐI CHỌN GÓI NẠP -->
+        <div
+            class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200/40">
+            <h2 class="text-lg font-black text-[#004aad] uppercase tracking-wide mb-5">
+                CHỌN GÓI NẠP
+            </h2>
+            <div id="packages-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-4"></div>
+        </div>
+
+        <!-- KHỐI HƯỚNG DẪN NẠP GAME-->
+        <div
+            class="max-w-3xl mx-auto w-full bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200/40 relative">
+            <h2
+                class="text-lg font-black text-[#004aad] uppercase tracking-wide mb-5 text-center sm:text-left">
+                HƯỚNG DẪN NẠP GAME
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 text-xs text-slate-600 leading-relaxed">
+                <div class="flex gap-4 items-start">
+                    <span
+                        class="w-6 h-6 bg-[#D8E6FA] text-[#004aad] rounded-full flex items-center justify-center font-black shrink-0 text-xs shadow-sm">1</span>
+                    <p class="pt-0.5">Chọn hình thức nạp phù hợp.</p>
+                </div>
+                <div class="flex gap-4 items-start">
+                    <span
+                        class="w-6 h-6 bg-[#D8E6FA] text-[#004aad] rounded-full flex items-center justify-center font-black shrink-0 text-xs shadow-sm">4</span>
+                    <div class="pt-0.5">
+                        <p>MyE Coin sẽ được cộng vào tài khoản ngay sau khi giao dịch thanh toán thành công.</p>
+                    </div>
+                </div>
+                <div class="flex gap-4 items-start">
+                    <span
+                        class="w-6 h-6 bg-[#D8E6FA] text-[#004aad] rounded-full flex items-center justify-center font-black shrink-0 text-xs shadow-sm">2</span>
+                    <p class="pt-0.5">Chọn gói MyE Coin muốn nạp.</p>
+                </div>
+                <div class="flex gap-4 items-start md:row-span-2">
+                    <span
+                        class="w-6 h-6 bg-[#D8E6FA] text-[#004aad] rounded-full flex items-center justify-center font-black shrink-0 text-xs shadow-sm">5</span>
+                    <div class="pt-0.5">
+                        <p class="font-bold text-slate-700">Sử dụng MyE Coin:</p>
+                        <ul class="list-disc pl-4 mt-1 space-y-1 text-slate-500">
+                            <li>Đăng nhập vào app game.</li>
+                            <li>Chọn mua gói vật phẩm mong muốn trong game.</li>
+                            <li>MyE Coin sẽ tự động được trừ ngay khi bấm xác nhận mua trong game.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="flex gap-4 items-start">
+                    <span
+                        class="w-6 h-6 bg-[#D8E6FA] text-[#004aad] rounded-full flex items-center justify-center font-black shrink-0 text-xs shadow-sm">3</span>
+                    <p class="pt-0.5">Thanh toán theo hướng dẫn.</p>
+                </div>
+            </div>
+
+            <div
+                class="mt-6 pt-4 border-t border-slate-100 text-[11px] text-[#004aad] font-bold flex items-center gap-2">
+                <span class="inline-block">🔒</span> Giao dịch an toàn, bảo mật và được xử lý tự động 24/7.
+            </div>
+        </div>
+
+        <!-- KHỐI BA CỘT TIỆN ÍCH -->
+        <div
+            class="bg-white rounded-2xl shadow-sm border border-slate-200/40 p-5 py-6 grid grid-cols-1 md:grid-cols-3 gap-6 relative pr-6 md:pr-48 min-h-[110px] md:h-[110px] overflow-visible w-full">
+            <div class="flex items-center gap-3 relative z-10">
+                <div class="w-10 h-10 bg-blue-50 text-[#004aad] rounded-full flex items-center justify-center shrink-0">
+                    <!-- SVG Shield Icon -->
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
+                        </path>
+                    </svg>
+                </div>
+                <div class="text-xs">
+    <p class="font-bold text-[#004aad]">An toàn & Bảo mật</p>
+    <p class="text-slate-400 mt-0.5 leading-tight">Giao dịch được mã hoá, thông tin của bạn luôn được
+    bảo vệ</p>
+                </div>
+            </div>
+            <div
+                class="flex items-center gap-3 border-t md:border-t-0 md:border-x border-slate-100 pt-3 md:pt-0 md:px-4 relative z-10">
+                <div
+    class="w-10 h-10 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center shrink-0">
+    <!-- SVG Clock Icon -->
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg">
+    <path stroke-linecap="round" stroke-linejoin="round"
+    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+                </div>
+                <div class="text-xs">
+    <p class="font-bold text-orange-600">Nạp tự động 24/7</p>
+    <p class="text-slate-400 mt-0.5 leading-tight">Thanh toán thành công, MyE Coin sẽ được cộng ngay vào
+    tài khoản.</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 border-t md:border-t-0 pt-3 md:pt-0 relative z-10">
+                <div
+    class="w-10 h-10 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center shrink-0">
+    <!-- SVG Headset Icon -->
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg">
+    <path stroke-linecap="round" stroke-linejoin="round"
+    d="M12 2a9 9 0 00-9 9v7a3 3 0 003 3h1a2 2 0 002-2V12a2 2 0 00-2-2H5a7 7 0 0114 0h-1a2 2 0 00-2 2v7a2 2 0 002 2h1a3 3 0 003-3v-7a9 9 0 00-9-9z">
+    </path>
+    </svg>
+                </div>
+                <div class="text-xs">
+    <p class="font-bold text-emerald-600">Hỗ trợ nhanh chóng</p>
+    <p class="text-slate-500 font-medium mt-0.5">Email: hotro@mye.vn</p>
+    <p class="text-slate-500 font-medium">Hotline: 0902 500 198</p>
+                </div>
+            </div>
+
+            <!-- Mascot-->
+            <img src="./images/nữMye.png" alt="Mascot"
+                class="hidden md:block w-auto h-[165px] object-contain absolute -right-3 -top-16 z-20 pointer-events-none" />
+        </div>
+
+    </main>
+
+    <!-- Khung xương đón Footer (Sẽ được file layout.js tự động tiêm giao diện vào khi load) -->
+    <div id="global-footer"></div>
+
+
+    <!-- ==================== POPUP 1: LỊCH SỬ GIAO DỊCH ==================== -->
+    <div id="history-modal"
+        class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 opacity-0 pointer-events-none transition-all duration-300">
+        <div
+            class="bg-white rounded-2xl w-full max-w-xl p-6 mx-4 shadow-2xl transform scale-95 transition-all duration-300 relative space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 class="text-sm font-black text-[#004aad] uppercase tracking-wider flex items-center gap-2">
+                    📜 Lịch sử giao dịch nạp coin
+                </h3>
+                <button onclick="closeHistory()"
+                    class="text-slate-400 hover:text-slate-600 font-bold text-lg p-1">&times;</button>
+            </div>
+
+            <div class="overflow-x-auto max-h-60 overflow-y-auto pr-1">
+                <table class="w-full text-left text-xs border-collapse">
+    <thead>
+    <tr class="bg-slate-50 text-slate-500 font-bold border-b border-slate-100">
+    <th class="py-2 px-3">Thời gian</th>
+    <th class="py-2 px-3">Gói nạp</th>
+    <th class="py-2 px-3">Hình thức</th>
+    <th class="py-2 px-3">Số tiền</th>
+    <th class="py-2 px-3 text-right">Trạng thái</th>
+    </tr>
+    </thead>
+    <tbody id="history-table-body"></tbody>
+                </table>
+            </div>
+
+            <div class="text-right pt-2 border-t border-slate-50">
+                <button onclick="closeHistory()"
+    class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold px-4 py-2 rounded-lg transition-colors">
+    Đóng cửa sổ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== POPUP 2: CẢNH BÁO ĐĂNG NHẬP ==================== -->
+    <div id="login-warning-modal"
+        class="fixed inset-0 bg-black/60 flex items-center justify-center z-[60] opacity-0 pointer-events-none transition-all duration-300">
+        <div
+            class="bg-white rounded-2xl w-full max-w-sm p-6 mx-4 shadow-2xl transform scale-95 transition-all duration-300 space-y-4 text-xs">
+            <div class="text-center pb-2 border-b border-slate-100">
+                <div
+                    class="w-12 h-12 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center text-2xl mx-auto mb-2 animate-pulse">
+                    ⚠️</div>
+                <h4 class="text-sm font-black text-slate-800 uppercase tracking-wide">Thông Báo Hệ Thống</h4>
+            </div>
+
+            <div class="space-y-3 text-center text-slate-600 leading-relaxed">
+                <p class="font-bold text-slate-800 text-xs">
+    Bạn chưa đăng nhập tài khoản!
+                </p>
+                <p class="text-slate-500 font-medium leading-normal">
+    Để đảm bảo an toàn giao dịch và cập nhật đúng số dư ví xu, vui lòng hoàn tất đăng nhập tài khoản
+    **MyE ID** trước khi chọn mua các gói nạp.
+                </p>
+            </div>
+
+            <div class="pt-2 border-t border-slate-50 flex gap-3">
+                <button onclick="closeLoginWarning()"
+    class="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 rounded-xl transition-colors uppercase tracking-wider text-[10px]">
+    Đóng
+                </button>
+                <button onclick="triggerLoginFromWarning()"
+    class="w-1/2 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 rounded-xl transition-colors uppercase tracking-wider text-[10px] shadow-md shadow-orange-500/20 active:scale-95">
+    Đăng nhập ngay
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container cho Toast Notifications -->
+    <div id="toast-container"
+        class="fixed top-4 right-4 z-[9999] flex flex-col gap-3 pointer-events-none w-full max-w-sm px-4 sm:px-0"></div>
+
+    <!-- SCRIPT ĐIỀU KHIỂN HỆ THỐNG -->
+    <script src="./layout.js"></script>
+    <script src="./portal.js"></script>
+</body>
+
+</html>
