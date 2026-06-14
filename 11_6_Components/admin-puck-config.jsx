@@ -8,7 +8,7 @@ import AdminHero from './components/admin-hero';
 //Config — đăng ký 5 components với fields + defaultProps + render.
 import AdminHeroPro from './components/admin-hero-tona';
 import AdminFeatures from './components/admin-features-tona';
-import AdminOrg from './components/admin-org';
+import AdminOrg from './components/admin-org-tona';
 
 export const puckConfig = {
   components: {
