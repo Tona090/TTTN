@@ -5,7 +5,7 @@ import AdminImage from './components/admin-image';
 import AdminSection from './components/admin-section';
 import AdminHero from './components/admin-hero';
 
-//Config — đăng ký 5 components với fields + defaultProps + render.
+// Import cac components bai tap
 import AdminHeroPro from './components/admin-hero-tona';
 import AdminFeatures from './components/admin-features-tona';
 import AdminOrg from './components/admin-org-tona';
@@ -113,7 +113,7 @@ export const puckConfig = {
         },
         padding_x: { type: 'number', label: 'Padding ngang', min: 0, max: 16, default: 4 },
         padding_y: { type: 'number', label: 'Padding dọc', min: 0, max: 16, default: 4 },
-        content: { type: 'slot' } // Cho phép nested components
+        content: { type: 'slot' }
       },
       defaultProps: {
         container: 'lg',
@@ -162,120 +162,106 @@ export const puckConfig = {
       defaultProps: {
         title: "Sen Hồng",
         description: "CLB Doanh nhân Đồng Tháp...",
-        background: { type: 'image', url: 'https://link-anh-cua-ban.jpg' },
+        background: { type: 'image', url: 'https://via.placeholder.com/1600x900' },
         contentBox: { align: 'left', borderRadius: 20 },
         button: { text: "Tham gia cộng đồng", borderRadius: 50 }
       },
       render: (props) => <AdminHeroPro {...props} />
-    }
-  },
-  Features: {
-    label: 'Các Ban Chuyên Môn',
-    fields: {
-      title: { type: 'text', label: 'Tiêu đề lớn' },
-      subtitle: { type: 'text', label: 'Tiêu đề nhỏ' },
-      background: {
-        type: 'object',
-        label: 'Nền Section',
-        objectFields: {
-          type: { type: 'select', label: 'Loại nền', options: [{ label: 'Màu', value: 'color' }, { label: 'Ảnh', value: 'image' }] },
-          color: { type: 'text', label: 'Màu nền' },
-          url: { type: 'text', label: 'Link ảnh nền' }
-        }
-      },
-      items: {
-        type: 'array',
-        label: 'Danh sách các Ban',
-        arrayFields: {
-          label: { type: 'text', label: 'Tên Ban' },
-          icon: { type: 'text', label: 'Link Icon (PNG/SVG)' },
-          btnText: { type: 'text', label: 'Chữ trên nút' },
-          btnBorderRadius: { type: 'number', label: 'Bo góc nút' }
-        },
-        // Giúp hiển thị tên ban ngay ngoài danh sách array cho dễ quản lý
-        getItemSummary: (item) => item.label || "Tên ban chuyên môn"
-      }
     },
-    defaultProps: {
-      title: "CÁC BAN CHUYÊN MÔN",
-      subtitle: "CLB DOANH NHÂN ĐỒNG THÁP TẠI TP. HỒ CHÍ MINH",
-      items: [
-        { label: "Ban Kinh tế - Đầu tư", btnText: "Xem hoạt động", btnBorderRadius: 20 },
-        { label: "Ban Văn hóa - Thể thao", btnText: "Xem hoạt động", btnBorderRadius: 20 },
-        { label: "Ban Xã hội - Cộng đồng", btnText: "Xem hoạt động", btnBorderRadius: 20 }
-      ]
-    },
-    render: (props) => <AdminFeatures {...props} />
-  },
-  // ... Thêm vào trong puckConfig.components ...
-  Organization: {
-    label: 'Giới thiệu & Nhân sự',
-    fields: {
-      background: {
-        type: 'object',
-        label: 'Nền',
-        objectFields: {
-          type: { type: 'select', options: [{ label: 'Trắng', value: 'white' }, { label: 'Gradient', value: 'gradient' }] }
-        }
-      },
-      columns: {
-        type: 'array',
-        label: 'Danh sách các Khối (Cột)',
-        getItemSummary: (item) => item.title || "Khối nội dung",
-        arrayFields: {
-          title: { type: 'text', label: 'Tiêu đề khối' },
-          type: {
-            type: 'select',
-            label: 'Loại nội dung',
-            options: [
-              { label: 'Đoạn văn bản', value: 'text' },
-              { label: 'Danh sách nhân sự', value: 'people' }
-            ]
-          },
-          // Field cho loại 'text'
-          description: { type: 'textarea', label: 'Nội dung văn bản' },
-          image: { type: 'text', label: 'Link ảnh minh họa' },
 
-          // Field cho loại 'people' (Mảng con)
-          members: {
-            type: 'array',
-            label: 'Danh sách nhân sự',
-            getItemSummary: (item) => item.name || "Nhân viên",
-            arrayFields: {
-              name: { type: 'text', label: 'Tên' },
-              role: { type: 'text', label: 'Chức vụ' },
-              company: { type: 'text', label: 'Công ty' },
-              avatar: { type: 'text', label: 'Link ảnh đại diện' }
+    Features: {
+      label: 'Các Ban Chuyên Môn',
+      fields: {
+        title: { type: 'text', label: 'Tiêu đề lớn' },
+        subtitle: { type: 'text', label: 'Tiêu đề nhỏ' },
+        background: {
+          type: 'object',
+          label: 'Nền Section',
+          objectFields: {
+            type: { type: 'select', label: 'Loại nền', options: [{ label: 'Màu', value: 'color' }, { label: 'Ảnh', value: 'image' }] },
+            color: { type: 'text', label: 'Màu nền' },
+            url: { type: 'text', label: 'Link ảnh nền' }
+          }
+        },
+        items: {
+          type: 'array',
+          label: 'Danh sách các Ban',
+          arrayFields: {
+            label: { type: 'text', label: 'Tên Ban' },
+            icon: { type: 'text', label: 'Link Icon (PNG/SVG)' },
+            btnText: { type: 'text', label: 'Chữ trên nút' },
+            btnBorderRadius: { type: 'number', label: 'Bo góc nút' }
+          },
+          getItemSummary: (item) => item.label || "Tên ban chuyên môn"
+        }
+      },
+      defaultProps: {
+        title: "CÁC BAN CHUYÊN MÔN",
+        subtitle: "CLB DOANH NHÂN ĐỒNG THÁP TẠI TP. HỒ CHÍ MINH",
+        items: [
+          { label: "Ban Kinh tế - Đầu tư", btnText: "Xem hoạt động", btnBorderRadius: 20 },
+          { label: "Ban Văn hóa - Thể thao", btnText: "Xem hoạt động", btnBorderRadius: 20 },
+          { label: "Ban Xã hội - Cộng đồng", btnText: "Xem hoạt động", btnBorderRadius: 20 }
+        ]
+      },
+      render: (props) => <AdminFeatures {...props} />
+    },
+
+    Organization: {
+      label: 'Giới thiệu & Nhân sự',
+      fields: {
+        background: {
+          type: 'object',
+          label: 'Nền',
+          objectFields: {
+            type: { type: 'select', label: 'Loại nền', options: [{ label: 'Trắng', value: 'white' }, { label: 'Gradient', value: 'gradient' }] }
+          }
+        },
+        columns: {
+          type: 'array',
+          label: 'Danh sách các Khối (Cột)',
+          getItemSummary: (item) => item.title || "Khối nội dung",
+          arrayFields: {
+            title: { type: 'text', label: 'Tiêu đề khối' },
+            type: {
+              type: 'select',
+              label: 'Loại nội dung',
+              options: [
+                { label: 'Đoạn văn bản', value: 'text' },
+                { label: 'Danh sách nhân sự', value: 'people' }
+              ]
+            },
+            description: { type: 'textarea', label: 'Nội dung văn bản' },
+            image: { type: 'text', label: 'Link ảnh minh họa' },
+            members: {
+              type: 'array',
+              label: 'Danh sách nhân sự',
+              getItemSummary: (item) => item.name || "Nhân viên",
+              arrayFields: {
+                name: { type: 'text', label: 'Tên' },
+                role: { type: 'text', label: 'Chức vụ' },
+                company: { type: 'text', label: 'Công ty' },
+                avatar: { type: 'text', label: 'Link ảnh đại diện' }
+              }
             }
           }
         }
-      }
-    },
-    defaultProps: {
-      columns: [
-        {
-          title: "VỀ CÂU LẠC BỘ",
-          type: 'text',
-          description: "CLB Doanh nhân Đồng Tháp là nơi hội tụ..."
-        },
-        {
-          title: "CƠ CẤU TỔ CHỨC",
-          type: 'people',
-          members: [
-            { name: "Trần Văn Khang", role: "Ủy viên BCH", company: "Công ty CP Logistics" },
-            { name: "Đỗ Thu Trang", role: "Thủ quỹ CLB", company: "Công ty TNHH Sen Việt" }
-          ]
-        }
-      ]
-    },
-    render: (props) => <AdminOrg {...props} />
-  },
+      },
+      defaultProps: {
+        background: { type: 'white' },
+        columns: [
+          { title: "VỀ CÂU LẠC BỘ", type: 'text', description: "CLB Doanh nhân Đồng Tháp là nơi hội tụ..." },
+          { title: "CƠ CẤU TỔ CHỨC", type: 'people', members: [ { name: "Trần Văn Khang", role: "Ủy viên BCH", company: "Công ty Logistics" } ] }
+        ]
+      },
+      render: (props) => <AdminOrg {...props} />
+    }
 
   // Sidebar categories
   categoryGroups: [
     { title: 'Cơ bản', components: ['Heading', 'Text', 'Image'] },
     { title: 'Layout', components: ['Section'] },
-    { title: 'Nâng cao', components: ['Hero'] }
+    { title: 'Nâng cao', components: ['HeroPro', 'Features', 'Organization'] } 
   ],
 
   // Root config
