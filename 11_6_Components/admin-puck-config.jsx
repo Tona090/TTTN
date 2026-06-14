@@ -251,25 +251,25 @@ export const puckConfig = {
         background: { type: 'white' },
         columns: [
           { title: "VỀ CÂU LẠC BỘ", type: 'text', description: "CLB Doanh nhân Đồng Tháp là nơi hội tụ..." },
-          { title: "CƠ CẤU TỔ CHỨC", type: 'people', members: [ { name: "Trần Văn Khang", role: "Ủy viên BCH", company: "Công ty Logistics" } ] }
+          { title: "CƠ CẤU TỔ CHỨC", type: 'people', members: [{ name: "Trần Văn Khang", role: "Ủy viên BCH", company: "Công ty Logistics" }] }
         ]
       },
       render: (props) => <AdminOrg {...props} />
     }
-
+  },
   // Sidebar categories
   categoryGroups: [
-    { title: 'Cơ bản', components: ['Heading', 'Text', 'Image'] },
-    { title: 'Layout', components: ['Section'] },
-    { title: 'Nâng cao', components: ['HeroPro', 'Features', 'Organization'] } 
-  ],
+      { title: 'Cơ bản', components: ['Heading', 'Text', 'Image'] },
+      { title: 'Layout', components: ['Section'] },
+      { title: 'Nâng cao', components: ['HeroPro', 'Features', 'Organization'] }
+    ],
 
-  // Root config
-  root: {
-    render: ({ children }) => (
-      <div className="min-h-screen">{children}</div>
-    )
-  }
-};
+    // Root config
+    root: {
+      render: ({ children }) => (
+        <div className="min-h-screen">{children}</div>
+      )
+    }
+  };
 
-export default puckConfig;
+  export default puckConfig;
