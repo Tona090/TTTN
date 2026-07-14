@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "services": "Services",
+    "news": "News",
+    "support": "Support",
+    "contact": "Contact"
+  },
+  "hero": {
+    "subtitle": "Future Technology",
+    "type1": "Digital Transformation",
+    "type2": "Software Solutions",
+    "type3": "Cybersecurity",
+    "type4": "Artificial Intelligence",
+    "title": "HEXAGON Solutions",
+    "desc": "Hexagon creates comprehensive digital transformation solutions, from software and AI to cybersecurity, helping businesses break through in the digital era.",
+    "explore": "Explore Services",
+    "contact": "Contact for Consultation",
+    "scroll": "Scroll down to explore "
+  },
+  "about": {
+    "title": "About Hexagon",
+    "desc": "Hexagon Corporation - Pioneering technology, where we constantly create and innovate to bring outstanding value in the digital era. With a multi-dimensional vision and aspiration to reach the top, Hexagon is proud to be a reliable partner, accompanying you on the journey to conquer technological peaks.",
+    "quote": "\"Working days, working nights, working on weekends ^_^\"",
+    "quoteAuthor": "— Hexagon Culture",
+    "stat1": "Completed projects",
+    "stat2": "Accompanying partners",
+    "stat3": "Technical team",
+    "stat4": "Continuous support"
+  },
+  "services": {
+    "title": "Areas of Operation",
+    "desc": "At Hexagon, we focus on developing a comprehensive technology ecosystem, including:",
+    "s1Title": "Technology Solutions",
+    "s1Desc": "Providing modern technological solutions, meeting digital transformation needs and improving business operational efficiency.",
+    "s2Title": "Construction & Installation",
+    "s2Desc": "Construction and installation of network systems, cameras, light electricity, and IT infrastructure with quality, safety, and on schedule.",
+    "s3Title": "IT Equipment Supply",
+    "s3Desc": "Distributing genuine computers, servers, network equipment, and hardware solutions for enterprises.",
+    "s4Title": "Information Technology Services",
+    "s4Desc": "Providing professional and comprehensive IT consulting, maintenance, system administration, and technical support services.",
+    "viewDetail": "View details"
+  },
+  "news": {
+    "title": "News",
+    "desc": "Update the latest news, events, and information from Hexagon Corporation.",
+    "viewAll": "View all articles"
+  },
+  "partners": {
+    "title": "Associated Partners"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "desc": "Ready for the next project? Hexagon's team of experts is always here to listen and provide the best solution for you.",
+    "hq": "Headquarters",
+    "address": "615 Au Co, Tan Phu Ward, Ho Chi Minh City"
+  },
+  "footer": {
+    "copy": "Copyright 2026 ©"
+  },
+  "articles": {
+    "title": "News",
+    "desc": "The latest news, updates and information from Hexagon Corporation.",
+    "viewMore": "View more",
+    "ourServices": "Our Services",
+    "learnMore": "Learn more",
+    "viewAllServices": "View all services",
+    "home": "Home",
+    "news": "News",
+    "articles": "Articles",
+    "share": "Share article:"
+  }
+}

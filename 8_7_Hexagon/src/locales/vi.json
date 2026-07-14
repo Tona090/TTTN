@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "home": "Trang chủ",
+    "about": "Giới thiệu",
+    "services": "Dịch vụ",
+    "news": "Tin tức",
+    "support": "Hỗ trợ",
+    "contact": "Liên hệ"
+  },
+  "hero": {
+    "subtitle": "Công nghệ tương lai",
+    "type1": "Chuyển đổi số",
+    "type2": "Giải pháp Phần mềm",
+    "type3": "An ninh mạng",
+    "type4": "Trí tuệ Nhân tạo",
+    "title": "HEXAGON Solutions",
+    "desc": "Hexagon kiến tạo các giải pháp chuyển đổi số toàn diện, từ phần mềm, AI đến an ninh mạng, giúp doanh nghiệp bứt phá trong kỷ nguyên số.",
+    "explore": "Khám phá Dịch vụ",
+    "contact": "Liên hệ Tư vấn",
+    "scroll": "Cuộn xuống để khám phá "
+  },
+  "about": {
+    "title": "Về Hexagon",
+    "desc": "Hexagon Corporation – Công nghệ tiên phong, nơi chúng tôi không ngừng kiến tạo và đổi mới để mang đến những giá trị vượt trội trong kỷ nguyên số. Với tầm nhìn đa chiều và khát vọng vươn tầm, Hexagon tự hào là đối tác tin cậy, đồng hành cùng bạn trên hành trình chinh phục những đỉnh cao công nghệ.",
+    "quote": "\"Làm ngày, làm đêm, làm thêm ngày nghỉ ^_^\"",
+    "quoteAuthor": "— Hexagon Culture",
+    "stat1": "Dự án đã thực hiện",
+    "stat2": "Đối tác đồng hành",
+    "stat3": "Đội ngũ kỹ thuật",
+    "stat4": "Hỗ trợ xuyên suốt"
+  },
+  "services": {
+    "title": "Lĩnh vực hoạt động",
+    "desc": "Tại Hexagon, chúng tôi tập trung phát triển hệ sinh thái công nghệ toàn diện, bao gồm:",
+    "s1Title": "Giải pháp công nghệ",
+    "s1Desc": "Cung cấp các giải pháp công nghệ hiện đại, đáp ứng nhu cầu chuyển đổi số và nâng cao hiệu quả vận hành doanh nghiệp.",
+    "s2Title": "Giải pháp thi công & lắp đặt",
+    "s2Desc": "Thi công, lắp đặt hệ thống mạng, camera, điện nhẹ và hạ tầng CNTT với chất lượng, an toàn và đúng tiến độ.",
+    "s3Title": "Cung cấp thiết bị CNTT",
+    "s3Desc": "Phân phối máy tính, máy chủ, thiết bị mạng và các giải pháp phần cứng chính hãng cho doanh nghiệp.",
+    "s4Title": "Dịch vụ Công nghệ thông tin",
+    "s4Desc": "Cung cấp dịch vụ tư vấn, bảo trì, quản trị hệ thống và hỗ trợ kỹ thuật CNTT chuyên nghiệp, toàn diện.",
+    "viewDetail": "Xem chi tiết"
+  },
+  "news": {
+    "title": "Tin tức",
+    "desc": "Cập nhật tin tức, sự kiện và thông tin mới nhất từ Hexagon Corporation.",
+    "viewAll": "Xem tất cả bài viết"
+  },
+  "partners": {
+    "title": "Các đối tác liên kết"
+  },
+  "contact": {
+    "title": "Liên hệ với chúng tôi",
+    "desc": "Sẵn sàng cho dự án tiếp theo? Đội ngũ chuyên gia của Hexagon luôn ở đây để lắng nghe và đưa ra giải pháp tốt nhất cho bạn.",
+    "hq": "Trụ sở chính",
+    "address": "615 Âu Cơ, Phường Tân Phú, TP. Hồ Chí Minh"
+  },
+  "footer": {
+    "copy": "Copyright 2026 ©"
+  },
+  "articles": {
+    "title": "Tin tức",
+    "desc": "Tin tức mới nhất, cập nhật và thông tin từ Hexagon Corporation.",
+    "viewMore": "Xem thêm",
+    "ourServices": "Dịch vụ của chúng tôi",
+    "learnMore": "Tìm hiểu thêm",
+    "viewAllServices": "Xem tất cả dịch vụ",
+    "home": "Trang chủ",
+    "news": "Tin tức",
+    "articles": "Bài viết",
+    "share": "Chia sẻ bài viết:"
+  }
+}
