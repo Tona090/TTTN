@@ -1,0 +1,265 @@
+html {
+    scroll-behavior: smooth;
+}
+body, html { 
+    margin: 0; padding: 0; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    background-color: #0d0121; 
+}
+.cursor-pointer { cursor: pointer; }
+.hover-scale { transition: transform 0.2s ease-in-out; }
+.hover-scale:hover { transform: scale(1.02); }
+
+.bg-purple { background-color: #4b1a7d !important; }
+
+/* Navbar Buttons */
+.btn-login { 
+    background: linear-gradient(to bottom, #4facfe, #00f2fe); 
+    color: white; 
+    font-weight: bold; 
+    border-radius: 4px; 
+    font-size: 16px; 
+    box-shadow: 0 0 8px rgba(0, 242, 254, 0.6); 
+}
+
+/* ============ BANNER / HERO ARENA ============ */
+.main-wrapper {
+    background-image: url('./TN/BGTRANGVOTING.png');
+    background-size: 100% auto; 
+    background-position: top center; 
+    background-repeat: no-repeat;
+    min-height: 1800px; 
+}
+.hero-arena { max-width: 1920px; height: 1050px; }
+.logo-hao-khi {
+    top: -180px; width: 465px; height: 465px;
+    object-fit: contain; z-index: 5; filter: drop-shadow(0 0 20px rgba(0, 242, 254, 0.4));
+}
+.logo-miss-mister {
+    top: 300px; width: 750px; height: 469px; object-fit: contain; z-index: 6;
+}
+.hero-nav { top: 800px; z-index: 10; }
+.nav-bg-frame { width: 1439px; height: 114px; z-index: -1; pointer-events: none; margin-top: 60px; }
+
+.hero-btn { width: 246px; height: 89px; transition: all 0.3s ease-in-out; }
+.hero-btn:hover { transform: scale(1.05) translateY(-3px); filter: hue-rotate(30deg) brightness(1.2) saturate(1.3); }
+
+.btn-vote {
+    width: 274px; height: 254px; object-fit: contain;
+    transition: all 0.3s ease-in-out; filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.6));
+}
+.btn-vote:hover { transform: scale(1.08); filter: brightness(1.3) saturate(1.2) drop-shadow(0 0 20px rgba(255, 50, 200, 0.8)); }
+
+/* ============ CSS TRANG 1: FORM ĐĂNG KÝ ============ */
+.title-dkdt { height: 141px; width: auto; filter: drop-shadow(0 0 10px rgba(200, 0, 255, 0.4)); }
+.custom-form .custom-input { 
+    background-color: white; border-radius: 0; padding: 12px 15px;
+    color: #333; font-weight: 500; height: 59px; font-size: 16px;
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+.custom-form .custom-input:focus { outline: none; box-shadow: none; background-color: #f0f8ff; }
+.custom-form .custom-input::placeholder { color: #a87eb6; }
+.custom-radio { width: 24px; height: 24px; accent-color: #00f2fe; }
+.radio-img { height: 65px; transition: all 0.3s ease; }
+.action-btn { height: 65px; max-width: 250px; transition: transform 0.2s; }
+.upload-box-main { max-width: 815px; height: 495px; }
+.upload-sub-container { max-width: 803px; }
+.upload-box-sub { height: 190px; }
+
+/* ============ CSS TRANG 2: VOTING ============ */
+/* Phân trang */
+.custom-pagination .page-link {
+    background-color: #1c3580; color: white; border: 1px solid #00f2fe;
+    border-radius: 4px; padding: 8px 16px; font-weight: 500;
+}
+.custom-pagination .page-item.active .page-link, 
+.custom-pagination .page-link:hover {
+    background-color: #00f2fe; color: #0d0121; border-color: #00f2fe; box-shadow: 0 0 10px rgba(0,242,254,0.8);
+}
+
+/* Các Title Mục (Danh sách, BXH, Tích lũy) */
+.section-title { width: 600px; height: 145px; object-fit: contain; max-width: 100%; }
+
+/* ============ BỘ LỌC (FILTERS) ============ */
+.filter-select {
+    width: 300px; height: 45px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") no-repeat right 15px center / 24px 24px, 
+                url('./TN/box.png') no-repeat center / 100% 100%;
+    border: none; color: white; padding: 0 40px 0 20px; appearance: none; 
+    font-family: 'Montserrat', sans-serif; font-size: 15px; font-weight: 500;
+}
+.filter-select:focus { outline: none; box-shadow: none; color: white; }
+.filter-select option { background-color: #2b0b5e; }
+
+/* Ô tìm kiếm */
+.filter-search-box {
+    width: 350px; height: 48px;
+    background: url('./TN/box%20trắng.png') no-repeat center / 100% 100%;
+    display: flex; align-items: center; justify-content: space-between; padding: 0 15px 0 20px;
+}
+.filter-search-box input { 
+    background: transparent; border: none; outline: none; width: 85%; 
+    color: #333; font-family: 'Montserrat', sans-serif; font-size: 15px; font-weight: 500; 
+}
+
+/* ============ CARD THÍ SINH ============ */
+.candidate-card-wrap { width: 430px; height: 327px; margin: 0 auto; max-width: 100%; }
+.candidate-info-box {
+    position: absolute; bottom: 22px; left: 0; width: 100%; text-align: center;
+}
+.candidate-name {
+    font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 24px;
+    color: #FFFFFF; line-height: 1; margin-bottom: 6px;
+}
+.candidate-server {
+    font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 16px;
+    color: #FFE779; line-height: 1;
+}
+
+/* ============ TÍCH LŨY ĐỔI QUÀ ============ */
+.thanh-moc-qua { width: 1320px; height: 74px; max-width: 100%; object-fit: contain; }
+.flower-icon { width: 252px; height: 168px; object-fit: contain; z-index: 10; }
+.box-item-container {
+    width: 209px; height: 249px;
+    background: url('./TN/boxitem.png') no-repeat center; background-size: 100% 100%;
+    display: flex; align-items: center; justify-content: center; padding-top: 15px;
+}
+.reward-grid {
+    display: grid; grid-template-columns: 74px 74px; grid-template-rows: 74px 74px; gap: 8px;
+}
+.reward-slot { width: 74px; height: 74px; background-color: #D9D9D9; }
+
+
+/* ============ BẢNG XẾP HẠNG ============ */
+.bxh-wrapper {
+    max-width: 1620px;
+    margin: -190px auto 0;
+}
+
+.bxh-tab-btn { 
+    width: 312px; 
+    height: 84px; 
+    object-fit: contain; 
+}
+
+/* Đẩy tab lên trên để cắt ngang viền khung neon giống demo */
+.bxh-tabs {
+    top: 200px; /* Tăng từ 10px lên 45px (Bạn có thể tăng/giảm số này để nhích lên xuống tùy ý) */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+}
+
+/* Kỹ thuật Screen khử viền đen cho khung Neon */
+.neon-frame {
+    width: 1620px;
+    height: auto;
+    display: block;
+    mix-blend-mode: screen !important; /* ĐÃ THÊM LẠI LỆNH TÁCH NỀN */
+}
+
+.table-container {
+    position: absolute;
+    top: 320px; /* Tăng từ 115px lên 160px để tạo khoảng trống với 3 nút tab */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1280px;
+    height: 610px; /* Có thể cần giảm chiều cao này một chút nếu bảng bị tràn viền dưới */
+    padding: 0;
+}
+/* Ép bảng và mọi thành phần bên trong hoàn toàn trong suốt, chữ trắng */
+.bxh-table, 
+.bxh-table tbody, 
+.bxh-table tr, 
+.bxh-table th, 
+.bxh-table td {
+    background-color: transparent !important;
+    border: none !important;
+    color: #FFFFFF !important; 
+    box-shadow: none !important;
+    --bs-table-bg: transparent; /* Reset biến nền của Bootstrap */
+    --bs-table-color: #FFFFFF; /* Reset biến màu chữ của Bootstrap */
+    --bs-table-hover-color: #FFFFFF;
+}
+
+/* Riêng thanh Header có nền xanh */
+.bxh-table thead tr.bxh-header-row th {
+    background-color: rgba(31, 70, 180, 0.7) !important;
+    height: 70px;
+    vertical-align: middle;
+}
+
+/* Các ô dữ liệu */
+.bxh-table td {
+    padding: 28px 0; /* Thay vì 18px như cũ, hãy tăng lên 35px, 40px hoặc 45px để giãn hàng */
+}
+
+/* Hiệu ứng hover từng dòng */
+.bxh-table tbody tr {
+    transition: background-color 0.2s;
+}
+.bxh-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.crown-icon { 
+    width: 80px; 
+    height: 56px; 
+    object-fit: contain; 
+}
+/* ============ POPUP GIFTCODE & TRẠNG THÁI NÚT ============ */
+.giftcode-popup {
+    width: 450px;
+    max-width: 100%;
+    background-color: rgba(13, 20, 45, 0.95);
+    border: 3px solid transparent;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 242, 254, 0.4), inset 0 0 20px rgba(0, 242, 254, 0.2);
+    /* Tạo viền gradient xanh hồng */
+    background-image: linear-gradient(rgba(13, 20, 45, 0.95), rgba(13, 20, 45, 0.95)), 
+                      linear-gradient(45deg, #00f2fe, #ff007f);
+    background-origin: border-box;
+    background-clip: content-box, border-box;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.btn-close-giftcode {
+    top: 15px; 
+    right: 20px;
+    background: transparent;
+    border: none;
+    color: #ff007f;
+    font-size: 26px;
+    text-shadow: 0 0 8px #ff007f;
+    transition: transform 0.2s;
+}
+.btn-close-giftcode:hover { transform: scale(1.15); color: #fff; }
+
+.code-box {
+    width: 85%;
+    height: 55px;
+    background: rgba(31, 70, 180, 0.5);
+    border: 1px solid #4facfe;
+}
+
+.btn-saochep {
+    background: linear-gradient(90deg, #b04cf5, #ff007f);
+    width: 200px;
+    height: 45px;
+    border-radius: 25px;
+    border: 1px solid #ffb6ff;
+    box-shadow: 0 0 15px rgba(255, 0, 127, 0.6);
+}
+
+/* Class làm xám nút sau khi đã nhận */
+.btn-disabled {
+    opacity: 0.5 !important;
+    filter: grayscale(100%);
+    cursor: not-allowed !important;
+}
+
+/* Custom Scrollbar cho Bảng Xếp Hạng */
+.custom-scrollbar::-webkit-scrollbar { width: 8px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: rgba(13, 1, 33, 0.5); border-radius: 10px; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: #00f2fe; border-radius: 10px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #ff007f; }
