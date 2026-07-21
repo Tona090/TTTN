@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LDP Miss & Mister - Hào Khí Du Hiệp</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-dark text-white"> <nav class="navbar py-2 px-4" style="background-color: #8b008b;">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center ms-lg-5 ms-0"> <img src="./TN/iconapp.png" alt="Icon App" style="height: 70px; width: auto;">
+            </div>
+            
+            <div class="d-flex align-items-center gap-4">
+                <a href="#" class="text-white text-decoration-none fs-3 hover-scale"><i class="bi bi-house-door-fill"></i></a>
+                <a href="#" class="text-white text-decoration-none fs-3 hover-scale"><i class="bi bi-facebook"></i></a>
+                <a href="#" class="btn btn-login py-2 px-4">ĐĂNG NHẬP</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-wrapper w-100">
+        
+        <div class="hero-arena position-relative mx-auto">
+            <img src="./TN/Logo-HaoKhiDuHiep.png" class="logo-hao-khi position-absolute start-50 translate-middle-x" alt="Logo Hào Khí">
+            <img src="./TN/text.png" class="logo-miss-mister position-absolute start-50 translate-middle-x" alt="Miss Mister">
+
+            <div class="hero-nav position-absolute start-50 translate-middle-x d-flex justify-content-center align-items-center w-100 gap-3">
+                <img src="./TN/khungdautrang.png" class="nav-bg-frame position-absolute top-50 start-50 translate-middle" alt="Khung nền">
+
+                <img src="./TN/thele.png" class="hero-btn" data-bs-toggle="modal" data-bs-target="#theleModal" alt="Thể Lệ">
+                <img src="./TN/hd.png" class="hero-btn" data-bs-toggle="modal" data-bs-target="#huongdanModal" alt="Hướng Dẫn">
+                
+                <a href="voting.html">
+    <img src="./TN/thamgiangay.png" class="btn-vote mb-4" alt="Tham Gia Ngay">
+</a> <img src="./TN/taigame.png" class="hero-btn" alt="Tải Game">
+                <img src="./TN/napthe.png" class="hero-btn" alt="Nạp Thẻ">
+            </div>
+        </div>
+
+        <div class="container form-arena position-relative" style="z-index: 15;">
+            <div class="text-center mb-5 mt-4">
+                <img src="./TN/đkdt.png" class="title-dkdt" alt="Đăng Ký Dự Thi">
+            </div>
+
+            <div class="row g-4 justify-content-center align-items-start">
+                <div class="col-md-7 d-flex flex-column align-items-center">
+                    <div class="upload-box-main position-relative mb-4 w-100 text-center">
+                        <input type="file" id="mainImage" class="d-none">
+                        <label for="mainImage" class="cursor-pointer w-100 h-100 d-block">
+                            <img src="./TN/themanh.png" alt="Thêm ảnh chính" class="img-fluid w-100 h-100 object-fit-fill hover-scale">
+                        </label>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between gap-3 w-100 upload-sub-container">
+                        <div class="upload-box-sub position-relative flex-fill">
+                            <input type="file" class="d-none" id="subImg1">
+                            <label for="subImg1" class="cursor-pointer w-100 h-100 d-block">
+                                <img src="./TN/themanhnho.png" class="img-fluid w-100 h-100 object-fit-fill hover-scale">
+                            </label>
+                        </div>
+                        <div class="upload-box-sub position-relative flex-fill">
+                            <input type="file" class="d-none" id="subImg2">
+                            <label for="subImg2" class="cursor-pointer w-100 h-100 d-block">
+                                <img src="./TN/themanhnho.png" class="img-fluid w-100 h-100 object-fit-fill hover-scale">
+                            </label>
+                        </div>
+                        <div class="upload-box-sub position-relative flex-fill">
+                            <input type="file" class="d-none" id="subImg3">
+                            <label for="subImg3" class="cursor-pointer w-100 h-100 d-block">
+                                <img src="./TN/themanhnho.png" class="img-fluid w-100 h-100 object-fit-fill hover-scale">
+                            </label>
+                        </div>
+                    </div>
+                    <p class="text-white mt-3 fst-italic w-100 text-center fs-4">*Bắt buộc phải đăng ký đủ 4 ảnh dự thi</p>
+                </div>
+
+                <div class="col-lg-5 ps-md-4">
+                    <div class="text-white mb-4 fs-4">
+                        <p class="mb-2">Nhân vật: <strong class="text-warning">Lục Trà Bạc Hà</strong></p>
+                        <p class="mb-2">Bang hội: <strong class="text-warning">Lạc Viên</strong></p>
+                        <p class="mb-2">Máy chủ: <strong class="text-warning">S1 - Lý Bạch</strong></p>
+                    </div>
+
+                    <div class="d-flex gap-4 mb-4 align-items-center">
+                        <label class="cursor-pointer d-flex align-items-center gap-2">
+                            <input type="radio" name="gender" value="miss" class="custom-radio" checked>
+                            <img src="./TN/thimiss.png" alt="Thi Miss" class="radio-img">
+                        </label>
+                        <label class="cursor-pointer d-flex align-items-center gap-2">
+                            <input type="radio" name="gender" value="misster" class="custom-radio">
+                            <img src="./TN/thimisster.png" alt="Thi Misster" class="radio-img opacity-50">
+                        </label>
+                    </div>
+
+                    <form class="custom-form w-100 mx-auto" style="max-width: 512px;">
+                        <input type="text" class="form-control custom-input mb-4" placeholder="Nhập địa chỉ liên hệ nhận thưởng">
+                        <div class="row g-2 mb-4">
+                            <div class="col-6"><input type="text" class="form-control custom-input" placeholder="Nhập số điện thoại"></div>
+                            <div class="col-6"><select class="form-select custom-input text-muted"><option>Chọn khu vực</option></select></div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="text-white fw-medium fs-5 mb-2">Nhập ảnh CMND/CCCD mặt trước và sau</label>
+                            <div class="d-flex gap-3">
+                                <label class="cursor-pointer flex-fill"><input type="file" class="d-none"><img src="./TN/mattruoc.png" class="img-fluid w-100 hover-scale"></label>
+                                <label class="cursor-pointer flex-fill"><input type="file" class="d-none"><img src="./TN/matsau.png" class="img-fluid w-100 hover-scale"></label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <textarea class="form-control custom-input" style="height: 112px; resize: none;" placeholder="Nhập nội dung giới thiệu (không quá 300 kí tự)"></textarea>
+                        </div>
+                        <div class="mb-4">
+                            <input type="text" class="form-control custom-input" placeholder="Nhập video dự thi">
+                        </div>
+                        
+                        <div class="d-flex justify-content-between gap-4 mt-5">
+                            <img src="./TN/buttondongy.png" alt="Đồng ý" class="action-btn cursor-pointer flex-fill" data-bs-toggle="modal" data-bs-target="#successModal">
+                            <img src="./TN/buttonhuybo.png" alt="Hủy bỏ" class="action-btn cursor-pointer flex-fill">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="theleModal" tabindex="-1"><div class="modal-dialog modal-xl modal-dialog-centered"><div class="modal-content bg-transparent border-0"><div class="modal-body p-0 text-center position-relative"><img src="./TN/popup_thele.png" class="img-fluid w-100"><button type="button" class="btn-close-invisible position-absolute bg-transparent border-0" data-bs-dismiss="modal" style="top: 14%; right: 6%; width: 60px; height: 60px;"></button></div></div></div></div>
+    <div class="modal fade" id="huongdanModal" tabindex="-1"><div class="modal-dialog modal-xl modal-dialog-centered"><div class="modal-content bg-transparent border-0"><div class="modal-body p-0 text-center position-relative"><img src="./TN/popup_huongdan.png" class="img-fluid w-100"><button type="button" class="btn-close-invisible position-absolute bg-transparent border-0" data-bs-dismiss="modal" style="top: 14%; right: 6%; width: 60px; height: 60px;"></button></div></div></div></div>
+    
+    <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 bg-transparent position-relative">
+                <img src="./TN/popupthongbao.png" class="img-fluid" alt="Đăng ký thành công">
+                
+                <div class="position-absolute top-50 start-50 translate-middle text-white text-center w-100 fs-4 fw-bold" style="letter-spacing: 1px;">
+                    ĐÃ ĐĂNG KÝ THÀNH CÔNG
+                </div>
+
+                <button type="button" data-bs-dismiss="modal" class="position-absolute bg-transparent border-0 hover-scale" style="top: 8%; right: 6%; color: #ff1493; font-size: 2.5rem; text-shadow: 0 0 15px rgba(255, 20, 147, 0.8); z-index: 1050;">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.querySelectorAll('input[name="gender"]').forEach((radio) => {
+            radio.addEventListener('change', function() {
+                document.querySelectorAll('.radio-img').forEach(img => img.classList.add('opacity-50'));
+                this.nextElementSibling.classList.remove('opacity-50');
+            });
+        });
+    </script>
+</body>
+</html>
