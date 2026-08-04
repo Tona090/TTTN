@@ -1,0 +1,6 @@
+{
+  "name": "Fullstack E-Commerce Graduation Platform",
+  "description": "Website Thương mại điện tử Fullstack (Client & Admin) phục vụ đồ án tốt nghiệp với đầy đủ các chức năng quản lý sản phẩm, danh mục, banner, tin tức, giỏ hàng, phân quyền JWT và cài đặt giao diện.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

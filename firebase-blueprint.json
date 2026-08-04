@@ -1,0 +1,69 @@
+{
+  "entities": {
+    "products": {
+      "title": "Products",
+      "description": "Sản phẩm cửa hàng TechGear",
+      "properties": {
+        "id": { "type": "number" },
+        "name": { "type": "string" },
+        "sku": { "type": "string" },
+        "category_id": { "type": "number" },
+        "category_name": { "type": "string" },
+        "price": { "type": "number" },
+        "sale_price": { "type": "number" },
+        "quantity": { "type": "number" },
+        "cost_price": { "type": "number" },
+        "image": { "type": "string" },
+        "description": { "type": "string" },
+        "is_new": { "type": "boolean" },
+        "is_sale": { "type": "boolean" },
+        "is_best": { "type": "boolean" }
+      },
+      "required": ["name", "price", "quantity"]
+    },
+    "categories": {
+      "title": "Categories",
+      "description": "Danh mục sản phẩm",
+      "properties": {
+        "id": { "type": "number" },
+        "name": { "type": "string" },
+        "slug": { "type": "string" },
+        "description": { "type": "string" }
+      },
+      "required": ["name"]
+    },
+    "orders": {
+      "title": "Orders",
+      "description": "Đơn hàng mua sắm",
+      "properties": {
+        "id": { "type": "number" },
+        "customer_name": { "type": "string" },
+        "customer_email": { "type": "string" },
+        "customer_phone": { "type": "string" },
+        "shipping_address": { "type": "string" },
+        "total_amount": { "type": "number" },
+        "status": { "type": "string" },
+        "payment_method": { "type": "string" },
+        "created_at": { "type": "string" }
+      },
+      "required": ["customer_name", "total_amount", "status"]
+    },
+    "stock_logs": {
+      "title": "Stock Logs",
+      "description": "Nhật ký nhập xuất kho hàng",
+      "properties": {
+        "id": { "type": "number" },
+        "product_id": { "type": "number" },
+        "product_name": { "type": "string" },
+        "sku": { "type": "string" },
+        "type": { "type": "string" },
+        "quantity_change": { "type": "number" },
+        "new_quantity": { "type": "number" },
+        "note": { "type": "string" },
+        "created_at": { "type": "string" },
+        "created_by": { "type": "string" }
+      },
+      "required": ["product_id", "type", "quantity_change"]
+    }
+  }
+}
