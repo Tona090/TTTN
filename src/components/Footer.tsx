@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, Truck, RotateCcw, Headphones, Heart, CreditCard } from 'lucide-react';
+import { ShieldCheck, Truck, RotateCcw, Headphones } from 'lucide-react';
 import { SiteSettings } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -76,14 +76,14 @@ export const Footer: React.FC<Props> = ({ settings }) => {
 
         <div>
           <h4 className="font-extrabold text-slate-900 dark:text-white text-xs uppercase tracking-wider mb-3 text-blue-600 dark:text-blue-400">
-            {lang === 'vi' ? 'ĐỒ ÁN TỐT NGHIỆP FULLSTACK' : 'GRADUATION PROJECT'}
+            {lang === 'vi' ? 'HỖ TRỢ KHÁCH HÀNG' : 'CUSTOMER SUPPORT'}
           </h4>
-          <ul className="space-y-2 text-xs text-slate-700 dark:text-slate-300">
-            <li>🎓 {lang === 'vi' ? 'Đồ Án Tốt Nghiệp Ecommerce' : 'Ecommerce Graduation Project'}</li>
-            <li>👨‍🏫 {lang === 'vi' ? 'GVHD: Giảng Viên Hướng Dẫn' : 'Supervisor: Project Advisor'}</li>
-            <li>👨‍💻 {lang === 'vi' ? 'SV TH: Nguyễn Minh Toàn' : 'Developer: Nguyen Minh Toan'}</li>
-            <li>💻 React 19 + Express.js + MySQL</li>
-            <li>⚡ RESTful API & {lang === 'vi' ? 'Chức Năng Quản Trị Full CRUD' : 'Full CRUD Admin Management'}</li>
+          <ul className="space-y-2 text-xs">
+            <li><a href="#" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">{lang === 'vi' ? 'Chính Sách Bảo Hành & Đổi Trả' : 'Warranty & Return Policy'}</a></li>
+            <li><a href="#" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">{lang === 'vi' ? 'Hướng Dẫn Mua Hàng & Build PC' : 'Buying & PC Building Guide'}</a></li>
+            <li><a href="#" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">{lang === 'vi' ? 'Phương Thức Thanh Toán & Trả Góp' : 'Payment & Installment Methods'}</a></li>
+            <li><a href="#" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">{lang === 'vi' ? 'Chính Sách Vận Chuyển Giao Hàng' : 'Shipping & Delivery Policy'}</a></li>
+            <li><a href="#" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">{lang === 'vi' ? 'Bảo Mật Thông Tin Khách Hàng' : 'Customer Privacy Policy'}</a></li>
           </ul>
         </div>
 
@@ -122,8 +122,8 @@ export const Footer: React.FC<Props> = ({ settings }) => {
 
       {/* Copyright Bottom Bar */}
       <div className="border-t border-slate-200 dark:border-slate-800/80 py-4 text-center text-[11px] text-slate-500 bg-slate-100 dark:bg-slate-950 transition-colors">
-        <p className="flex items-center justify-center gap-1">
-          © 2026 {settings.logoText || 'TECHGEAR'} Storefront & Administration Platform. Built with <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500" /> React & Express.
+        <p>
+          © 2026 {settings.logoText || 'TECHGEAR'} Store. Tất cả quyền được bảo lưu. Hệ thống phân phối linh kiện PC & Gear hàng đầu.
         </p>
       </div>
 
