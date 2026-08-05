@@ -274,11 +274,23 @@ export const OrderManager: React.FC = () => {
                     <td className="p-3.5">
                       {order.payment_method === 'VIETQR' ? (
                         <span className="px-2 py-0.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold rounded text-[10px] flex items-center gap-1 w-fit">
-                          <QrCode className="w-3 h-3" /> VietQR
+                          <QrCode className="w-3 h-3" /> VietQR 24/7
+                        </span>
+                      ) : order.payment_method === 'VNPAY' ? (
+                        <span className="px-2 py-0.5 bg-red-500/10 text-red-600 dark:text-red-400 font-bold rounded text-[10px] w-fit">
+                          VNPAY QR
                         </span>
                       ) : order.payment_method === 'MOMO' ? (
                         <span className="px-2 py-0.5 bg-pink-500/10 text-pink-600 dark:text-pink-400 font-bold rounded text-[10px] w-fit">
                           Ví MoMo
+                        </span>
+                      ) : order.payment_method === 'CARD' ? (
+                        <span className="px-2 py-0.5 bg-purple-500/10 text-purple-600 dark:text-purple-400 font-bold rounded text-[10px] w-fit">
+                          Thẻ Quốc Tế
+                        </span>
+                      ) : order.payment_method === 'INSTALLMENT' ? (
+                        <span className="px-2 py-0.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold rounded text-[10px] w-fit">
+                          Trả Góp 0% ({order.installment_months || 6}T)
                         </span>
                       ) : (
                         <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold rounded text-[10px] w-fit">

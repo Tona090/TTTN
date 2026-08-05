@@ -303,7 +303,8 @@ export async function createOrder(orderData: {
   shipping_address: string;
   phone: string;
   user_name: string;
-  payment_method?: 'COD' | 'VIETQR' | 'MOMO';
+  payment_method?: string;
+  installment_months?: number;
   note?: string;
   voucher_code?: string;
   discount_amount?: number;

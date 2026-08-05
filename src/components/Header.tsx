@@ -27,6 +27,7 @@ import {
 import { User, SiteSettings, Category } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { getStoreMetadata } from '../services/storeMetadata';
+import { TechGearLogo } from './TechGearLogo';
 
 interface Props {
   user: User | null;
@@ -142,24 +143,9 @@ export const Header: React.FC<Props> = ({
                 setActiveView('client');
                 setCurrentTab('home');
               }}
-              className="flex items-center space-x-2 text-left group"
+              className="flex items-center text-left group hover:opacity-95 transition-opacity"
             >
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-tr from-orange-500 via-amber-500 to-yellow-400 flex items-center justify-center text-slate-950 font-black text-2xl shadow-md shadow-orange-500/20 group-hover:scale-105 transition-transform border border-amber-300">
-                ⚡
-              </div>
-              <div>
-                <div className="flex items-center gap-1">
-                  <span className="text-xl font-black tracking-tight text-slate-900 dark:text-white uppercase font-mono">
-                    {settings.logoText || 'TECHGEAR'}
-                  </span>
-                  <span className="px-1.5 py-0.5 rounded bg-orange-500 text-slate-950 text-[10px] font-black uppercase tracking-wider">
-                    STORE
-                  </span>
-                </div>
-                <span className="block text-[10px] text-slate-500 dark:text-slate-400 font-semibold tracking-wider">
-                  Tech Hardware & Gear Hub
-                </span>
-              </div>
+              <TechGearLogo variant="full" size="md" showSubtitle={true} />
             </button>
           </div>
 

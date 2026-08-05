@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { User } from '../../types';
 import { useLanguage } from '../../context/LanguageContext';
+import { TechGearLogo } from '../TechGearLogo';
 
 interface Props {
   user: User | null;
@@ -94,16 +95,8 @@ export const AdminLayout: React.FC<Props> = ({
       <aside className="w-64 bg-slate-900 text-slate-300 hidden md:flex flex-col border-r border-slate-800">
         
         {/* Sidebar Header */}
-        <div className="p-6 border-b border-slate-800 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-black text-base shadow-md">
-              A
-            </div>
-            <div>
-              <h2 className="font-extrabold text-white text-sm">Admin Portal</h2>
-              <span className="text-[10px] text-blue-400 font-semibold block">TechGear Management</span>
-            </div>
-          </div>
+        <div className="p-5 border-b border-slate-800 flex items-center justify-between">
+          <TechGearLogo variant="full" size="sm" showSubtitle={false} />
         </div>
 
         {/* Current User Badge */}

@@ -2,6 +2,7 @@ import React from 'react';
 import { ShieldCheck, Truck, RotateCcw, Headphones } from 'lucide-react';
 import { SiteSettings } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { TechGearLogo } from './TechGearLogo';
 
 interface Props {
   settings: SiteSettings;
@@ -43,11 +44,8 @@ export const Footer: React.FC<Props> = ({ settings }) => {
       <div className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-4 gap-8">
         
         <div className="space-y-3">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-orange-500 to-amber-500 flex items-center justify-center text-slate-950 font-black text-lg">
-              ⚡
-            </div>
-            <span className="text-base font-black text-slate-900 dark:text-white font-mono uppercase tracking-wider">{settings.logoText || 'TECHGEAR'} STORE</span>
+          <div className="flex items-center">
+            <TechGearLogo variant="full" size="md" showSubtitle={true} />
           </div>
           <p className="text-slate-600 dark:text-slate-400 text-xs leading-relaxed">
             {lang === 'vi' 

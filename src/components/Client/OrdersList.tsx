@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Package, Clock, CheckCircle2, Truck, XCircle, ChevronDown, ChevronUp, 
-  Search, FileText, Download, ShieldCheck, MapPin, Phone, User as UserIcon, AlertCircle, RefreshCw
+  Search, FileText, Download, ShieldCheck, MapPin, Phone, User as UserIcon, AlertCircle, RefreshCw, CreditCard
 } from 'lucide-react';
 import { Order, User } from '../../types';
 import { fetchOrders, cancelCustomerOrder } from '../../services/api';
@@ -25,12 +25,22 @@ export const OrdersList: React.FC<Props> = ({ user }) => {
   const [submittingCancel, setSubmittingCancel] = useState<boolean>(false);
 
   const loadCustomerOrders = () => {
+    setLoading(true);
     if (user) {
-      setLoading(true);
       fetchOrders()
         .then(setOrders)
         .catch(console.error)
         .finally(() => setLoading(false));
+    } else {
+      // Guest user: Load orders created in local guest session
+      try {
+        const localGuestOrders = JSON.parse(localStorage.getItem('techgear_guest_orders') || '[]');
+        setOrders(localGuestOrders);
+      } catch (e) {
+        setOrders([]);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -323,7 +333,7 @@ Cảm ơn quý khách đã mua sắm tại TechGear!
                     </div>
 
                     {/* Info Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-300">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-300">
                       <div>
                         <p className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-white mb-0.5">
                           <MapPin className="w-3.5 h-3.5 text-orange-500" /> Địa chỉ giao hàng:
@@ -333,9 +343,24 @@ Cảm ơn quý khách đã mua sắm tại TechGear!
 
                       <div>
                         <p className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-white mb-0.5">
-                          <Phone className="w-3.5 h-3.5 text-blue-500" /> Số điện thoại người nhận:
+                          <Phone className="w-3.5 h-3.5 text-blue-500" /> Số điện thoại:
                         </p>
                         <p className="pl-5 text-slate-500">{order.phone}</p>
+                      </div>
+
+                      <div>
+                        <p className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-white mb-0.5">
+                          <CreditCard className="w-3.5 h-3.5 text-purple-500" /> Thanh toán:
+                        </p>
+                        <p className="pl-5 text-slate-500 font-semibold">
+                          {order.payment_method === 'COD' && '💵 Thanh toán khi nhận hàng (COD)'}
+                          {order.payment_method === 'VIETQR' && '🏦 Chuyển khoản VietQR 24/7'}
+                          {order.payment_method === 'VNPAY' && '💳 Cổng VNPAY QR'}
+                          {order.payment_method === 'MOMO' && '👛 Ví MoMo Pay'}
+                          {order.payment_method === 'CARD' && '💳 Thẻ Tín Dụng Quốc Tế'}
+                          {order.payment_method === 'INSTALLMENT' && `📊 Trả Góp 0% (${order.installment_months || 6}T)`}
+                          {!['COD', 'VIETQR', 'VNPAY', 'MOMO', 'CARD', 'INSTALLMENT'].includes(order.payment_method || '') && (order.payment_method || 'Thanh toán trực tiếp')}
+                        </p>
                       </div>
                     </div>
 
