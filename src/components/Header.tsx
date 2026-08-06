@@ -96,18 +96,17 @@ export const Header: React.FC<Props> = ({
           </div>
 
           <div className="flex items-center space-x-3.5">
-            {user && (
-              <button
-                onClick={() => {
-                  setActiveView('client');
-                  setCurrentTab('orders');
-                }}
-                className="hover:text-slate-900 dark:hover:text-white flex items-center gap-1 transition-colors font-medium"
-              >
-                <PackageCheck className="w-3.5 h-3.5 text-blue-500" />
-                <span>{t('nav.track_order', 'Tra Cứu Đơn Hàng')}</span>
-              </button>
-            )}
+            <button
+              onClick={() => {
+                setActiveView('client');
+                setCurrentTab('orders');
+              }}
+              className="hover:text-slate-900 dark:hover:text-white flex items-center gap-1 transition-colors font-medium text-blue-600 dark:text-blue-400"
+              title="Tra cứu đơn hàng vãng lai hoặc tài khoản"
+            >
+              <PackageCheck className="w-3.5 h-3.5 text-blue-500" />
+              <span>{t('nav.track_order', 'Tra Cứu Đơn Hàng')}</span>
+            </button>
 
             {/* Language Switcher */}
             <button
@@ -380,10 +379,10 @@ export const Header: React.FC<Props> = ({
 
               <button
                 onClick={() => setCurrentTab('products')}
-                className="px-3 py-2.5 text-orange-600 dark:text-orange-400 hover:text-orange-500 flex items-center gap-1 font-black"
+                className="px-3 py-2.5 text-orange-600 dark:text-orange-400 hover:text-orange-500 flex items-center gap-1 font-bold"
               >
                 <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />
-                <span>SHELL SHOCKER DEALS</span>
+                <span>KHUYẾN MÃI HOT</span>
               </button>
 
               <button
@@ -402,14 +401,24 @@ export const Header: React.FC<Props> = ({
                   currentTab === 'news' ? 'text-orange-600 dark:text-orange-400 border-b-2 border-orange-500' : 'text-slate-700 dark:text-slate-200'
                 }`}
               >
-                {t('nav.news', 'TIN TỨC BLOG')}
+                {t('nav.news', 'TIN TỨC')}
+              </button>
+
+              <button
+                onClick={() => setCurrentTab('orders')}
+                className={`px-3 py-2.5 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-1.5 transition-colors ${
+                  currentTab === 'orders' ? 'text-emerald-600 dark:text-emerald-400 border-b-2 border-emerald-500 font-black' : 'text-emerald-600 dark:text-emerald-400 font-bold'
+                }`}
+              >
+                <PackageCheck className="w-4 h-4 text-emerald-500" />
+                <span>TRA CỨU ĐƠN</span>
               </button>
 
             </div>
 
             <div className="text-[11px] text-slate-400 flex items-center gap-2">
               <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span>{lang === 'vi' ? 'Chính Hãng 100% | Cam Kết Đổi Trả 30 Ngày' : '100% Authentic | 30-Day Easy Returns'}</span>
+              <span>{lang === 'vi' ? 'Hàng Chính Hãng • Bảo Hành Uy Tín' : '100% Authentic • Full Warranty'}</span>
             </div>
 
           </div>
@@ -474,6 +483,13 @@ export const Header: React.FC<Props> = ({
             >
               {t('nav.news', 'Tin Tức & Đánh Giá')}
             </button>
+            <button
+              onClick={() => { setCurrentTab('orders'); setMobileMenuOpen(false); }}
+              className="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800 text-emerald-400 font-bold flex items-center gap-1.5"
+            >
+              <PackageCheck className="w-4 h-4 text-emerald-400" />
+              <span>{t('nav.track_order', 'Tra Cứu Đơn Hàng')}</span>
+            </button>
             {!user && (
               <button
                 onClick={() => { setActiveView('auth'); setMobileMenuOpen(false); }}
@@ -481,14 +497,6 @@ export const Header: React.FC<Props> = ({
               >
                 <UserIcon className="w-4 h-4 text-orange-400" />
                 <span>{t('nav.login', 'Đăng Nhập')}</span>
-              </button>
-            )}
-            {user && (
-              <button
-                onClick={() => { setCurrentTab('orders'); setMobileMenuOpen(false); }}
-                className="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800 text-blue-400"
-              >
-                {t('nav.track_order', 'Đơn Hàng Của Tôi')}
               </button>
             )}
           </div>

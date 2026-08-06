@@ -291,7 +291,7 @@ export default function App() {
           </main>
 
           {/* Footer */}
-          <Footer settings={settings} />
+          <Footer settings={settings} onNavigateTab={(tab) => handleNavigateTab(tab)} />
 
           {/* AI Advisor Chatbot Floating Widget */}
           <AIChatAssistant

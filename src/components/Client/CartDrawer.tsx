@@ -3,10 +3,10 @@ import {
   X, Trash2, ShoppingBag, CreditCard, CheckCircle2, ArrowRight, Tag, 
   QrCode, DollarSign, Wallet, ShieldCheck, Copy, Check, Lock, Building2,
   Percent, Sparkles, Clock, Smartphone, BadgePercent, Printer, ArrowLeft,
-  User as UserIcon, LogIn, UserCheck
+  User as UserIcon, LogIn, UserCheck, Loader2, RefreshCw, Upload, Image as ImageIcon, FileText, Eye, Mail, Send
 } from 'lucide-react';
 import { Product, User, SiteSettings } from '../../types';
-import { createOrder, fetchSettings } from '../../services/api';
+import { createOrder, fetchSettings, notifyTransfer, sendReceiptEmail } from '../../services/api';
 import { useLanguage } from '../../context/LanguageContext';
 
 interface Props {
@@ -36,8 +36,15 @@ export const CartDrawer: React.FC<Props> = ({
   const [step, setStep] = useState<'cart' | 'checkout' | 'success'>('cart');
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState(user?.email || '');
   const [fullName, setFullName] = useState(user?.name || '');
   const [orderNote, setOrderNote] = useState('');
+  
+  // Email receipt delivery state
+  const [receiptEmailInput, setReceiptEmailInput] = useState('');
+  const [emailSending, setEmailSending] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [emailSuccessMsg, setEmailSuccessMsg] = useState<string | null>(null);
   
   // Payment Method Selection
   type PaymentMethod = 'COD' | 'VIETQR' | 'MOMO' | 'VNPAY' | 'CARD' | 'INSTALLMENT';
@@ -61,12 +68,16 @@ export const CartDrawer: React.FC<Props> = ({
   const [placedOrderInfo, setPlacedOrderInfo] = useState<any | null>(null);
   const [copiedAccount, setCopiedAccount] = useState(false);
   const [paymentVerified, setPaymentVerified] = useState(false);
+  const [transferStatus, setTransferStatus] = useState<'idle' | 'verifying' | 'notified'>('idle');
+  const [receiptImage, setReceiptImage] = useState<string | null>(null);
   const [settings, setSettings] = useState<SiteSettings | null>(propSettings || null);
 
   // Reset form & payment state whenever drawer is opened or user changes
   useEffect(() => {
     if (isOpen) {
       setPaymentVerified(false);
+      setTransferStatus('idle');
+      setReceiptImage(null);
       setError(null);
 
       if (user) {
@@ -90,9 +101,62 @@ export const CartDrawer: React.FC<Props> = ({
     }
   }, [isOpen, user]);
 
+  const handleReceiptUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Dung lượng ảnh tối đa 5MB');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setReceiptImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleNotifyTransfer = async () => {
+    if (!placedOrderInfo?.id) return;
+    setTransferStatus('verifying');
+    try {
+      await new Promise(r => setTimeout(r, 800));
+      await notifyTransfer(placedOrderInfo.id, receiptImage || undefined);
+      setTransferStatus('notified');
+      setPaymentVerified(true);
+
+      if (placedOrderInfo) {
+        setPlacedOrderInfo({
+          ...placedOrderInfo,
+          payment_status: 'pending_verification',
+          payment_receipt_url: receiptImage || placedOrderInfo.payment_receipt_url
+        });
+      }
+
+      if (!user) {
+        try {
+          const guestOrders = JSON.parse(localStorage.getItem('techgear_guest_orders') || '[]');
+          const updated = guestOrders.map((o: any) => o.id === placedOrderInfo.id ? { 
+            ...o, 
+            payment_status: 'pending_verification',
+            payment_receipt_url: receiptImage || o.payment_receipt_url
+          } : o);
+          localStorage.setItem('techgear_guest_orders', JSON.stringify(updated));
+        } catch (e) {
+          console.error('Error updating guest order transfer status:', e);
+        }
+      }
+    } catch (err) {
+      setTransferStatus('notified');
+      setPaymentVerified(true);
+    }
+  };
+
   const handleCloseDrawer = () => {
     setStep('cart');
     setPaymentVerified(false);
+    setTransferStatus('idle');
+    setReceiptImage(null);
     setPlacedOrderInfo(null);
     setError(null);
     onClose();
@@ -145,10 +209,30 @@ export const CartDrawer: React.FC<Props> = ({
 
   const handleCheckoutSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!address || !phone || !fullName) {
+    const cleanName = fullName.trim();
+    const cleanPhone = phone.trim();
+    const cleanAddress = address.trim();
+
+    if (!cleanName || cleanName.length < 3) {
       setError(lang === 'vi' 
-        ? 'Vui lòng điền đầy đủ họ tên, số điện thoại và địa chỉ nhận hàng.' 
-        : 'Please fill in full name, phone number, and delivery address.');
+        ? 'Họ và tên người nhận không hợp lệ! Vui lòng nhập tối thiểu 3 ký tự (Ví dụ: Nguyễn Văn A).' 
+        : 'Invalid recipient name! Please enter at least 3 characters.');
+      return;
+    }
+
+    // Strict regex check for Vietnamese mobile numbers (10 digits starting with 03, 05, 07, 08, 09)
+    const phoneRegex = /^(03|05|07|08|09)+[0-9]{8}$/;
+    if (!phoneRegex.test(cleanPhone)) {
+      setError(lang === 'vi' 
+        ? 'Số điện thoại không hợp lệ! Vui lòng nhập đúng 10 chữ số di động Việt Nam (Ví dụ: 0398933652 hoặc 0908123456).' 
+        : 'Invalid phone number! Please enter a valid 10-digit phone number starting with 03, 05, 07, 08, 09.');
+      return;
+    }
+
+    if (!cleanAddress || cleanAddress.length < 10) {
+      setError(lang === 'vi' 
+        ? 'Địa chỉ giao hàng quá ngắn! Vui lòng nhập chi tiết Số nhà, Tên đường, Phường/Xã, Quận/Huyện, Tỉnh/Thành phố (Tối thiểu 10 ký tự).' 
+        : 'Shipping address is too short! Please enter house number, street, ward, and city (Min 10 characters).');
       return;
     }
 
@@ -159,8 +243,8 @@ export const CartDrawer: React.FC<Props> = ({
 
     setLoading(true);
     setError(null);
-    // Explicitly reset payment verification status to false for the new order
     setPaymentVerified(false);
+    setTransferStatus('idle');
 
     try {
       const orderData = await createOrder({
@@ -174,6 +258,7 @@ export const CartDrawer: React.FC<Props> = ({
         total_amount: totalAmount,
         shipping_address: address,
         phone,
+        email: email.trim(),
         user_name: fullName,
         payment_method: paymentMethod,
         installment_months: paymentMethod === 'INSTALLMENT' ? installmentMonths : undefined,
@@ -182,15 +267,13 @@ export const CartDrawer: React.FC<Props> = ({
         discount_amount: discountAmount
       });
 
-      // If placing as guest user, store order in localStorage so guest can track it
-      if (!user) {
-        try {
-          const existingGuestOrders = JSON.parse(localStorage.getItem('techgear_guest_orders') || '[]');
-          existingGuestOrders.unshift(orderData);
-          localStorage.setItem('techgear_guest_orders', JSON.stringify(existingGuestOrders.slice(0, 20)));
-        } catch (err) {
-          console.error('Error saving guest order locally:', err);
-        }
+      // Always save order in localStorage so guest & logged-in users can access locally
+      try {
+        const existingGuestOrders = JSON.parse(localStorage.getItem('techgear_guest_orders') || '[]');
+        const updated = [orderData, ...existingGuestOrders.filter((o: any) => o.id !== orderData.id)];
+        localStorage.setItem('techgear_guest_orders', JSON.stringify(updated.slice(0, 30)));
+      } catch (err) {
+        console.error('Error saving order locally:', err);
       }
 
       setPlacedOrderInfo({
@@ -198,12 +281,28 @@ export const CartDrawer: React.FC<Props> = ({
         user_name: fullName,
         shipping_address: address,
         phone: phone,
+        email: email.trim() || user?.email || '',
         paymentMethod,
         installmentMonths,
         selectedBank,
         orderNote,
         totalAmount
       });
+
+      setReceiptEmailInput(email.trim() || user?.email || '');
+      setEmailSent(false);
+      setEmailSuccessMsg(null);
+
+      // Auto send receipt email if email is provided
+      const targetEmail = email.trim() || user?.email || '';
+      if (targetEmail && targetEmail.includes('@')) {
+        sendReceiptEmail(orderData.id, targetEmail)
+          .then(res => {
+            setEmailSent(true);
+            setEmailSuccessMsg(res.message);
+          })
+          .catch(console.error);
+      }
 
       // Clear card input fields
       setCardNumber('');
@@ -256,15 +355,15 @@ export const CartDrawer: React.FC<Props> = ({
             )}
             <ShoppingBag className="w-5 h-5 text-orange-500" />
             <div>
-              <h3 className="font-extrabold text-slate-900 dark:text-white text-sm">
+              <h3 className="font-bold text-slate-900 dark:text-white text-sm">
                 {step === 'cart' && `${t('cart.title', 'Giỏ Hàng')} (${cartItems.length})`}
-                {step === 'checkout' && (lang === 'vi' ? 'Thanh Toán & Cổng Chuyển Khoản' : 'Checkout & Payment Portal')}
+                {step === 'checkout' && (lang === 'vi' ? 'Thanh Toán' : 'Checkout')}
                 {step === 'success' && (lang === 'vi' ? 'Hoàn Tất Đơn Hàng' : 'Order Placed')}
               </h3>
               <p className="text-[10px] text-slate-500">
-                {step === 'cart' && 'Kiểm tra sản phẩm & mã khuyến mãi'}
-                {step === 'checkout' && 'Chọn phương thức & thông tin nhận hàng'}
-                {step === 'success' && 'Thông tin thanh toán & hoá đơn điện tử'}
+                {step === 'cart' && 'Kiểm tra sản phẩm & mã giảm giá'}
+                {step === 'checkout' && 'Nhập thông tin giao hàng & thanh toán'}
+                {step === 'success' && 'Thông tin đơn hàng & thanh toán'}
               </p>
             </div>
           </div>
@@ -389,67 +488,64 @@ export const CartDrawer: React.FC<Props> = ({
             <form onSubmit={handleCheckoutSubmit} className="space-y-4">
               {/* User Account / Guest Status Banner */}
               {user ? (
-                <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-xl flex items-center justify-between text-emerald-800 dark:text-emerald-300">
+                <div className="p-2.5 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 rounded-xl flex items-center justify-between text-emerald-800 dark:text-emerald-300">
                   <div className="flex items-center space-x-2">
-                    <UserCheck className="w-4.5 h-4.5 text-emerald-500 shrink-0" />
+                    <UserCheck className="w-4 h-4 text-emerald-500 shrink-0" />
                     <div>
-                      <p className="font-bold text-[11px]">Đang thanh toán với tài khoản: <span className="underline font-extrabold">{user.name}</span></p>
-                      <p className="text-[10px] text-emerald-600 dark:text-emerald-400">{user.email} • Tự động tích điểm & theo dõi đơn hàng</p>
+                      <p className="font-semibold text-xs">Tài khoản: <span className="font-bold">{user.name}</span></p>
+                      <p className="text-[10px] text-emerald-600 dark:text-emerald-400">{user.email}</p>
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-xl flex items-center justify-between text-amber-900 dark:text-amber-200">
+                <div className="p-2.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 rounded-xl flex items-center justify-between text-amber-900 dark:text-amber-200">
                   <div className="flex items-center space-x-2">
-                    <UserIcon className="w-4.5 h-4.5 text-amber-500 shrink-0" />
+                    <UserIcon className="w-4 h-4 text-amber-500 shrink-0" />
                     <div>
-                      <p className="font-bold text-[11px]">Bạn đang mua hàng với tư cách <span className="text-amber-600 dark:text-amber-400 font-extrabold">Khách Vãng Lai</span></p>
-                      <p className="text-[10px] text-amber-700 dark:text-amber-300">Đăng nhập để tích điểm, tự động điền địa chỉ & xem lịch sử đơn hàng.</p>
+                      <p className="font-semibold text-xs">Khách vãng lai</p>
+                      <p className="text-[10px] text-amber-700 dark:text-amber-300">Đăng nhập để tích điểm & tự động điền địa chỉ</p>
                     </div>
                   </div>
                   <button
                     type="button"
                     onClick={onOpenAuth}
-                    className="ml-2 px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold rounded-lg text-[10px] whitespace-nowrap shadow-xs transition-colors flex items-center gap-1 shrink-0"
+                    className="ml-2 px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg text-[10px] whitespace-nowrap shadow-xs transition-colors flex items-center gap-1 shrink-0"
                   >
                     <LogIn className="w-3 h-3" />
-                    <span>Đăng Nhập</span>
+                    <span>Đăng nhập</span>
                   </button>
                 </div>
               )}
 
               {error && (
-                <div className="p-3 text-red-600 bg-red-50 border border-red-200 rounded-xl text-[11px]">
+                <div className="p-2.5 text-red-600 bg-red-50 border border-red-200 rounded-xl text-xs">
                   {error}
                 </div>
               )}
 
               {/* 1. SHIPPING DETAILS */}
-              <div className="space-y-3">
-                <h4 className="font-extrabold text-slate-900 dark:text-white text-xs border-b border-slate-200 dark:border-slate-800 pb-1 flex items-center justify-between">
-                  <span>1. {lang === 'vi' ? 'Thông Tin Nhận Hàng' : 'Shipping Details'}</span>
-                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
-                    <ShieldCheck className="w-3.5 h-3.5" /> Giao hàng toàn quốc
-                  </span>
+              <div className="space-y-2.5">
+                <h4 className="font-bold text-slate-900 dark:text-white text-xs border-b border-slate-200 dark:border-slate-800 pb-1">
+                  1. {lang === 'vi' ? 'Thông tin giao hàng' : 'Shipping Details'}
                 </h4>
 
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    {lang === 'vi' ? 'Họ và tên người nhận *' : 'Full Name *'}
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    {lang === 'vi' ? 'Họ và tên *' : 'Full Name *'}
                   </label>
                   <input
                     type="text"
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    placeholder={lang === 'vi' ? 'Ví dụ: Nguyễn Minh Toàn' : 'e.g. John Doe'}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white"
+                    placeholder={lang === 'vi' ? 'Nguyễn Văn A' : 'e.g. John Doe'}
+                    className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white text-xs focus:ring-1 focus:ring-orange-500 focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    {lang === 'vi' ? 'Số điện thoại nhận hàng *' : 'Phone Number *'}
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    {lang === 'vi' ? 'Số điện thoại *' : 'Phone Number *'}
                   </label>
                   <input
                     type="tel"
@@ -457,44 +553,60 @@ export const CartDrawer: React.FC<Props> = ({
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="0908123456"
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white"
+                    className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white text-xs focus:ring-1 focus:ring-orange-500 focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    {lang === 'vi' ? 'Địa chỉ giao hàng chi tiết *' : 'Delivery Address *'}
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    {lang === 'vi' ? 'Email (không bắt buộc)' : 'Email (optional)'}
+                  </label>
+                  <div className="relative">
+                    <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-2 pointer-events-none" />
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="khachhang@gmail.com"
+                      className="w-full pl-9 pr-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white text-xs focus:ring-1 focus:ring-orange-500 focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    {lang === 'vi' ? 'Địa chỉ giao hàng *' : 'Delivery Address *'}
                   </label>
                   <textarea
                     required
                     rows={2}
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
-                    placeholder={lang === 'vi' ? 'Số nhà, Tên đường, Phường/Xã, Quận/Huyện, Tỉnh/TP...' : 'Street address, city...'}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white"
+                    placeholder={lang === 'vi' ? 'Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/TP...' : 'Street address, city...'}
+                    className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white text-xs focus:ring-1 focus:ring-orange-500 focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    {lang === 'vi' ? 'Ghi chú cho kỹ thuật viên / shipper (Tùy chọn)' : 'Order Note (Optional)'}
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    {lang === 'vi' ? 'Ghi chú (tùy chọn)' : 'Note (optional)'}
                   </label>
                   <input
                     type="text"
                     value={orderNote}
                     onChange={(e) => setOrderNote(e.target.value)}
-                    placeholder={lang === 'vi' ? 'Ví dụ: Cài sẵn Win 11, lắp fan LED, giao giờ hành chính...' : 'e.g. Call before delivery...'}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white"
+                    placeholder={lang === 'vi' ? 'Ví dụ: Giao giờ hành chính, gọi trước khi giao...' : 'e.g. Call before delivery...'}
+                    className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white text-xs focus:ring-1 focus:ring-orange-500 focus:outline-none"
                   />
                 </div>
               </div>
 
               {/* 2. PAYMENT METHODS SELECTION */}
-              <div className="space-y-3 pt-2">
-                <h4 className="font-extrabold text-slate-900 dark:text-white text-xs border-b border-slate-200 dark:border-slate-800 pb-1 flex items-center justify-between">
+              <div className="space-y-2.5 pt-2">
+                <h4 className="font-bold text-slate-900 dark:text-white text-xs border-b border-slate-200 dark:border-slate-800 pb-1 flex items-center justify-between">
                   <span>2. {lang === 'vi' ? 'Phương Thức Thanh Toán' : 'Payment Method'}</span>
-                  <span className="text-[10px] text-orange-500 font-bold flex items-center gap-1">
-                    <Lock className="w-3 h-3" /> Bảo mật SSL 256-bit
+                  <span className="text-[10px] text-slate-400 font-normal flex items-center gap-1">
+                    <Lock className="w-3 h-3 text-slate-400" /> Thanh toán an toàn
                   </span>
                 </h4>
 
@@ -503,24 +615,23 @@ export const CartDrawer: React.FC<Props> = ({
                   {/* VIETQR BANK TRANSFER */}
                   <div
                     onClick={() => setPaymentMethod('VIETQR')}
-                    className={`p-3 rounded-2xl border transition-all cursor-pointer ${
+                    className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
                       paymentMethod === 'VIETQR'
-                        ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-950/40 ring-2 ring-blue-500/20'
-                        : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
+                        ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-950/30 ring-1 ring-blue-500/20'
+                        : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-850'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
-                        <div className="p-2 rounded-xl bg-blue-600 text-white shrink-0">
-                          <QrCode className="w-5 h-5" />
+                        <div className="p-1.5 rounded-lg bg-blue-600 text-white shrink-0">
+                          <QrCode className="w-4 h-4" />
                         </div>
                         <div>
-                          <div className="font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
-                            <span>Chuyển Khoản Ngân Hàng VietQR 24/7</span>
-                            <span className="px-1.5 py-0.2 rounded bg-blue-600 text-white text-[9px] font-black">Khuyên Dùng</span>
+                          <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-1.5">
+                            <span>Chuyển Khoản VietQR 24/7</span>
                           </div>
-                          <p className="text-[10px] text-slate-500">
-                            Mở ứng dụng ngân hàng quét mã QR tự động điền STK & số tiền.
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                            Quét mã QR tự động qua app ngân hàng.
                           </p>
                         </div>
                       </div>
@@ -535,17 +646,17 @@ export const CartDrawer: React.FC<Props> = ({
 
                     {/* Bank selector options when VietQR is selected */}
                     {paymentMethod === 'VIETQR' && (
-                      <div className="mt-3 pt-3 border-t border-blue-200 dark:border-blue-900 space-y-2">
-                        <label className="block text-[11px] font-bold text-blue-900 dark:text-blue-300">
-                          Chọn Ngân Hàng Nhận Chuyển Khoản:
+                      <div className="mt-2.5 pt-2 border-t border-blue-200 dark:border-blue-900 space-y-1.5">
+                        <label className="block text-[10px] font-semibold text-blue-900 dark:text-blue-300">
+                          Ngân hàng nhận khoản:
                         </label>
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                        <div className="grid grid-cols-4 gap-1">
                           {supportedBanks.map(b => (
                             <button
                               key={b.code}
                               type="button"
                               onClick={(e) => { e.stopPropagation(); setSelectedBank(b.name); }}
-                              className={`p-1.5 rounded-xl border text-[10px] font-bold text-center transition-all ${
+                              className={`p-1 rounded-lg border text-[10px] font-semibold text-center transition-all ${
                                 selectedBank === b.name
                                   ? 'border-blue-600 bg-blue-600 text-white shadow-xs'
                                   : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300'
@@ -562,24 +673,23 @@ export const CartDrawer: React.FC<Props> = ({
                   {/* VNPAY */}
                   <div
                     onClick={() => setPaymentMethod('VNPAY')}
-                    className={`p-3 rounded-2xl border transition-all cursor-pointer ${
+                    className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
                       paymentMethod === 'VNPAY'
-                        ? 'border-blue-600 bg-blue-50/50 dark:bg-blue-950/40 ring-2 ring-blue-500/20'
-                        : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
+                        ? 'border-red-500 bg-red-50/50 dark:bg-red-950/30 ring-1 ring-red-500/20'
+                        : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-850'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
-                        <div className="p-2 rounded-xl bg-red-600 text-white shrink-0 font-black text-xs">
+                        <div className="p-1.5 rounded-lg bg-red-600 text-white shrink-0 font-bold text-xs">
                           VN
                         </div>
                         <div>
-                          <div className="font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
-                            <span>Thanh Toán VNPAY QR</span>
-                            <span className="px-1.5 py-0.2 rounded bg-red-500 text-white text-[9px] font-black">Giảm 50K</span>
+                          <div className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-1.5">
+                            <span>VNPAY QR</span>
                           </div>
-                          <p className="text-[10px] text-slate-500">
-                            Cổng VNPAY liên kết 32+ ngân hàng Việt Nam & Ví VNPAY.
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                            Thanh toán qua ứng dụng ngân hàng hoặc ví VNPAY.
                           </p>
                         </div>
                       </div>
@@ -596,23 +706,23 @@ export const CartDrawer: React.FC<Props> = ({
                   {/* MOMO / ZALOPAY */}
                   <div
                     onClick={() => setPaymentMethod('MOMO')}
-                    className={`p-3 rounded-2xl border transition-all cursor-pointer ${
+                    className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
                       paymentMethod === 'MOMO'
-                        ? 'border-pink-500 bg-pink-50/50 dark:bg-pink-950/40 ring-2 ring-pink-500/20'
-                        : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
+                        ? 'border-pink-500 bg-pink-50/50 dark:bg-pink-950/30 ring-1 ring-pink-500/20'
+                        : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-850'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
-                        <div className="p-2 rounded-xl bg-pink-600 text-white shrink-0">
-                          <Wallet className="w-5 h-5" />
+                        <div className="p-1.5 rounded-lg bg-pink-600 text-white shrink-0">
+                          <Wallet className="w-4 h-4" />
                         </div>
                         <div>
-                          <div className="font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
-                            <span>Ví Điện Tử MoMo / ZaloPay</span>
+                          <div className="font-bold text-slate-900 dark:text-white text-xs">
+                            Ví Ví MoMo / ZaloPay
                           </div>
-                          <p className="text-[10px] text-slate-500">
-                            Thanh toán nhanh qua ứng dụng MoMo / ZaloPay với 1 chạm.
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                            Thanh toán nhanh qua ví điện tử.
                           </p>
                         </div>
                       </div>
@@ -629,24 +739,23 @@ export const CartDrawer: React.FC<Props> = ({
                   {/* CREDIT / DEBIT CARD */}
                   <div
                     onClick={() => setPaymentMethod('CARD')}
-                    className={`p-3 rounded-2xl border transition-all cursor-pointer ${
+                    className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
                       paymentMethod === 'CARD'
-                        ? 'border-purple-500 bg-purple-50/50 dark:bg-purple-950/40 ring-2 ring-purple-500/20'
-                        : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
+                        ? 'border-purple-500 bg-purple-50/50 dark:bg-purple-950/30 ring-1 ring-purple-500/20'
+                        : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-850'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
-                        <div className="p-2 rounded-xl bg-purple-600 text-white shrink-0">
-                          <CreditCard className="w-5 h-5" />
+                        <div className="p-1.5 rounded-lg bg-purple-600 text-white shrink-0">
+                          <CreditCard className="w-4 h-4" />
                         </div>
                         <div>
-                          <div className="font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
-                            <span>Thẻ Tín Dụng / Ghi Nợ (Visa, Mastercard, JCB)</span>
-                            <span className="px-1.5 py-0.2 rounded bg-purple-600 text-white text-[9px] font-black">3D Secure</span>
+                          <div className="font-bold text-slate-900 dark:text-white text-xs">
+                            Thẻ Tín Dụng / Ghi Nợ (Visa, Mastercard)
                           </div>
-                          <p className="text-[10px] text-slate-500">
-                            Mã hoá an toàn tiêu chuẩn thẻ quốc tế, xác minh OTP.
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                            Thanh toán an toàn qua thẻ quốc tế.
                           </p>
                         </div>
                       </div>
@@ -661,48 +770,48 @@ export const CartDrawer: React.FC<Props> = ({
 
                     {/* Card Form when Card is selected */}
                     {paymentMethod === 'CARD' && (
-                      <div className="mt-3 pt-3 border-t border-purple-200 dark:border-purple-900 space-y-2.5 text-[11px]" onClick={e => e.stopPropagation()}>
+                      <div className="mt-2.5 pt-2.5 border-t border-purple-200 dark:border-purple-900 space-y-2 text-[11px]" onClick={e => e.stopPropagation()}>
                         <div>
-                          <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Số Thẻ Tín Dụng / Ghi Nợ *</label>
+                          <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-0.5">Số thẻ *</label>
                           <input
                             type="text"
                             placeholder="4123 4567 8901 2345"
                             value={cardNumber}
                             onChange={e => setCardNumber(e.target.value)}
-                            className="w-full px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-mono"
+                            className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg font-mono text-xs"
                           />
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                           <div>
-                            <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Tên Chủ Thẻ *</label>
+                            <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-0.5">Tên chủ thẻ *</label>
                             <input
                               type="text"
-                              placeholder="NGUYEN MINH TOAN"
+                              placeholder="NGUYEN VAN A"
                               value={cardHolder}
                               onChange={e => setCardHolder(e.target.value.toUpperCase())}
-                              className="w-full px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-mono uppercase"
+                              className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg font-mono uppercase text-xs"
                             />
                           </div>
                           <div className="grid grid-cols-2 gap-1">
                             <div>
-                              <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Hạn Dùng</label>
+                              <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-0.5">Hạn dùng</label>
                               <input
                                 type="text"
                                 placeholder="MM/YY"
                                 value={cardExpiry}
                                 onChange={e => setCardExpiry(e.target.value)}
-                                className="w-full px-2 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-mono text-center"
+                                className="w-full px-2 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg font-mono text-center text-xs"
                               />
                             </div>
                             <div>
-                              <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">CVV/CVC</label>
+                              <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-0.5">CVV</label>
                               <input
                                 type="password"
                                 maxLength={4}
                                 placeholder="123"
                                 value={cardCvc}
                                 onChange={e => setCardCvc(e.target.value)}
-                                className="w-full px-2 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl font-mono text-center"
+                                className="w-full px-2 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg font-mono text-center text-xs"
                               />
                             </div>
                           </div>
@@ -714,24 +823,23 @@ export const CartDrawer: React.FC<Props> = ({
                   {/* 0% INSTALLMENT */}
                   <div
                     onClick={() => setPaymentMethod('INSTALLMENT')}
-                    className={`p-3 rounded-2xl border transition-all cursor-pointer ${
+                    className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
                       paymentMethod === 'INSTALLMENT'
-                        ? 'border-amber-500 bg-amber-50/50 dark:bg-amber-950/40 ring-2 ring-amber-500/20'
-                        : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
+                        ? 'border-amber-500 bg-amber-50/50 dark:bg-amber-950/30 ring-1 ring-amber-500/20'
+                        : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-850'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
-                        <div className="p-2 rounded-xl bg-amber-500 text-slate-950 shrink-0 font-extrabold">
-                          <Percent className="w-5 h-5" />
+                        <div className="p-1.5 rounded-lg bg-amber-500 text-slate-950 shrink-0 font-bold">
+                          <Percent className="w-4 h-4" />
                         </div>
                         <div>
-                          <div className="font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
-                            <span>Trả Góp 0% Lãi Suất (Thẻ Tín Dụng / Fundiin)</span>
-                            <span className="px-1.5 py-0.2 rounded bg-amber-500 text-slate-950 text-[9px] font-black">Lãi Suất 0%</span>
+                          <div className="font-bold text-slate-900 dark:text-white text-xs">
+                            Trả Góp 0% Lãi Suất
                           </div>
-                          <p className="text-[10px] text-slate-500">
-                            Chia nhỏ trả hàng tháng qua Thẻ Tín Dụng hoặc Ví Trả Sau Fundiin / Kredivo.
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                            Chia nhỏ trả hàng tháng qua thẻ tín dụng hoặc ví trả sau.
                           </p>
                         </div>
                       </div>
@@ -746,24 +854,24 @@ export const CartDrawer: React.FC<Props> = ({
 
                     {/* Installment breakdown options */}
                     {paymentMethod === 'INSTALLMENT' && (
-                      <div className="mt-3 pt-3 border-t border-amber-200 dark:border-amber-900 space-y-2" onClick={e => e.stopPropagation()}>
-                        <label className="block text-[11px] font-bold text-amber-900 dark:text-amber-300">
-                          Chọn Kỳ Hạn Trả Góp 0% Lãi Suất:
+                      <div className="mt-2.5 pt-2 border-t border-amber-200 dark:border-amber-900 space-y-1.5" onClick={e => e.stopPropagation()}>
+                        <label className="block text-[10px] font-semibold text-amber-900 dark:text-amber-300">
+                          Kỳ hạn trả góp:
                         </label>
-                        <div className="grid grid-cols-4 gap-1.5">
+                        <div className="grid grid-cols-4 gap-1">
                           {[3, 6, 9, 12].map(m => (
                             <button
                               key={m}
                               type="button"
                               onClick={() => setInstallmentMonths(m)}
-                              className={`p-2 rounded-xl border text-[11px] font-bold text-center transition-all ${
+                              className={`p-1.5 rounded-lg border text-[10px] font-bold text-center transition-all ${
                                 installmentMonths === m
-                                  ? 'border-amber-500 bg-amber-500 text-slate-950 font-black shadow-xs'
+                                  ? 'border-amber-500 bg-amber-500 text-slate-950 font-bold shadow-xs'
                                   : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300'
                               }`}
                             >
-                              <div>{m} Tháng</div>
-                              <div className="text-[9px] opacity-80">{formatVND(Math.round(totalAmount / m))}/tháng</div>
+                              <div>{m} tháng</div>
+                              <div className="text-[9px] opacity-80">{formatVND(Math.round(totalAmount / m))}</div>
                             </button>
                           ))}
                         </div>
@@ -774,23 +882,23 @@ export const CartDrawer: React.FC<Props> = ({
                   {/* COD */}
                   <div
                     onClick={() => setPaymentMethod('COD')}
-                    className={`p-3 rounded-2xl border transition-all cursor-pointer ${
+                    className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
                       paymentMethod === 'COD'
-                        ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/40 ring-2 ring-emerald-500/20'
-                        : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
+                        ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/30 ring-1 ring-emerald-500/20'
+                        : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-850'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
-                        <div className="p-2 rounded-xl bg-emerald-600 text-white shrink-0">
-                          <DollarSign className="w-5 h-5" />
+                        <div className="p-1.5 rounded-lg bg-emerald-600 text-white shrink-0">
+                          <DollarSign className="w-4 h-4" />
                         </div>
                         <div>
-                          <div className="font-extrabold text-slate-900 dark:text-white">
+                          <div className="font-bold text-slate-900 dark:text-white text-xs">
                             Thanh Toán Khi Nhận Hàng (COD)
                           </div>
-                          <p className="text-[10px] text-slate-500">
-                            Thanh toán bằng tiền mặt trực tiếp cho Shipper khi giao tới tận nơi.
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                            Thanh toán tiền mặt cho nhân viên giao hàng.
                           </p>
                         </div>
                       </div>
@@ -811,17 +919,17 @@ export const CartDrawer: React.FC<Props> = ({
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 bg-orange-500 hover:bg-orange-600 text-slate-950 font-extrabold rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2 uppercase tracking-wider text-xs"
+                className="w-full py-2.5 bg-orange-500 hover:bg-orange-600 text-slate-950 font-bold rounded-xl shadow-xs transition-all flex items-center justify-center space-x-2 text-xs"
               >
                 {loading 
-                  ? (lang === 'vi' ? 'Đang khởi tạo đơn hàng...' : 'Submitting order...') 
-                  : (lang === 'vi' ? `XÁC NHẬN ĐẶT HÀNG (${formatVND(totalAmount)})` : `CONFIRM ORDER (${formatVND(totalAmount)})`)}
+                  ? (lang === 'vi' ? 'Đang xử lý...' : 'Processing...') 
+                  : (lang === 'vi' ? `Đặt Hàng (${formatVND(totalAmount)})` : `Place Order (${formatVND(totalAmount)})`)}
               </button>
 
               <button
                 type="button"
                 onClick={() => setStep('cart')}
-                className="w-full py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold rounded-xl text-slate-700 dark:text-slate-300 transition-colors"
+                className="w-full py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-medium rounded-xl text-slate-700 dark:text-slate-300 transition-colors text-xs"
               >
                 {lang === 'vi' ? 'Quay lại giỏ hàng' : 'Back to cart'}
               </button>
@@ -868,8 +976,14 @@ export const CartDrawer: React.FC<Props> = ({
                         <QrCode className="w-4 h-4 text-blue-500" />
                         Chuyển Khoản {placedOrderInfo?.paymentMethod === 'VNPAY' ? 'VNPAY QR' : 'VietQR 24/7'}
                       </span>
-                      <span className="px-2 py-0.5 rounded bg-blue-600 text-white font-bold text-[9px]">
-                        {paymentVerified ? 'ĐÃ XÁC NHẬN' : 'CHỜ TỰ ĐỘNG'}
+                      <span className={`px-2 py-0.5 rounded font-bold text-[9px] ${
+                        transferStatus === 'notified' 
+                          ? 'bg-amber-500 text-slate-950 font-black' 
+                          : transferStatus === 'verifying'
+                          ? 'bg-blue-600 text-white flex items-center gap-1'
+                          : 'bg-blue-600 text-white'
+                      }`}>
+                        {transferStatus === 'notified' ? '⏳ CHỜ KẾ TOÁN ĐỐI SOÁT' : transferStatus === 'verifying' ? 'ĐANG ĐỐI SOÁT...' : 'CHỜ TỰ ĐỘNG'}
                       </span>
                     </div>
 
@@ -892,8 +1006,39 @@ export const CartDrawer: React.FC<Props> = ({
                         <p><strong>Số tiền:</strong> <strong className="text-blue-600 dark:text-blue-400">{formatVND(placedOrderInfo?.totalAmount)}</strong></p>
                         <p><strong>Nội dung:</strong> <span className="font-mono bg-white dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700 font-bold">TECHGEAR DON {placedOrderInfo?.id}</span></p>
                         
+                        <div className="pt-2 border-t border-blue-200/60 dark:border-blue-800/60 space-y-2">
+                          <label className="block text-[10px] font-bold text-slate-700 dark:text-slate-300">
+                            📸 Tải ảnh biên lai / Ảnh chụp chuyển khoản (Không bắt buộc):
+                          </label>
+                          {receiptImage ? (
+                            <div className="flex items-center gap-2 p-1.5 bg-white dark:bg-slate-800 rounded-lg border border-blue-300 dark:border-blue-700">
+                              <img src={receiptImage} alt="Biên lai chuyển khoản" className="w-10 h-10 object-cover rounded border" />
+                              <div className="flex-1 min-w-0">
+                                <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 truncate flex items-center gap-1">
+                                  <Check className="w-3 h-3 shrink-0" /> Đã chọn ảnh biên lai
+                                </p>
+                                <p className="text-[9px] text-slate-400">Ảnh sẽ gửi cho Admin xác minh</p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => setReceiptImage(null)}
+                                className="px-1.5 py-0.5 text-[9px] bg-red-100 hover:bg-red-200 text-red-700 rounded font-bold"
+                              >
+                                Xóa
+                              </button>
+                            </div>
+                          ) : (
+                            <label className="flex items-center justify-center gap-2 px-3 py-2 bg-white dark:bg-slate-800 hover:bg-slate-50 border border-dashed border-blue-300 dark:border-blue-700 rounded-xl cursor-pointer text-[10px] text-blue-600 dark:text-blue-400 font-bold transition-colors">
+                              <Upload className="w-3.5 h-3.5" />
+                              <span>Chọn ảnh chụp màn hình bill chuyển tiền</span>
+                              <input type="file" accept="image/*" onChange={handleReceiptUpload} className="hidden" />
+                            </label>
+                          )}
+                        </div>
+
                         <div className="pt-1 flex items-center gap-2">
                           <button
+                            type="button"
                             onClick={() => copyToClipboard(bAcc)}
                             className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[10px] font-bold flex items-center gap-1 transition-colors"
                           >
@@ -901,20 +1046,76 @@ export const CartDrawer: React.FC<Props> = ({
                             <span>{copiedAccount ? 'Đã sao chép STK' : 'Sao Chép STK'}</span>
                           </button>
 
-                          <button
-                            onClick={() => setPaymentVerified(true)}
-                            className={`px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-colors ${
-                              paymentVerified 
-                                ? 'bg-emerald-600 text-white' 
-                                : 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 hover:bg-emerald-500 hover:text-white'
-                            }`}
-                          >
-                            <CheckCircle2 className="w-3 h-3" />
-                            <span>{paymentVerified ? 'Đã xác nhận' : 'Tôi đã chuyển khoản'}</span>
-                          </button>
+                          {transferStatus === 'idle' && (
+                            <button
+                              type="button"
+                              onClick={handleNotifyTransfer}
+                              className="px-2.5 py-1 bg-orange-500 hover:bg-orange-600 text-slate-950 font-extrabold rounded-lg text-[10px] flex items-center gap-1 transition-colors shadow-xs"
+                            >
+                              <CheckCircle2 className="w-3 h-3" />
+                              <span>{receiptImage ? 'Gửi ảnh & Báo đã chuyển' : 'Tôi đã chuyển khoản'}</span>
+                            </button>
+                          )}
+
+                          {transferStatus === 'verifying' && (
+                            <button
+                              disabled
+                              type="button"
+                              className="px-2.5 py-1 bg-blue-500 text-white font-bold rounded-lg text-[10px] flex items-center gap-1 opacity-90 cursor-wait"
+                            >
+                              <Loader2 className="w-3 h-3 animate-spin" />
+                              <span>Đang gửi thông báo...</span>
+                            </button>
+                          )}
+
+                          {transferStatus === 'notified' && (
+                            <span className="px-2.5 py-1 bg-emerald-600 text-white font-bold rounded-lg text-[10px] flex items-center gap-1">
+                              <CheckCircle2 className="w-3 h-3" />
+                              <span>Đã báo chuyển khoản</span>
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
+
+                    {transferStatus === 'notified' && (
+                      <div className="p-3 bg-emerald-50/90 dark:bg-emerald-950/80 border border-emerald-200 dark:border-emerald-800 rounded-xl space-y-1.5 animate-fade-in">
+                        <div className="flex items-center justify-between text-emerald-900 dark:text-emerald-200 font-black text-[11px]">
+                          <span className="flex items-center gap-1.5">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                            Đã gửi thông báo cho Kế Toán đối soát!
+                          </span>
+                          <span className="text-[9px] text-amber-700 dark:text-amber-300 font-bold bg-amber-100 dark:bg-amber-900/60 px-1.5 py-0.5 rounded border border-amber-300/50">
+                            ⏳ Chờ Xác Minh Thanh Toán
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-emerald-800 dark:text-emerald-300 leading-tight">
+                          Đơn hàng <strong className="font-mono font-bold">#{placedOrderInfo?.id}</strong> đang ở trạng thái: <span className="underline font-extrabold">Chờ kế toán đối soát biến động số dư</span>. Quản trị viên sẽ xem xét bill chuyển khoản và kích hoạt đơn hàng trong ít phút.
+                        </p>
+
+                        {(receiptImage || placedOrderInfo?.payment_receipt_url) && (
+                          <div className="mt-2 p-2 bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-800 rounded-lg flex items-center gap-2">
+                            <img src={receiptImage || placedOrderInfo?.payment_receipt_url} alt="Biên lai đã gửi" className="w-12 h-12 object-cover rounded border" />
+                            <div className="text-[10px] flex-1">
+                              <p className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1">
+                                <FileText className="w-3 h-3 text-blue-500" /> Ảnh biên lai đã đính kèm
+                              </p>
+                              <p className="text-[9px] text-slate-500">Kế toán sẽ kiểm tra hình ảnh này để duyệt đơn ngay.</p>
+                            </div>
+                          </div>
+                        )}
+                        <div className="pt-1 flex items-center justify-between text-[10px]">
+                          <button 
+                            type="button"
+                            onClick={handleNotifyTransfer}
+                            className="text-blue-600 dark:text-blue-400 font-bold hover:underline flex items-center gap-1 text-[10px]"
+                          >
+                            <RefreshCw className="w-3 h-3" /> Kiểm tra lại sao kê
+                          </button>
+                          <span className="text-slate-500 dark:text-slate-400 text-[9px]">Hotline / Zalo: 1900-8888</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 );
               })()}
@@ -960,17 +1161,34 @@ export const CartDrawer: React.FC<Props> = ({
                           <span>{copiedAccount ? 'Đã chép SĐT MoMo' : 'Sao chép SĐT'}</span>
                         </button>
 
-                        <button
-                          onClick={() => setPaymentVerified(true)}
-                          className={`px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-colors ${
-                            paymentVerified 
-                              ? 'bg-emerald-600 text-white' 
-                              : 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 hover:bg-emerald-500 hover:text-white'
-                          }`}
-                        >
-                          <CheckCircle2 className="w-3 h-3" />
-                          <span>{paymentVerified ? 'Đã xác nhận' : 'Tôi đã chuyển MoMo'}</span>
-                        </button>
+                        {transferStatus === 'idle' && (
+                          <button
+                            type="button"
+                            onClick={handleNotifyTransfer}
+                            className="px-2.5 py-1 bg-pink-600 hover:bg-pink-700 text-white font-extrabold rounded-lg text-[10px] flex items-center gap-1 transition-colors shadow-xs"
+                          >
+                            <CheckCircle2 className="w-3 h-3" />
+                            <span>Tôi đã chuyển MoMo</span>
+                          </button>
+                        )}
+
+                        {transferStatus === 'verifying' && (
+                          <button
+                            disabled
+                            type="button"
+                            className="px-2.5 py-1 bg-pink-500 text-white font-bold rounded-lg text-[10px] flex items-center gap-1 opacity-90 cursor-wait"
+                          >
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                            <span>Đang đối soát MoMo...</span>
+                          </button>
+                        )}
+
+                        {transferStatus === 'notified' && (
+                          <span className="px-2.5 py-1 bg-emerald-600 text-white font-bold rounded-lg text-[10px] flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3" />
+                            <span>Đã báo chuyển MoMo</span>
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -988,6 +1206,76 @@ export const CartDrawer: React.FC<Props> = ({
                   <p className="text-[10px] text-slate-500">Chuyên viên tư vấn trả góp sẽ liên hệ trực tiếp qua số điện thoại <strong>{placedOrderInfo?.phone}</strong> để xác nhận thủ tục trong 15 phút.</p>
                 </div>
               )}
+
+              {/* E-RECEIPT & EMAIL NOTIFICATION BOX */}
+              <div className="p-3.5 bg-blue-50/80 dark:bg-blue-950/70 border border-blue-200 dark:border-blue-900 rounded-2xl space-y-2 text-[11px]">
+                <div className="flex items-center justify-between">
+                  <span className="font-extrabold text-blue-900 dark:text-blue-200 text-xs flex items-center gap-1.5">
+                    <Mail className="w-4 h-4 text-blue-500" /> Gửi Hóa Đơn Điện Tử & Thông Báo Qua Email
+                  </span>
+                  {emailSent && (
+                    <span className="px-2 py-0.5 bg-emerald-600 text-white font-extrabold rounded text-[9px]">
+                      ✓ Đã Gửi Email
+                    </span>
+                  )}
+                </div>
+
+                <p className="text-[10px] text-slate-600 dark:text-slate-300">
+                  Gửi bản sao hóa đơn, mã đơn <strong className="font-mono font-bold">#{placedOrderInfo?.id}</strong> và link theo dõi tiến độ giao hàng về email người nhận.
+                </p>
+
+                <div className="flex items-center gap-2 pt-1">
+                  <input
+                    type="email"
+                    value={receiptEmailInput}
+                    onChange={(e) => setReceiptEmailInput(e.target.value)}
+                    placeholder="Nhập email của bạn..."
+                    className="flex-1 px-3 py-1.5 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 rounded-xl text-slate-900 dark:text-white text-xs"
+                  />
+                  <button
+                    type="button"
+                    disabled={emailSending}
+                    onClick={async () => {
+                      const target = receiptEmailInput.trim() || placedOrderInfo?.email || email || user?.email || '';
+                      if (!target || !target.includes('@')) {
+                        alert('Vui lòng nhập địa chỉ email hợp lệ');
+                        return;
+                      }
+                      setEmailSending(true);
+                      try {
+                        const res = await sendReceiptEmail(placedOrderInfo?.id, target);
+                        setEmailSent(true);
+                        setEmailSuccessMsg(res.message || `Đã gửi hóa đơn về ${target}`);
+                      } catch (err: any) {
+                        alert('Lỗi: ' + (err.message || 'Chưa gửi được email'));
+                      } finally {
+                        setEmailSending(false);
+                      }
+                    }}
+                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center gap-1 shrink-0 transition-colors shadow-xs"
+                  >
+                    {emailSending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                    <span>{emailSending ? 'Đang gửi...' : 'Gửi Email Bill'}</span>
+                  </button>
+                </div>
+
+                {emailSuccessMsg && (
+                  <div className="p-2 bg-emerald-500/15 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 rounded-xl text-[10px] font-semibold flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                    <span>{emailSuccessMsg}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* GUEST REASSURANCE NOTICE */}
+              <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-2xl text-[10px] text-amber-900 dark:text-amber-200 space-y-1">
+                <p className="font-extrabold text-xs flex items-center gap-1.5 text-amber-800 dark:text-amber-300">
+                  <ShieldCheck className="w-4 h-4 text-amber-500" /> Lưu mã đơn hàng để tra cứu
+                </p>
+                <p>
+                  Mã đơn hàng: <strong className="font-mono font-bold text-amber-700 dark:text-amber-300 text-xs">#{placedOrderInfo?.id}</strong>. Dùng <strong>Mã đơn hàng + Số điện thoại ({placedOrderInfo?.phone})</strong> để tra cứu tại mục <strong>"Tra Cứu Đơn Hàng"</strong> trên menu.
+                </p>
+              </div>
 
               {/* Order Summary details */}
               <div className="p-3.5 bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700 text-[11px] space-y-1.5">

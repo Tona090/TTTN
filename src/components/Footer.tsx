@@ -6,9 +6,10 @@ import { TechGearLogo } from './TechGearLogo';
 
 interface Props {
   settings: SiteSettings;
+  onNavigateTab?: (tab: string) => void;
 }
 
-export const Footer: React.FC<Props> = ({ settings }) => {
+export const Footer: React.FC<Props> = ({ settings, onNavigateTab }) => {
   const { lang, t } = useLanguage();
 
   return (
@@ -77,6 +78,14 @@ export const Footer: React.FC<Props> = ({ settings }) => {
             {lang === 'vi' ? 'HỖ TRỢ KHÁCH HÀNG' : 'CUSTOMER SUPPORT'}
           </h4>
           <ul className="space-y-2 text-xs">
+            <li>
+              <button 
+                onClick={() => onNavigateTab && onNavigateTab('orders')}
+                className="text-emerald-600 dark:text-emerald-400 font-extrabold hover:underline transition-colors flex items-center gap-1"
+              >
+                <span>🔍 {lang === 'vi' ? 'Tra Cứu Đơn Hàng Vãng Lai' : 'Track Guest Order'}</span>
+              </button>
+            </li>
             <li><a href="#" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">{lang === 'vi' ? 'Chính Sách Bảo Hành & Đổi Trả' : 'Warranty & Return Policy'}</a></li>
             <li><a href="#" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">{lang === 'vi' ? 'Hướng Dẫn Mua Hàng & Build PC' : 'Buying & PC Building Guide'}</a></li>
             <li><a href="#" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">{lang === 'vi' ? 'Phương Thức Thanh Toán & Trả Góp' : 'Payment & Installment Methods'}</a></li>

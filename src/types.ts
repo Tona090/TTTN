@@ -105,8 +105,10 @@ export interface Order {
   created_at: string;
   shipping_address: string;
   phone: string;
+  email?: string;
   payment_method?: 'COD' | 'VIETQR' | 'MOMO' | 'VNPAY' | 'CARD' | 'INSTALLMENT' | string;
-  payment_status?: 'unpaid' | 'paid' | 'refunding';
+  payment_status?: 'unpaid' | 'pending_verification' | 'paid' | 'refunding';
+  payment_receipt_url?: string;
   installment_months?: number;
   note?: string;
   voucher_code?: string;

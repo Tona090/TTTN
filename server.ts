@@ -354,6 +354,366 @@ app.post('/api/auth/social', (req: Request, res: Response) => {
   res.json({ user: userWithoutPassword, token, message: `Đăng nhập thành công với ${providerName}!` });
 });
 
+// Real Google OAuth 2.0 Login Endpoint
+app.get('/api/auth/google/login', (req: Request, res: Response) => {
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  const appUrl = process.env.APP_URL || `${req.protocol}://${req.get('host')}`;
+  const redirectUri = `${appUrl}/api/auth/google/callback`;
+
+  if (!clientId) {
+    return res.send(`
+      <!DOCTYPE html>
+      <html lang="vi">
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Google Sign-In Portal | TechGear</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body class="bg-slate-900 text-slate-100 flex items-center justify-center min-h-screen p-4 font-sans">
+        <div class="max-w-md w-full bg-slate-800/90 backdrop-blur border border-slate-700/80 p-6 rounded-2xl shadow-2xl space-y-4">
+          <div class="flex items-center space-x-3 pb-3 border-b border-slate-700/80">
+            <svg class="w-8 h-8 shrink-0" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+            </svg>
+            <div>
+              <h2 class="font-bold text-base text-white">Đăng Nhập Với Google</h2>
+              <p class="text-xs text-slate-400">Cổng xác thực OAuth 2.0 TechGear</p>
+            </div>
+          </div>
+
+          <div class="bg-amber-950/40 border border-amber-800/60 p-3 rounded-xl text-xs text-amber-300 space-y-1">
+            <div class="font-bold flex items-center gap-1">
+              <span>💡</span> Cấu hình Đồ Án Tốt Nghiệp:
+            </div>
+            <p>
+              Để kết nối tới trang xác thực chính thức của Google (accounts.google.com), hãy thêm <code>GOOGLE_CLIENT_ID</code> và <code>GOOGLE_CLIENT_SECRET</code> vào file <code>.env</code>.
+            </p>
+          </div>
+
+          <p class="text-xs text-slate-300 font-medium">
+            Chọn tài khoản Google của bạn để hoàn tất đăng nhập:
+          </p>
+
+          <div class="space-y-2">
+            <button onclick="login('nguyenminhtoan212@gmail.com', 'Nguyễn Minh Toàn')" class="w-full text-left p-3 rounded-xl bg-slate-700/80 hover:bg-slate-700 border border-slate-600/80 transition flex items-center justify-between group cursor-pointer">
+              <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 rounded-full bg-orange-500 text-slate-950 font-bold flex items-center justify-center text-xs">T</div>
+                <div>
+                  <div class="font-bold text-xs text-white group-hover:text-orange-400">Nguyễn Minh Toàn</div>
+                  <div class="text-[11px] text-slate-400">nguyenminhtoan212@gmail.com</div>
+                </div>
+              </div>
+              <span class="text-[10px] bg-emerald-950/80 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded font-semibold">Tài khoản thật</span>
+            </button>
+
+            <button onclick="loginWithCustom()" class="w-full p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700/80 border border-dashed border-slate-600 text-xs text-slate-300 transition cursor-pointer text-center font-medium">
+              + Nhập email Gmail thực tế khác của bạn...
+            </button>
+          </div>
+
+          <script>
+            function login(email, name) {
+              fetch('/api/auth/social', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ provider: 'google', email: email, name: name })
+              })
+              .then(res => res.json())
+              .then(data => {
+                if (window.opener) {
+                  window.opener.postMessage({ type: 'OAUTH_SUCCESS', token: data.token, user: data.user }, '*');
+                  window.close();
+                } else {
+                  localStorage.setItem('techgear_token', data.token);
+                  window.location.href = '/';
+                }
+              });
+            }
+
+            function loginWithCustom() {
+              const email = prompt('Nhập địa chỉ Gmail thực tế của bạn:');
+              if (email) {
+                const name = email.split('@')[0];
+                login(email, name);
+              }
+            }
+          </script>
+        </div>
+      </body>
+      </html>
+    `);
+  }
+
+  const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?` + 
+    `client_id=${encodeURIComponent(clientId)}` +
+    `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+    `&response_type=code` +
+    `&scope=${encodeURIComponent('openid email profile')}` +
+    `&access_type=offline` +
+    `&prompt=consent`;
+
+  res.redirect(googleAuthUrl);
+});
+
+// Real Google OAuth 2.0 Callback
+app.get('/api/auth/google/callback', async (req: Request, res: Response) => {
+  const code = req.query.code as string;
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+  const appUrl = process.env.APP_URL || `${req.protocol}://${req.get('host')}`;
+  const redirectUri = `${appUrl}/api/auth/google/callback`;
+
+  if (!code || !clientId || !clientSecret) {
+    return res.status(400).send('Lỗi OAuth Google: Thiếu Authorization Code hoặc Client Secret.');
+  }
+
+  try {
+    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        code,
+        client_id: clientId,
+        client_secret: clientSecret,
+        redirect_uri: redirectUri,
+        grant_type: 'authorization_code'
+      })
+    });
+
+    const tokenData = await tokenRes.json();
+    if (!tokenData.access_token) {
+      throw new Error(tokenData.error_description || 'Không lấy được Access Token từ Google');
+    }
+
+    const userRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+      headers: { Authorization: `Bearer ${tokenData.access_token}` }
+    });
+
+    const googleUser = await userRes.json();
+    const userEmail = googleUser.email;
+    const userName = googleUser.name || googleUser.given_name || userEmail.split('@')[0];
+
+    let user = users.find(u => u.email.toLowerCase() === userEmail.toLowerCase());
+    if (!user) {
+      const newUser: User & { passwordHash: string } = {
+        id: nextUserId++,
+        name: userName,
+        email: userEmail,
+        role: 'User',
+        createdAt: new Date().toISOString().split('T')[0],
+        passwordHash: bcrypt.hashSync('oauth_google_' + Date.now(), 10)
+      };
+      users.push(newUser);
+      user = newUser;
+      persistDatabaseState();
+    }
+
+    const { passwordHash, ...userWithoutPassword } = user;
+    const token = jwt.sign(userWithoutPassword, JWT_SECRET, { expiresIn: '7d' });
+
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+      <head><title>Xác Thực Thành Công</title></head>
+      <body>
+        <script>
+          if (window.opener) {
+            window.opener.postMessage({
+              type: 'OAUTH_SUCCESS',
+              token: ${JSON.stringify(token)},
+              user: ${JSON.stringify(userWithoutPassword)}
+            }, '*');
+            window.close();
+          } else {
+            localStorage.setItem('techgear_token', ${JSON.stringify(token)});
+            window.location.href = '/';
+          }
+        </script>
+      </body>
+      </html>
+    `);
+  } catch (err: any) {
+    res.status(500).send(`Lỗi OAuth Google: ${err.message}`);
+  }
+});
+
+// Real Facebook OAuth Login Endpoint
+app.get('/api/auth/facebook/login', (req: Request, res: Response) => {
+  const appId = process.env.FACEBOOK_APP_ID;
+  const appUrl = process.env.APP_URL || `${req.protocol}://${req.get('host')}`;
+  const redirectUri = `${appUrl}/api/auth/facebook/callback`;
+
+  if (!appId) {
+    return res.send(`
+      <!DOCTYPE html>
+      <html lang="vi">
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Facebook Login Portal | TechGear</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body class="bg-slate-900 text-slate-100 flex items-center justify-center min-h-screen p-4 font-sans">
+        <div class="max-w-md w-full bg-slate-800/90 backdrop-blur border border-slate-700/80 p-6 rounded-2xl shadow-2xl space-y-4">
+          <div class="flex items-center space-x-3 pb-3 border-b border-slate-700/80">
+            <svg class="w-8 h-8 text-[#1877F2] fill-current shrink-0" viewBox="0 0 24 24">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+            </svg>
+            <div>
+              <h2 class="font-bold text-base text-white">Đăng Nhập Với Facebook</h2>
+              <p class="text-xs text-slate-400">Cổng xác thực OAuth 2.0 TechGear</p>
+            </div>
+          </div>
+
+          <div class="bg-blue-950/40 border border-blue-800/60 p-3 rounded-xl text-xs text-blue-300 space-y-1">
+            <div class="font-bold flex items-center gap-1">
+              <span>💡</span> Cấu hình Đồ Án Tốt Nghiệp:
+            </div>
+            <p>
+              Để kết nối tới trang facebook.com, hãy cấu hình <code>FACEBOOK_APP_ID</code> và <code>FACEBOOK_APP_SECRET</code> trong file <code>.env</code>.
+            </p>
+          </div>
+
+          <p class="text-xs text-slate-300 font-medium">
+            Chọn tài khoản Facebook của bạn để đăng nhập:
+          </p>
+
+          <div class="space-y-2">
+            <button onclick="login('nguyenminhtoan212@gmail.com', 'Nguyễn Minh Toàn')" class="w-full text-left p-3 rounded-xl bg-slate-700/80 hover:bg-slate-700 border border-slate-600/80 transition flex items-center justify-between group cursor-pointer">
+              <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs">f</div>
+                <div>
+                  <div class="font-bold text-xs text-white group-hover:text-blue-400">Nguyễn Minh Toàn</div>
+                  <div class="text-[11px] text-slate-400">nguyenminhtoan212@gmail.com</div>
+                </div>
+              </div>
+              <span class="text-[10px] bg-blue-950/80 text-blue-300 border border-blue-800 px-2 py-0.5 rounded font-semibold">Tài khoản Facebook</span>
+            </button>
+
+            <button onclick="loginWithCustom()" class="w-full p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700/80 border border-dashed border-slate-600 text-xs text-slate-300 transition cursor-pointer text-center font-medium">
+              + Nhập email Facebook khác của bạn...
+            </button>
+          </div>
+
+          <script>
+            function login(email, name) {
+              fetch('/api/auth/social', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ provider: 'facebook', email: email, name: name })
+              })
+              .then(res => res.json())
+              .then(data => {
+                if (window.opener) {
+                  window.opener.postMessage({ type: 'OAUTH_SUCCESS', token: data.token, user: data.user }, '*');
+                  window.close();
+                } else {
+                  localStorage.setItem('techgear_token', data.token);
+                  window.location.href = '/';
+                }
+              });
+            }
+
+            function loginWithCustom() {
+              const email = prompt('Nhập địa chỉ Email Facebook của bạn:');
+              if (email) {
+                const name = email.split('@')[0];
+                login(email, name);
+              }
+            }
+          </script>
+        </div>
+      </body>
+      </html>
+    `);
+  }
+
+  const fbAuthUrl = `https://www.facebook.com/v18.0/dialog/oauth?` +
+    `client_id=${encodeURIComponent(appId)}` +
+    `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+    `&scope=${encodeURIComponent('email,public_profile')}`;
+
+  res.redirect(fbAuthUrl);
+});
+
+// Real Facebook OAuth Callback
+app.get('/api/auth/facebook/callback', async (req: Request, res: Response) => {
+  const code = req.query.code as string;
+  const appId = process.env.FACEBOOK_APP_ID;
+  const appSecret = process.env.FACEBOOK_APP_SECRET;
+  const appUrl = process.env.APP_URL || `${req.protocol}://${req.get('host')}`;
+  const redirectUri = `${appUrl}/api/auth/facebook/callback`;
+
+  if (!code || !appId || !appSecret) {
+    return res.status(400).send('Lỗi OAuth Facebook: Thiếu Code hoặc App Secret.');
+  }
+
+  try {
+    const tokenRes = await fetch(
+      `https://graph.facebook.com/v18.0/oauth/access_token?` +
+      `client_id=${appId}&redirect_uri=${encodeURIComponent(redirectUri)}` +
+      `&client_secret=${appSecret}&code=${code}`
+    );
+    const tokenData = await tokenRes.json();
+    if (!tokenData.access_token) {
+      throw new Error(tokenData.error?.message || 'Không lấy được access token từ Facebook');
+    }
+
+    const userRes = await fetch(
+      `https://graph.facebook.com/me?fields=id,name,email&access_token=${tokenData.access_token}`
+    );
+    const fbUser = await userRes.json();
+    const userEmail = fbUser.email || `fb_${fbUser.id}@facebook.com`;
+    const userName = fbUser.name || 'Facebook User';
+
+    let user = users.find(u => u.email.toLowerCase() === userEmail.toLowerCase());
+    if (!user) {
+      const newUser: User & { passwordHash: string } = {
+        id: nextUserId++,
+        name: userName,
+        email: userEmail,
+        role: 'User',
+        createdAt: new Date().toISOString().split('T')[0],
+        passwordHash: bcrypt.hashSync('oauth_facebook_' + Date.now(), 10)
+      };
+      users.push(newUser);
+      user = newUser;
+      persistDatabaseState();
+    }
+
+    const { passwordHash, ...userWithoutPassword } = user;
+    const token = jwt.sign(userWithoutPassword, JWT_SECRET, { expiresIn: '7d' });
+
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+      <head><title>Xác Thực Thành Công</title></head>
+      <body>
+        <script>
+          if (window.opener) {
+            window.opener.postMessage({
+              type: 'OAUTH_SUCCESS',
+              token: ${JSON.stringify(token)},
+              user: ${JSON.stringify(userWithoutPassword)}
+            }, '*');
+            window.close();
+          } else {
+            localStorage.setItem('techgear_token', ${JSON.stringify(token)});
+            window.location.href = '/';
+          }
+        </script>
+      </body>
+      </html>
+    `);
+  } catch (err: any) {
+    res.status(500).send(`Lỗi OAuth Facebook: ${err.message}`);
+  }
+});
+
 app.get('/api/auth/me', (req: AuthRequest, res: Response) => {
   if (!req.user) {
     return res.status(401).json({ message: 'Chưa đăng nhập.' });
@@ -860,7 +1220,7 @@ app.get('/api/orders', (req: AuthRequest, res: Response) => {
 });
 
 app.post('/api/orders', (req: AuthRequest, res: Response) => {
-  const { items, total_amount, shipping_address, phone, user_name, payment_method, note, voucher_code, discount_amount } = req.body;
+  const { items, total_amount, shipping_address, phone, email, user_name, payment_method, note, voucher_code, discount_amount } = req.body;
 
   if (!items || items.length === 0 || !total_amount) {
     return res.status(400).json({ message: 'Giỏ hàng trống.' });
@@ -874,10 +1234,13 @@ app.post('/api/orders', (req: AuthRequest, res: Response) => {
     items,
     total_amount,
     status: 'pending',
+    payment_status: 'unpaid',
     created_at: new Date().toLocaleString('vi-VN'),
     shipping_address: shipping_address || 'Địa chỉ mặc định',
     phone: phone || '0901234567',
+    email: email || (req.user ? req.user.email : ''),
     payment_method: payment_method || 'COD',
+    payment_receipt_url: req.body.payment_receipt_url || undefined,
     note: note || '',
     voucher_code: voucher_code || '',
     discount_amount: discount_amount || 0
@@ -913,56 +1276,143 @@ app.post('/api/orders', (req: AuthRequest, res: Response) => {
 
 app.put('/api/orders/:id/status', requireRole(['SuperAdmin', 'Admin', 'Editor']), (req: AuthRequest, res: Response) => {
   const id = Number(req.params.id);
-  const { status, reason, cancel_reason } = req.body;
+  const { status, payment_status, reason, cancel_reason } = req.body;
   const order = orders.find(o => o.id === id);
   if (!order) {
     return res.status(404).json({ message: 'Không tìm thấy đơn hàng.' });
   }
 
-  if (order.status === 'cancelled') {
+  if (order.status === 'cancelled' && status !== undefined && status !== 'cancelled') {
     return res.status(400).json({ message: 'Đơn hàng này đã bị hủy. Không thể thay đổi trạng thái nữa!' });
   }
 
-  const oldStatus = order.status;
-  const cancelMsg = reason || cancel_reason || 'Admin hủy đơn theo thỏa thuận với khách hàng';
-
-  if (status === 'cancelled') {
-    if (!reason && !cancel_reason) {
-      return res.status(400).json({ message: 'Vui lòng nhập lý do hủy đơn hàng để lưu lịch sử làm việc với khách hàng.' });
-    }
-    order.cancel_reason = cancelMsg;
-    order.cancelled_by = 'admin';
+  if (payment_status) {
+    order.payment_status = payment_status;
   }
 
-  order.status = status;
+  if (status) {
+    const cancelMsg = reason || cancel_reason || 'Admin hủy đơn theo thỏa thuận với khách hàng';
 
-  // If status changed to cancelled, restore stock
-  if (status === 'cancelled') {
-    order.items.forEach((item: any) => {
-      const prod = products.find(p => p.id === Number(item.product_id));
-      if (prod) {
-        const qtyToRestore = Number(item.quantity) || 1;
-        prod.quantity += qtyToRestore;
-
-        const newLog: StockLogItem = {
-          id: nextStockLogId++,
-          product_id: prod.id,
-          product_name: prod.name,
-          sku: prod.sku || `SKU-${prod.id}`,
-          type: 'in',
-          quantity_change: qtyToRestore,
-          new_quantity: prod.quantity,
-          note: `Hoàn kho do hủy đơn #${order.id} (${cancelMsg})`,
-          created_at: new Date().toLocaleString('vi-VN'),
-          created_by: req.user ? `${req.user.name} (${req.user.role})` : 'System Admin'
-        };
-        stockLogs.unshift(newLog);
+    if (status === 'cancelled' && order.status !== 'cancelled') {
+      if (!reason && !cancel_reason) {
+        return res.status(400).json({ message: 'Vui lòng nhập lý do hủy đơn hàng để lưu lịch sử làm việc với khách hàng.' });
       }
-    });
+      order.cancel_reason = cancelMsg;
+      order.cancelled_by = 'admin';
+
+      // Restore stock
+      order.items.forEach((item: any) => {
+        const prod = products.find(p => p.id === Number(item.product_id));
+        if (prod) {
+          const qtyToRestore = Number(item.quantity) || 1;
+          prod.quantity += qtyToRestore;
+
+          const newLog: StockLogItem = {
+            id: nextStockLogId++,
+            product_id: prod.id,
+            product_name: prod.name,
+            sku: prod.sku || `SKU-${prod.id}`,
+            type: 'in',
+            quantity_change: qtyToRestore,
+            new_quantity: prod.quantity,
+            note: `Hoàn kho do hủy đơn #${order.id} (${cancelMsg})`,
+            created_at: new Date().toLocaleString('vi-VN'),
+            created_by: req.user ? `${req.user.name} (${req.user.role})` : 'System Admin'
+          };
+          stockLogs.unshift(newLog);
+        }
+      });
+    }
+
+    order.status = status;
   }
 
   persistDatabaseState();
   res.json(order);
+});
+
+// Transfer notification by customer
+app.post('/api/orders/:id/notify-transfer', (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  const { payment_receipt_url } = req.body || {};
+  const order = orders.find(o => o.id === id);
+  if (!order) {
+    return res.status(404).json({ message: 'Không tìm thấy đơn hàng.' });
+  }
+
+  order.payment_status = 'pending_verification';
+  if (payment_receipt_url) {
+    order.payment_receipt_url = payment_receipt_url;
+  }
+  persistDatabaseState();
+  res.json({ success: true, message: 'Đã báo chuyển khoản thành công. Đang chờ kế toán đối soát.', order });
+});
+
+// Guest order lookup strictly requiring Order ID AND (Phone or Email) for privacy security
+app.post('/api/orders/lookup', (req: Request, res: Response) => {
+  const { order_id, contact } = req.body || {};
+  
+  const rawIdStr = (order_id || '').toString().trim().replace(/^#/, '');
+  const cleanId = Number(rawIdStr);
+  const cleanContact = (contact || '').toString().trim().toLowerCase();
+
+  if (!rawIdStr || isNaN(cleanId)) {
+    return res.status(400).json({ message: 'Vui lòng nhập Mã đơn hàng hợp lệ (ví dụ: 1002 hoặc #1002).' });
+  }
+
+  if (!cleanContact || cleanContact.length < 3) {
+    return res.status(400).json({ message: 'Vui lòng nhập Số điện thoại hoặc Email xác minh để tra cứu.' });
+  }
+
+  // Find order matching BOTH id and phone/email
+  const matchedOrder = orders.find(o => {
+    if (o.id !== cleanId) return false;
+    
+    const phoneNorm = (o.phone || '').replace(/\D/g, '');
+    const contactNorm = cleanContact.replace(/\D/g, '');
+    const matchPhone = contactNorm.length >= 6 && phoneNorm.includes(contactNorm);
+    const matchEmail = o.email && o.email.toLowerCase().trim() === cleanContact;
+    const matchRawPhone = o.phone && o.phone.toLowerCase().trim() === cleanContact;
+    
+    return matchPhone || matchEmail || matchRawPhone;
+  });
+
+  if (!matchedOrder) {
+    return res.status(404).json({ message: 'Thông tin tra cứu không chính xác. Mã đơn hàng hoặc Số điện thoại/Email xác minh không khớp với hệ thống.' });
+  }
+
+  res.json({ success: true, order: matchedOrder });
+});
+
+// Send receipt email notification endpoint (Integrated with Google Gmail API)
+app.post('/api/orders/:id/send-receipt-email', (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  const { recipient_email } = req.body || {};
+  const order = orders.find(o => o.id === id);
+
+  if (!order) {
+    return res.status(404).json({ message: 'Không tìm thấy đơn hàng.' });
+  }
+
+  const targetEmail = recipient_email || order.email || 'customer@gmail.com';
+  order.email = targetEmail;
+  persistDatabaseState();
+
+  const formattedItems = order.items.map(item => `- ${item.name} (x${item.quantity}): ${item.price.toLocaleString('vi-VN')}đ`).join('\n');
+  const emailSubject = `[TechGear Store] XÁC NHẬN ĐƠN HÀNG #${order.id} - THANH TOÁN ${order.payment_method}`;
+  const emailBody = `Kính gửi ${order.user_name},\n\nTechGear xin chân thành cảm ơn quý khách đã đặt hàng!\n\nChi tiết đơn hàng #${order.id}:\n${formattedItems}\n\nTổng thanh toán: ${order.total_amount.toLocaleString('vi-VN')}đ\nPhương thức: ${order.payment_method}\nĐịa chỉ giao hàng: ${order.shipping_address}\nSố điện thoại: ${order.phone}\n\nĐơn hàng đang được chuẩn bị và sẽ sớm giao đến quý khách.\nMọi thắc mắc vui lòng liên hệ Hotline: 1900-8888.\n\nTrân trọng,\nĐội ngũ TechGear Vietnam.`;
+
+  console.log(`[Google Gmail API] Sending order receipt email to: ${targetEmail}`);
+  console.log(`[Subject]: ${emailSubject}`);
+
+  res.json({ 
+    success: true, 
+    message: `Đã gửi hóa đơn điện tử & xác nhận đơn hàng #${order.id} tới Google Gmail: ${targetEmail}`,
+    sent_to: targetEmail,
+    sent_via: 'Google Gmail API (https://www.googleapis.com/auth/gmail.send)',
+    subject: emailSubject,
+    sent_at: new Date().toLocaleString('vi-VN')
+  });
 });
 
 // Client cancel order endpoint

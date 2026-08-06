@@ -302,6 +302,7 @@ export async function createOrder(orderData: {
   total_amount: number;
   shipping_address: string;
   phone: string;
+  email?: string;
   user_name: string;
   payment_method?: string;
   installment_months?: number;
@@ -324,15 +325,55 @@ export async function fetchOrders(): Promise<Order[]> {
   return res.json();
 }
 
-export async function updateOrderStatus(orderId: number, status: string, reason?: string): Promise<Order> {
+export async function updateOrderStatus(orderId: number, status?: string, reason?: string, paymentStatus?: string): Promise<Order> {
   const res = await fetch(`/api/orders/${orderId}/status`, {
     method: 'PUT',
     headers: getAuthHeaders(),
-    body: JSON.stringify({ status, reason })
+    body: JSON.stringify({ status, reason, payment_status: paymentStatus })
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.message || 'Lỗi cập nhật trạng thái');
+  }
+  return res.json();
+}
+
+export async function notifyTransfer(orderId: number, receiptUrl?: string): Promise<{ success: boolean; message: string; order: Order }> {
+  const res = await fetch(`/api/orders/${orderId}/notify-transfer`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ payment_receipt_url: receiptUrl })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || 'Lỗi gửi thông báo chuyển khoản');
+  }
+  return res.json();
+}
+
+export async function lookupOrders(orderId: string | number, contact: string): Promise<Order> {
+  const res = await fetch('/api/orders/lookup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ order_id: orderId, contact })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || 'Không tìm thấy thông tin đơn hàng');
+  }
+  const data = await res.json();
+  return data.order;
+}
+
+export async function sendReceiptEmail(orderId: number, recipientEmail?: string): Promise<{ success: boolean; message: string; sent_to: string; sent_at: string }> {
+  const res = await fetch(`/api/orders/${orderId}/send-receipt-email`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ recipient_email: recipientEmail })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || 'Lỗi gửi email hóa đơn');
   }
   return res.json();
 }

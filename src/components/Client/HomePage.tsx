@@ -117,11 +117,11 @@ export const HomePage: React.FC<Props> = ({
               </div>
 
               <div className="relative max-w-xl px-6 md:px-10 py-10 text-white space-y-3 z-10">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-orange-500 text-slate-950 text-[11px] font-black uppercase tracking-wider">
-                  <Zap className="w-3.5 h-3.5 fill-slate-950" />
-                  {settings.logoText || 'TECHGEAR'} OFFICIAL DEALS
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-orange-500 text-slate-950 text-[10px] font-bold uppercase tracking-wider">
+                  <Zap className="w-3 h-3 fill-slate-950" />
+                  SẢN PHẨM NỔI BẬT
                 </span>
-                <h1 className="text-2xl md:text-3xl font-extrabold leading-tight">
+                <h1 className="text-2xl md:text-3xl font-bold leading-tight">
                   {activeBanners[currentBannerIndex]?.title || settings.heroTitle}
                 </h1>
                 <p className="text-xs text-slate-300 leading-relaxed line-clamp-2">
@@ -130,10 +130,10 @@ export const HomePage: React.FC<Props> = ({
                 <div className="pt-2 flex items-center gap-3">
                   <button
                     onClick={() => onNavigateTab('products')}
-                    className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-slate-950 rounded-lg font-black text-xs shadow-lg transition-all flex items-center gap-2"
+                    className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-slate-950 rounded-lg font-bold text-xs shadow-md transition-all flex items-center gap-1.5"
                   >
-                    <span>MUA NGAY BÂY GIỜ</span>
-                    <ArrowRight className="w-4 h-4" />
+                    <span>Xem Sản Phẩm</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>

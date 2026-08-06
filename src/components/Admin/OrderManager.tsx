@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   ShoppingCart, Search, Filter, Eye, CheckCircle2, Truck, XCircle, 
-  Clock, DollarSign, QrCode, Phone, MapPin, User, FileText, Printer, Check, RefreshCw
+  Clock, DollarSign, QrCode, Phone, MapPin, User, FileText, Printer, Check, RefreshCw, Image as ImageIcon
 } from 'lucide-react';
 import { Order } from '../../types';
 import { fetchOrders, updateOrderStatus } from '../../services/api';
@@ -14,6 +14,7 @@ export const OrderManager: React.FC = () => {
   const [activeOrder, setActiveOrder] = useState<Order | null>(null);
   const [updatingId, setUpdatingId] = useState<number | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [receiptLightboxUrl, setReceiptLightboxUrl] = useState<string | null>(null);
 
   // Cancellation modal state for Admin
   const [cancelModalOrderId, setCancelModalOrderId] = useState<number | null>(null);
@@ -35,6 +36,23 @@ export const OrderManager: React.FC = () => {
   useEffect(() => {
     loadOrders();
   }, []);
+
+  const handlePaymentStatusChange = async (orderId: number, newPaymentStatus: string) => {
+    setUpdatingId(orderId);
+    try {
+      const updated = await updateOrderStatus(orderId, undefined, undefined, newPaymentStatus);
+      setOrders(prev => prev.map(o => o.id === orderId ? updated : o));
+      if (activeOrder && activeOrder.id === orderId) {
+        setActiveOrder(updated);
+      }
+      setSuccessMsg(`Đã cập nhật trạng thái thanh toán đơn hàng #${orderId}`);
+      setTimeout(() => setSuccessMsg(null), 3000);
+    } catch (err: any) {
+      alert(err.message || 'Lỗi cập nhật trạng thái thanh toán.');
+    } finally {
+      setUpdatingId(null);
+    }
+  };
 
   const handleStatusChange = async (orderId: number, newStatus: Order['status'], reason?: string) => {
     if (newStatus === 'cancelled' && !reason) {
@@ -121,11 +139,17 @@ export const OrderManager: React.FC = () => {
       o.id.toString().includes(searchTerm.trim()) ||
       (o.user_name && o.user_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (o.phone && o.phone.includes(searchTerm.trim()));
-    const matchesStatus = selectedStatus === 'all' || o.status === selectedStatus;
+    const matchesStatus = 
+      selectedStatus === 'all' 
+        ? true 
+        : selectedStatus === 'pending_verification' 
+        ? o.payment_status === 'pending_verification'
+        : o.status === selectedStatus;
     return matchesSearch && matchesStatus;
   });
 
   const totalOrdersCount = orders.length;
+  const pendingVerificationCount = orders.filter(o => o.payment_status === 'pending_verification').length;
   const pendingCount = orders.filter(o => o.status === 'pending').length;
   const processingCount = orders.filter(o => o.status === 'processing' || o.status === 'shipped').length;
   const completedCount = orders.filter(o => o.status === 'completed').length;
@@ -155,6 +179,28 @@ export const OrderManager: React.FC = () => {
         <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 font-bold rounded-xl flex items-center gap-2">
           <Check className="w-4 h-4 text-emerald-500" />
           <span>{successMsg}</span>
+        </div>
+      )}
+
+      {pendingVerificationCount > 0 && (
+        <div className="p-3.5 bg-amber-500/15 border border-amber-500/40 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-pulse">
+          <div className="flex items-center gap-2.5">
+            <Clock className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0" />
+            <div>
+              <h3 className="font-black text-slate-900 dark:text-white text-xs">
+                Có {pendingVerificationCount} đơn hàng đang CHỜ XÁC MINH THANH TOÁN (Pending Verification)
+              </h3>
+              <p className="text-[11px] text-slate-600 dark:text-slate-400">
+                Khách hàng đã tải ảnh biên lai / báo đã chuyển khoản ngân hàng. Vui lòng đối soát và bấm duyệt đơn.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setSelectedStatus('pending_verification')}
+            className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl text-[11px] shrink-0 transition-colors shadow-sm"
+          >
+            Xem {pendingVerificationCount} đơn chờ duyệt ➔
+          </button>
         </div>
       )}
 
@@ -200,6 +246,7 @@ export const OrderManager: React.FC = () => {
             <Filter className="w-3.5 h-3.5 text-slate-400 mr-1 shrink-0" />
             {[
               { id: 'all', label: 'Tất cả' },
+              { id: 'pending_verification', label: `⏳ Chờ xác minh (${pendingVerificationCount})` },
               { id: 'pending', label: 'Chờ xác nhận' },
               { id: 'processing', label: 'Đang xử lý' },
               { id: 'shipped', label: 'Đang giao' },
@@ -272,31 +319,78 @@ export const OrderManager: React.FC = () => {
                       {formatVND(order.total_amount)}
                     </td>
                     <td className="p-3.5">
-                      {order.payment_method === 'VIETQR' ? (
-                        <span className="px-2 py-0.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold rounded text-[10px] flex items-center gap-1 w-fit">
-                          <QrCode className="w-3 h-3" /> VietQR 24/7
-                        </span>
-                      ) : order.payment_method === 'VNPAY' ? (
-                        <span className="px-2 py-0.5 bg-red-500/10 text-red-600 dark:text-red-400 font-bold rounded text-[10px] w-fit">
-                          VNPAY QR
-                        </span>
-                      ) : order.payment_method === 'MOMO' ? (
-                        <span className="px-2 py-0.5 bg-pink-500/10 text-pink-600 dark:text-pink-400 font-bold rounded text-[10px] w-fit">
-                          Ví MoMo
-                        </span>
-                      ) : order.payment_method === 'CARD' ? (
-                        <span className="px-2 py-0.5 bg-purple-500/10 text-purple-600 dark:text-purple-400 font-bold rounded text-[10px] w-fit">
-                          Thẻ Quốc Tế
-                        </span>
-                      ) : order.payment_method === 'INSTALLMENT' ? (
-                        <span className="px-2 py-0.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold rounded text-[10px] w-fit">
-                          Trả Góp 0% ({order.installment_months || 6}T)
-                        </span>
-                      ) : (
-                        <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold rounded text-[10px] w-fit">
-                          COD Tiền Mặt
-                        </span>
-                      )}
+                      <div className="space-y-1">
+                        {order.payment_method === 'VIETQR' ? (
+                          <span className="px-2 py-0.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold rounded text-[10px] flex items-center gap-1 w-fit">
+                            <QrCode className="w-3 h-3" /> VietQR 24/7
+                          </span>
+                        ) : order.payment_method === 'VNPAY' ? (
+                          <span className="px-2 py-0.5 bg-red-500/10 text-red-600 dark:text-red-400 font-bold rounded text-[10px] w-fit">
+                            VNPAY QR
+                          </span>
+                        ) : order.payment_method === 'MOMO' ? (
+                          <span className="px-2 py-0.5 bg-pink-500/10 text-pink-600 dark:text-pink-400 font-bold rounded text-[10px] w-fit">
+                            Ví MoMo
+                          </span>
+                        ) : order.payment_method === 'CARD' ? (
+                          <span className="px-2 py-0.5 bg-purple-500/10 text-purple-600 dark:text-purple-400 font-bold rounded text-[10px] w-fit">
+                            Thẻ Quốc Tế
+                          </span>
+                        ) : order.payment_method === 'INSTALLMENT' ? (
+                          <span className="px-2 py-0.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold rounded text-[10px] w-fit">
+                            Trả Góp 0% ({order.installment_months || 6}T)
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold rounded text-[10px] w-fit">
+                            COD Tiền Mặt
+                          </span>
+                        )}
+
+                        {order.payment_status === 'paid' ? (
+                          <div className="space-y-1">
+                            <span className="px-2 py-0.5 rounded text-[9px] font-extrabold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 block w-fit">
+                              ✓ Đã Thanh Toán
+                            </span>
+                            {order.payment_receipt_url && (
+                              <button
+                                type="button"
+                                onClick={() => setReceiptLightboxUrl(order.payment_receipt_url!)}
+                                className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-100 dark:bg-slate-800 text-blue-600 dark:text-blue-400 flex items-center gap-1 hover:underline"
+                              >
+                                <ImageIcon className="w-3 h-3" /> Xem Ảnh Bill
+                              </button>
+                            )}
+                          </div>
+                        ) : order.payment_status === 'pending_verification' ? (
+                          <div className="space-y-1">
+                            <button
+                              onClick={() => {
+                                handlePaymentStatusChange(order.id, 'paid');
+                                if (order.status === 'pending') {
+                                  handleStatusChange(order.id, 'processing');
+                                }
+                              }}
+                              title="Bấm để duyệt: Đã nhận tiền & chuyển đơn sang Đang xử lý"
+                              className="px-2 py-0.5 rounded text-[9px] font-extrabold bg-amber-500/25 text-amber-800 dark:text-amber-200 border border-amber-500/50 animate-pulse block w-fit hover:bg-emerald-600 hover:text-white transition-colors shadow-xs"
+                            >
+                              ⏳ Chờ Xác Minh ➔ Duyệt Paid
+                            </button>
+                            {order.payment_receipt_url && (
+                              <button
+                                type="button"
+                                onClick={() => setReceiptLightboxUrl(order.payment_receipt_url!)}
+                                className="px-2 py-0.5 rounded text-[9px] font-extrabold bg-blue-600 text-white flex items-center gap-1 hover:bg-blue-700 transition-colors shadow-xs"
+                              >
+                                <ImageIcon className="w-3 h-3" /> Xem Ảnh Bill
+                              </button>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="px-2 py-0.5 rounded text-[9px] font-semibold bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 block w-fit">
+                            Chưa Thanh Toán
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="p-3.5">
                       {getStatusBadge(order.status)}
@@ -469,8 +563,106 @@ export const OrderManager: React.FC = () => {
                     {activeOrder.payment_method === 'VIETQR' ? 'Chuyển Khoản Ngân Hàng VietQR' : activeOrder.payment_method === 'MOMO' ? 'Ví Điện Tử MoMo' : 'Tiền Mặt COD'}
                   </span>
                 </p>
+                <p>
+                  <strong>Trạng thái tiền:</strong>{' '}
+                  {activeOrder.payment_status === 'paid' ? (
+                    <span className="px-2 py-0.5 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-extrabold rounded text-[10px]">✓ Đã Thanh Toán</span>
+                  ) : activeOrder.payment_status === 'pending_verification' ? (
+                    <span className="px-2 py-0.5 bg-amber-500/20 text-amber-900 dark:text-amber-300 font-extrabold rounded text-[10px] animate-pulse">⏳ Chờ Xác Minh Thanh Toán</span>
+                  ) : (
+                    <span className="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 font-bold rounded text-[10px]">Chưa Thanh Toán</span>
+                  )}
+                </p>
                 {activeOrder.note && <p><strong>Ghi chú:</strong> {activeOrder.note}</p>}
               </div>
+            </div>
+
+            {/* Receipt Verification Section */}
+            <div className="p-4 bg-blue-50/60 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 rounded-2xl space-y-3">
+              <div className="flex items-center justify-between">
+                <h4 className="font-extrabold text-blue-900 dark:text-blue-300 flex items-center gap-1.5 text-xs">
+                  <ImageIcon className="w-4 h-4 text-blue-500" /> Xác Minh Biên Lai / Bill Chuyển Khoản
+                </h4>
+                {activeOrder.payment_status === 'pending_verification' && (
+                  <span className="px-2 py-0.5 bg-amber-500 text-slate-950 font-black rounded text-[9px] animate-pulse">
+                    CẦN ĐỐI SOÁT
+                  </span>
+                )}
+              </div>
+
+              {activeOrder.payment_receipt_url ? (
+                <div className="flex flex-col sm:flex-row items-center gap-4 p-3 bg-white dark:bg-slate-900 rounded-xl border border-blue-200 dark:border-blue-800">
+                  <div className="relative group shrink-0">
+                    <img
+                      src={activeOrder.payment_receipt_url}
+                      alt="Ảnh bill chuyển khoản"
+                      className="w-28 h-28 object-cover rounded-xl border border-slate-200 cursor-pointer shadow-sm hover:opacity-90 transition-opacity"
+                      onClick={() => setReceiptLightboxUrl(activeOrder.payment_receipt_url!)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setReceiptLightboxUrl(activeOrder.payment_receipt_url!)}
+                      className="absolute bottom-1 right-1 p-1 bg-black/60 text-white rounded-md text-[9px] font-bold flex items-center gap-1"
+                    >
+                      <Eye className="w-3 h-3" /> Phóng to
+                    </button>
+                  </div>
+
+                  <div className="space-y-2 flex-1 text-xs">
+                    <p className="font-bold text-slate-800 dark:text-slate-200">
+                      Khách hàng đã đính kèm ảnh chụp màn hình giao dịch thành công.
+                    </p>
+                    <p className="text-[10px] text-slate-500">
+                      Vui lòng kiểm tra mã giao dịch, tên người chuyển và số tiền <strong className="text-orange-600 font-mono">{formatVND(activeOrder.total_amount)}</strong> trên sao kê ngân hàng trước khi xác nhận.
+                    </p>
+
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {activeOrder.payment_status !== 'paid' && (
+                        <button
+                          type="button"
+                          disabled={updatingId === activeOrder.id}
+                          onClick={async () => {
+                            await handlePaymentStatusChange(activeOrder.id, 'paid');
+                            if (activeOrder.status === 'pending') {
+                              await handleStatusChange(activeOrder.id, 'processing');
+                            }
+                          }}
+                          className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl text-xs flex items-center gap-1 shadow-md shadow-emerald-600/20"
+                        >
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span>Duyệt: Đã Nhận Tiền & Xử Lý Đơn</span>
+                        </button>
+                      )}
+
+                      {activeOrder.payment_status === 'pending_verification' && (
+                        <button
+                          type="button"
+                          disabled={updatingId === activeOrder.id}
+                          onClick={() => handlePaymentStatusChange(activeOrder.id, 'unpaid')}
+                          className="px-3 py-1.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-800 dark:text-slate-200 font-bold rounded-xl text-xs flex items-center gap-1"
+                        >
+                          <XCircle className="w-3.5 h-3.5 text-red-500" />
+                          <span>Từ Chối Bill / Chưa Nhận Tiền</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-3 bg-white/70 dark:bg-slate-900/60 rounded-xl border border-dashed border-blue-200 dark:border-blue-800 text-slate-500 text-[11px] flex items-center justify-between gap-2">
+                  <span>Khách hàng chưa tải ảnh biên lai. Bạn vẫn có thể kiểm tra sao kê ngân hàng thủ công và bấm duyệt.</span>
+                  {activeOrder.payment_status !== 'paid' && (
+                    <button
+                      type="button"
+                      disabled={updatingId === activeOrder.id}
+                      onClick={() => handlePaymentStatusChange(activeOrder.id, 'paid')}
+                      className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shrink-0 text-[11px]"
+                    >
+                      ✓ Xác Nhận Đã Nhận Tiền
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Items Breakdown Table */}
@@ -590,6 +782,49 @@ export const OrderManager: React.FC = () => {
                 ) : (
                   <span>Xác Nhận Hủy Đơn</span>
                 )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Lightbox Modal for Receipt Image */}
+      {receiptLightboxUrl && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in"
+          onClick={() => setReceiptLightboxUrl(null)}
+        >
+          <div 
+            className="relative max-w-2xl max-h-[90vh] w-full bg-slate-900 border border-slate-700 rounded-3xl p-4 space-y-3 shadow-2xl overflow-hidden"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <h3 className="font-black text-white text-sm flex items-center gap-2">
+                <ImageIcon className="w-5 h-5 text-blue-400" /> Ảnh Chụp Biên Lai Thanh Toán (Receipt Verification)
+              </h3>
+              <button 
+                onClick={() => setReceiptLightboxUrl(null)}
+                className="p-1.5 text-slate-400 hover:text-white rounded-xl bg-slate-800 hover:bg-slate-700 transition-colors"
+              >
+                <XCircle className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="overflow-auto max-h-[70vh] flex items-center justify-center bg-black/60 rounded-2xl p-2 border border-slate-800">
+              <img 
+                src={receiptLightboxUrl} 
+                alt="Biên lai chuyển khoản" 
+                className="max-w-full max-h-[65vh] object-contain rounded-xl shadow-lg"
+              />
+            </div>
+
+            <div className="flex justify-between items-center text-slate-400 text-xs pt-1">
+              <span className="text-[11px] text-slate-400">💡 Click bên ngoài hoặc nút Đóng để thoát xem ảnh.</span>
+              <button 
+                onClick={() => setReceiptLightboxUrl(null)}
+                className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-xl text-xs shadow-md shadow-blue-600/30"
+              >
+                Đóng Ảnh
               </button>
             </div>
           </div>
