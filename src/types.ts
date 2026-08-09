@@ -5,6 +5,7 @@ export interface User {
   name: string;
   email: string;
   role: Role;
+  avatar?: string;
   createdAt?: string;
 }
 
@@ -71,6 +72,20 @@ export interface Banner {
   status: 'active' | 'inactive';
 }
 
+export interface ArticleComment {
+  id: number;
+  article_id: number;
+  parent_id?: number | null;
+  user_id?: number;
+  user_name: string;
+  avatar?: string;
+  content: string;
+  created_at: string;
+  likes?: number;
+  is_author?: boolean;
+  replies?: ArticleComment[];
+}
+
 export interface NewsArticle {
   id: number;
   title: string;
@@ -79,6 +94,11 @@ export interface NewsArticle {
   excerpt: string;
   created_at: string;
   author?: string;
+  category?: string;
+  views?: number;
+  comments_count?: number;
+  likes?: number;
+  tags?: string[];
 }
 
 export interface CartItem {
@@ -115,6 +135,73 @@ export interface Order {
   discount_amount?: number;
   cancel_reason?: string;
   cancelled_by?: 'customer' | 'admin';
+  carrier?: string;
+  tracking_code?: string;
+  estimated_delivery?: string;
+  rescheduled_info?: {
+    date: string;
+    time_slot: string;
+    note?: string;
+  };
+  is_failed_attempt?: boolean;
+}
+
+export interface TrackingTimelineEvent {
+  id: string;
+  title: string;
+  description: string;
+  location?: string;
+  timestamp: string;
+  status: 'completed' | 'current' | 'upcoming' | 'cancelled' | 'failed' | 'warning';
+}
+
+export interface TrackingInfo {
+  order_id: number;
+  status: Order['status'];
+  is_failed_attempt?: boolean;
+  failed_attempt_reason?: string;
+  failed_attempt_count?: number;
+  rescheduled_info?: {
+    date: string;
+    time_slot: string;
+    note?: string;
+  };
+  carrier: string;
+  tracking_code: string;
+  estimated_delivery: string;
+  estimated_delivery_range: string;
+  progress_percent: number;
+  current_step_index: number;
+  shipper?: {
+    name: string;
+    phone: string;
+    vehicle?: string;
+    rating?: number;
+  };
+  timeline: TrackingTimelineEvent[];
+}
+
+export interface NotificationLog {
+  id: number;
+  order_id: number;
+  type: 'email' | 'sms';
+  recipient: string;
+  subject?: string;
+  message: string;
+  status: 'SENT' | 'DELIVERED' | 'FAILED';
+  trigger_reason: string;
+  created_at: string;
+  provider: string;
+}
+
+export interface NotificationSettings {
+  email_enabled: boolean;
+  sms_enabled: boolean;
+  sms_brand_name: string;
+  admin_copy_email: string;
+  admin_copy_phone: string;
+  notify_on_status_change: boolean;
+  notify_on_new_order: boolean;
 }
 
 export interface BrandSettings {

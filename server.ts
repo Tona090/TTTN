@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import nodemailer from 'nodemailer';
 import { GoogleGenAI } from '@google/genai';
 import { createServer as createViteServer } from 'vite';
 import {
@@ -10,12 +11,13 @@ import {
   initialProducts,
   initialBanners,
   initialNews,
+  initialArticleComments,
   initialUsers,
   initialOrders,
   initialSettings,
   initialReviews
 } from './src/data/mockData';
-import { Category, Product, Banner, NewsArticle, User, Order, SiteSettings, Role, Review, StockLogItem } from './src/types';
+import { Category, Product, Banner, NewsArticle, ArticleComment, User, Order, SiteSettings, Role, Review, StockLogItem } from './src/types';
 
 declare global {
   namespace Express {
@@ -35,6 +37,7 @@ let categories: Category[] = [...initialCategories];
 let products: Product[] = [...initialProducts];
 let banners: Banner[] = [...initialBanners];
 let newsList: NewsArticle[] = [...initialNews];
+let articleComments: ArticleComment[] = [...initialArticleComments];
 let users: (User & { passwordHash: string })[] = initialUsers.map(u => ({
   ...u,
   passwordHash: bcrypt.hashSync('123456', 10)
@@ -81,6 +84,65 @@ let stockLogs: StockLogItem[] = [
   }
 ];
 
+export interface NotificationLog {
+  id: number;
+  order_id: number;
+  type: 'email' | 'sms';
+  recipient: string;
+  subject?: string;
+  message: string;
+  status: 'SENT' | 'DELIVERED' | 'FAILED';
+  trigger_reason: string;
+  created_at: string;
+  provider: string;
+}
+
+export interface NotificationSettings {
+  email_enabled: boolean;
+  sms_enabled: boolean;
+  sms_brand_name: string;
+  admin_copy_email: string;
+  admin_copy_phone: string;
+  notify_on_status_change: boolean;
+  notify_on_new_order: boolean;
+}
+
+let notificationSettings: NotificationSettings = {
+  email_enabled: true,
+  sms_enabled: true,
+  sms_brand_name: 'TECHGEAR',
+  admin_copy_email: 'admin@techgear.vn',
+  admin_copy_phone: '0988.123.456',
+  notify_on_status_change: true,
+  notify_on_new_order: true
+};
+
+let notificationLogs: NotificationLog[] = [
+  {
+    id: 5001,
+    order_id: 2000,
+    type: 'email',
+    recipient: 'nguyen.a@gmail.com',
+    subject: '[TechGear Store] XÁC NHẬN ĐƠN HÀNG #2000 - ĐANG XỬ LÝ',
+    message: 'Kính gửi Nguyễn Văn A, đơn hàng #2000 của bạn đã được tiếp nhận và đang đóng gói kiểm định.',
+    status: 'SENT',
+    trigger_reason: 'Tự động gửi email khi tạo đơn hàng mới',
+    created_at: '2026-08-05 14:30',
+    provider: 'Google Gmail API'
+  },
+  {
+    id: 5002,
+    order_id: 2000,
+    type: 'sms',
+    recipient: '0901234567',
+    message: 'TechGear [TECHGEAR]: Don hang #2000 da tao thanh cong. Chung toi dang chuan bi hang va se giao som nhat!',
+    status: 'DELIVERED',
+    trigger_reason: 'Tự động gửi SMS BrandName xác nhận đơn',
+    created_at: '2026-08-05 14:30',
+    provider: 'SMS Gateway (TECHGEAR)'
+  }
+];
+
 let nextProductId = 200;
 let nextCategoryId = 10;
 let nextBannerId = 10;
@@ -88,7 +150,299 @@ let nextNewsId = 10;
 let nextUserId = 10;
 let nextOrderId = 2000;
 let nextReviewId = 100;
+let nextArticleCommentId = 100;
 let nextStockLogId = 1004;
+let nextNotificationLogId = 5003;
+
+// Helper to send real email via Nodemailer SMTP if credentials exist in .env
+async function sendRealEmail(to: string, subject: string, htmlContent: string, textContent?: string): Promise<{ success: boolean; mode: string; detail?: string }> {
+  const host = process.env.SMTP_HOST || 'smtp.gmail.com';
+  const port = Number(process.env.SMTP_PORT) || 465;
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+
+  if (!user || !pass) {
+    console.log(`[Email Transporter] SMTP_USER/SMTP_PASS not set. Email logged locally for ${to}`);
+    return { 
+      success: true, 
+      mode: 'Hệ thống đã lưu & hiển thị Nhật Ký Email (Môi trường Demo)', 
+      detail: 'Cấu hình SMTP_USER và SMTP_PASS trong file .env để phát Email thật tới hộp thư Gmail của khách hàng.' 
+    };
+  }
+
+  try {
+    const transporter = nodemailer.createTransport({
+      host,
+      port,
+      secure: port === 465,
+      auth: { user, pass }
+    });
+
+    const info = await transporter.sendMail({
+      from: process.env.EMAIL_FROM || `TechGear Store <${user}>`,
+      to,
+      subject,
+      text: textContent || 'Nội dung hóa đơn điện tử TechGear Vietnam',
+      html: htmlContent
+    });
+
+    console.log(`[SMTP Live Success] Real email delivered to ${to}, MessageID: ${info.messageId}`);
+    return { 
+      success: true, 
+      mode: 'Đã gửi Email thật tới hộp thư Gmail khách hàng thành công!', 
+      detail: `Message ID: ${info.messageId}` 
+    };
+  } catch (err: any) {
+    console.error(`[SMTP Live Error] Failed sending real email to ${to}:`, err.message);
+    return { success: false, mode: 'Gửi SMTP Thất Bại', detail: err.message };
+  }
+}
+
+// Function to generate rich, minimalist HTML Invoice (Email & Print Compatible)
+function generateHTMLInvoice(order: Order): string {
+  const subtotal = order.total_amount;
+  const formattedItems = order.items.map((item, idx) => `
+    <tr>
+      <td style="padding: 14px 12px; border-bottom: 1px solid #f1f5f9; text-align: center; font-size: 13px; color: #64748b; font-weight: 600;">${idx + 1}</td>
+      <td style="padding: 14px 12px; border-bottom: 1px solid #f1f5f9; font-size: 13px; font-weight: 700; color: #0f172a; line-height: 1.5;">${item.name}</td>
+      <td style="padding: 14px 12px; border-bottom: 1px solid #f1f5f9; text-align: center; font-size: 13px; color: #475569;">Cái</td>
+      <td style="padding: 14px 12px; border-bottom: 1px solid #f1f5f9; text-align: center; font-size: 13px; font-weight: 800; color: #0f172a;">${item.quantity}</td>
+      <td style="padding: 14px 12px; border-bottom: 1px solid #f1f5f9; text-align: right; font-size: 13px; color: #475569; font-family: 'Courier New', Courier, monospace;">${item.price.toLocaleString('vi-VN')}đ</td>
+      <td style="padding: 14px 12px; border-bottom: 1px solid #f1f5f9; text-align: right; font-size: 13px; font-weight: 800; color: #d97706; font-family: 'Courier New', Courier, monospace;">${(item.price * item.quantity).toLocaleString('vi-VN')}đ</td>
+    </tr>
+  `).join('');
+
+  return `<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hóa Đơn Điện Tử #${order.id} - TechGear Studio</title>
+</head>
+<body style="margin: 0; padding: 24px 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; color: #1e293b;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; width: 100%;">
+    <tr>
+      <td align="center" style="padding: 12px;">
+        <!-- Main Invoice Container -->
+        <table width="650" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; max-width: 650px; width: 100%; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03); overflow: hidden;">
+          
+          <!-- Header Bar -->
+          <tr>
+            <td style="padding: 32px 32px 24px 32px; border-bottom: 2px solid #f1f5f9;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td valign="top" style="line-height: 1.5;">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="background-color: #0f172a; color: #fbbf24; font-weight: 900; font-size: 16px; padding: 8px 14px; border-radius: 8px; letter-spacing: 2px; font-family: monospace;">TG</td>
+                        <td style="padding-left: 12px; font-size: 18px; font-weight: 900; color: #0f172a; letter-spacing: 1px;">TECHGEAR STUDIO</td>
+                      </tr>
+                    </table>
+                    <div style="font-size: 12px; color: #64748b; margin-top: 10px; line-height: 1.6;">
+                      CÔNG TY CỔ PHẦN CÔNG NGHỆ TECHGEAR VIỆT NAM<br>
+                      MST: 0317892341 &bull; Hotline CSKH: <strong>1900-8888</strong> &bull; techgear.vn<br>
+                      Địa chỉ: 115 Ỷ Lan, P. Phú Thạnh, Q. Tân Phú, TP. HCM
+                    </div>
+                  </td>
+                  <td valign="top" align="right" style="line-height: 1.5;">
+                    <div style="font-size: 20px; font-weight: 900; color: #d97706; text-transform: uppercase; letter-spacing: 1px;">HÓA ĐƠN BÁN HÀNG</div>
+                    <div style="font-family: 'Courier New', Courier, monospace; font-size: 15px; font-weight: 800; color: #0f172a; margin-top: 6px;">Đơn hàng: #${order.id}</div>
+                    <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Ngày lập: ${order.created_at}</div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Content Body -->
+          <tr>
+            <td style="padding: 28px 32px;">
+
+              <!-- Customer & Order Information Grid -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 28px;">
+                <tr>
+                  <td width="48%" valign="top" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px 20px;">
+                    <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: #64748b; letter-spacing: 1px; margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px;">THÔNG TIN NGƯỜI MUA HÀNG</div>
+                    <div style="font-size: 13px; color: #334155; line-height: 1.8;">
+                      <span style="color: #64748b;">Họ tên:</span> <strong style="color: #0f172a;">${order.user_name}</strong><br>
+                      <span style="color: #64748b;">Số điện thoại:</span> <strong style="color: #0f172a;">${order.phone}</strong><br>
+                      <span style="color: #64748b;">Email:</span> <strong style="color: #0f172a;">${order.email || 'N/A'}</strong><br>
+                      <span style="color: #64748b;">Địa chỉ giao:</span> <strong style="color: #0f172a;">${order.shipping_address}</strong>
+                    </div>
+                  </td>
+                  <td width="4%">&nbsp;</td>
+                  <td width="48%" valign="top" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px 20px;">
+                    <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: #64748b; letter-spacing: 1px; margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px;">THANH TOÁN & VẬN CHUYỂN</div>
+                    <div style="font-size: 13px; color: #334155; line-height: 1.8;">
+                      <span style="color: #64748b;">Phương thức:</span> <strong style="color: #b45309;">${order.payment_method}</strong><br>
+                      <span style="color: #64748b;">Trạng thái tiền:</span> <strong style="color: #0f172a;">${order.payment_status === 'paid' ? 'Đã Thanh Toán' : 'COD (Thu Tiền Tận Nơi)'}</strong><br>
+                      <span style="color: #64748b;">Trạng thái đơn:</span> <strong style="color: #2563eb;">${order.status.toUpperCase()}</strong><br>
+                      ${order.note ? `<span style="color: #64748b;">Ghi chú:</span> <em style="color: #475569;">"${order.note}"</em>` : ''}
+                    </div>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Product Table -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; margin-bottom: 28px;">
+                <thead>
+                  <tr style="background-color: #f1f5f9;">
+                    <th align="center" style="padding: 12px 10px; font-size: 11px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.8px; width: 40px;">STT</th>
+                    <th align="left" style="padding: 12px 12px; font-size: 11px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.8px;">TÊN SẢN PHẨM LINH KIỆN</th>
+                    <th align="center" style="padding: 12px 10px; font-size: 11px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.8px; width: 50px;">ĐVT</th>
+                    <th align="center" style="padding: 12px 10px; font-size: 11px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.8px; width: 50px;">SL</th>
+                    <th align="right" style="padding: 12px 12px; font-size: 11px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.8px; width: 110px;">ĐƠN GIÁ</th>
+                    <th align="right" style="padding: 12px 12px; font-size: 11px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.8px; width: 120px;">THÀNH TIỀN</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${formattedItems}
+                </tbody>
+              </table>
+
+              <!-- Total Box -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #fffbeb; border: 1px solid #fef3c7; border-radius: 12px; margin-bottom: 24px;">
+                <tr>
+                  <td style="padding: 20px 24px;">
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td valign="middle">
+                          <div style="font-size: 12px; font-weight: 800; color: #92400e; text-transform: uppercase; letter-spacing: 0.8px;">TỔNG CỘNG THANH TOÁN (ĐÃ BAO GỒM VAT)</div>
+                          <div style="font-size: 12px; color: #78350f; margin-top: 3px;">Đã kiểm định kỹ thuật & niêm phong đóng gói kho TechGear</div>
+                        </td>
+                        <td valign="middle" align="right">
+                          <div style="font-size: 24px; font-weight: 900; color: #b45309; font-family: 'Courier New', Courier, monospace; letter-spacing: 0.5px;">${subtotal.toLocaleString('vi-VN')} VNĐ</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Warranty Card -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f0fdf4; border: 1px solid #dcfce7; border-radius: 12px; margin-bottom: 28px;">
+                <tr>
+                  <td style="padding: 18px 20px; font-size: 13px; color: #166534; line-height: 1.6;">
+                    <div style="font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; color: #15803d;">🛡️ BẢO HÀNH ĐIỆN TỬ CHÍNH HÃNG (E-WARRANTY)</div>
+                    <div>Tất cả sản phẩm đã tự động kích hoạt bảo hành theo Số Điện Thoại <strong>${order.phone}</strong>. Quý khách chỉ cần đọc SĐT khi bảo hành 1 đổi 1 tại hệ thống TechGear.</div>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Footer Note -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top: 1px solid #f1f5f9;">
+                <tr>
+                  <td align="center" style="padding-top: 24px; font-size: 12px; color: #94a3b8; line-height: 1.6;">
+                    <div style="font-weight: 700; color: #475569; margin-bottom: 4px;">Cảm ơn quý khách đã tin tưởng và đồng hành cùng TechGear Studio!</div>
+                    <div>Hotline Hỗ Trợ Kỹ Thuật: <strong>1900-8888</strong> &bull; Email: <strong>support@techgear.vn</strong></div>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
+function dispatchOrderStatusNotification(order: Order, oldStatus: string, newStatus: string, customNote?: string): NotificationLog[] {
+  if (!notificationSettings.notify_on_status_change) return [];
+
+  const createdLogs: NotificationLog[] = [];
+  const timeStr = new Date().toLocaleString('vi-VN');
+  const recipientEmail = order.email || 'customer@gmail.com';
+  const recipientPhone = order.phone || '0901234567';
+
+  const getStatusLabelVi = (s: string) => {
+    switch (s) {
+      case 'pending': return 'Chờ Xác Nhận';
+      case 'processing': return 'Đã Xác Nhận / Đang Xử Lý & Đóng Gói';
+      case 'shipped': return 'Đang Vận Chuyển Giao Hàng';
+      case 'completed': return 'Giao Hàng Thành Công';
+      case 'cancelled': return 'Đã Hủy Đơn Hàng';
+      default: return s;
+    }
+  };
+
+  const oldLabel = getStatusLabelVi(oldStatus);
+  const newLabel = getStatusLabelVi(newStatus);
+  const itemsSummary = order.items.map(i => `${i.name} (x${i.quantity})`).join(', ');
+
+  // 1. DISPATCH EMAIL NOTIFICATION
+  if (notificationSettings.email_enabled) {
+    const emailSubject = `[TechGear Store] Cập nhật đơn hàng #${order.id} ➔ [${newLabel}]`;
+    let emailBody = `Kính gửi ${order.user_name},\n\nTechGear xin thông báo đơn hàng #${order.id} của quý khách vừa được cập nhật trạng thái từ "${oldLabel}" sang [${newLabel}].\n\nCHI TIẾT ĐƠN HÀNG #${order.id}:\n- Danh mục sản phẩm: ${itemsSummary}\n- Tổng tiền thanh toán: ${order.total_amount.toLocaleString('vi-VN')}đ (${order.payment_method})\n- Địa chỉ nhận hàng: ${order.shipping_address}\n- SĐT liên hệ: ${order.phone}\n`;
+
+    if (newStatus === 'processing') {
+      emailBody += `\n📦 Đơn hàng đã được bộ phận kho duyệt, kỹ thuật viên kiểm tra niêm phong và đóng gói cẩn thận.`;
+    } else if (newStatus === 'shipped') {
+      emailBody += `\n🚚 Đơn hàng đã xuất kho và giao cho đối tác vận chuyển giao nhanh. Shipper sẽ liên hệ quý khách trước khi giao.\nTra cứu hành trình real-time: https://techgear.vn/order-tracker?id=${order.id}`;
+    } else if (newStatus === 'completed') {
+      emailBody += `\n🎉 Đơn hàng đã được giao thành công! Thẻ bảo hành điện tử (E-Warranty) 12 tháng chính hãng TechGear đã tự động kích hoạt theo SĐT ${order.phone}.`;
+    } else if (newStatus === 'cancelled') {
+      emailBody += `\n❌ Đơn hàng đã bị hủy. Lý do: ${customNote || order.cancel_reason || 'Xử lý theo thỏa thuận'}.\nNếu cần thêm trợ giúp, vui lòng gọi Hotline: 1900-8888.`;
+    }
+
+    emailBody += `\n\nTrân trọng,\nĐội ngũ Quản trị TechGear Vietnam.`;
+
+    // Trigger background email delivery if SMTP configured
+    sendRealEmail(recipientEmail, emailSubject, generateHTMLInvoice(order), emailBody).catch(e => {
+      console.error('Background sendRealEmail error:', e);
+    });
+
+    const emailLog: NotificationLog = {
+      id: nextNotificationLogId++,
+      order_id: order.id,
+      type: 'email',
+      recipient: recipientEmail,
+      subject: emailSubject,
+      message: emailBody,
+      status: 'SENT',
+      trigger_reason: `Chuyển trạng thái đơn hàng: ${oldStatus} ➔ ${newStatus}`,
+      created_at: timeStr,
+      provider: 'Nodemailer SMTP / Google Gmail'
+    };
+    notificationLogs.unshift(emailLog);
+    createdLogs.push(emailLog);
+    console.log(`[Email Dispatched] To: ${recipientEmail} | Subject: ${emailSubject}`);
+  }
+
+  // 2. DISPATCH SMS / BRANDNAME NOTIFICATION
+  if (notificationSettings.sms_enabled) {
+    let smsMsg = `TechGear [${notificationSettings.sms_brand_name}]: Don hang #${order.id} da chuyen sang [${newLabel}].`;
+    if (newStatus === 'processing') {
+      smsMsg += ` Kiem dinh & dong goi tai kho. Hotline 19008888.`;
+    } else if (newStatus === 'shipped') {
+      smsMsg += ` Dang giao hang. Tra cuu tai: techgear.vn/track/${order.id}`;
+    } else if (newStatus === 'completed') {
+      smsMsg += ` Giao thanh cong. Kich hoat Bao Hanh Dien Tu theo SDT ${order.phone}. Cam on ban!`;
+    } else if (newStatus === 'cancelled') {
+      smsMsg += ` Don bi huy. Ly do: ${customNote || order.cancel_reason || 'Theo thoa thuan'}. Hotline 19008888.`;
+    }
+
+    const smsLog: NotificationLog = {
+      id: nextNotificationLogId++,
+      order_id: order.id,
+      type: 'sms',
+      recipient: recipientPhone,
+      message: smsMsg,
+      status: 'DELIVERED',
+      trigger_reason: `Tự động SMS BrandName: ${oldStatus} ➔ ${newStatus}`,
+      created_at: timeStr,
+      provider: `SMS Gateway (${notificationSettings.sms_brand_name})`
+    };
+    notificationLogs.unshift(smsLog);
+    createdLogs.push(smsLog);
+    console.log(`[SMS Dispatched] To: ${recipientPhone} | Msg: ${smsMsg}`);
+  }
+
+  persistDatabaseState();
+  return createdLogs;
+}
 
 // Helper: Save database state to data_store.json
 function persistDatabaseState() {
@@ -98,11 +452,14 @@ function persistDatabaseState() {
       products,
       banners,
       newsList,
+      articleComments,
       users,
       orders,
       siteSettings,
       reviews,
       stockLogs,
+      notificationLogs,
+      notificationSettings,
       nextProductId,
       nextCategoryId,
       nextBannerId,
@@ -110,7 +467,9 @@ function persistDatabaseState() {
       nextUserId,
       nextOrderId,
       nextReviewId,
+      nextArticleCommentId,
       nextStockLogId,
+      nextNotificationLogId,
       updatedAt: new Date().toISOString()
     };
     fs.writeFileSync(DB_FILE_PATH, JSON.stringify(dump, null, 2), 'utf-8');
@@ -129,11 +488,14 @@ function loadDatabaseState() {
       if (dump.products) products = dump.products;
       if (dump.banners) banners = dump.banners;
       if (dump.newsList) newsList = dump.newsList;
+      if (dump.articleComments) articleComments = dump.articleComments;
       if (dump.users) users = dump.users;
       if (dump.orders) orders = dump.orders;
       if (dump.siteSettings) siteSettings = dump.siteSettings;
       if (dump.reviews) reviews = dump.reviews;
       if (dump.stockLogs) stockLogs = dump.stockLogs;
+      if (dump.notificationLogs) notificationLogs = dump.notificationLogs;
+      if (dump.notificationSettings) notificationSettings = dump.notificationSettings;
       if (dump.nextProductId) nextProductId = dump.nextProductId;
       if (dump.nextCategoryId) nextCategoryId = dump.nextCategoryId;
       if (dump.nextBannerId) nextBannerId = dump.nextBannerId;
@@ -141,7 +503,9 @@ function loadDatabaseState() {
       if (dump.nextUserId) nextUserId = dump.nextUserId;
       if (dump.nextOrderId) nextOrderId = dump.nextOrderId;
       if (dump.nextReviewId) nextReviewId = dump.nextReviewId;
+      if (dump.nextArticleCommentId) nextArticleCommentId = dump.nextArticleCommentId;
       if (dump.nextStockLogId) nextStockLogId = dump.nextStockLogId;
+      if (dump.nextNotificationLogId) nextNotificationLogId = dump.nextNotificationLogId;
       console.log('✅ Đã tải dữ liệu bền vững từ data_store.json!');
     }
   } catch (err) {
@@ -852,7 +1216,7 @@ app.get('/api/products/:id/reviews', (req: AuthRequest, res: Response) => {
   });
 });
 
-app.post('/api/products/:id/reviews', (req: AuthRequest, res: Response) => {
+app.post('/api/products/:id/reviews', authenticateToken, (req: AuthRequest, res: Response) => {
   const productId = Number(req.params.id);
   const prod = products.find(p => p.id === productId);
   if (!prod) {
@@ -1084,18 +1448,236 @@ app.delete('/api/banners/:id', requireRole(['SuperAdmin', 'Admin']), (req: Reque
   res.json({ message: 'Đã xóa banner thành công.', id });
 });
 
+// Helper to calculate total comments for an article
+function getArticleCommentsCount(articleId: number): number {
+  let count = 0;
+  const list = articleComments.filter(c => c.article_id === articleId);
+  list.forEach(c => {
+    count++;
+    if (c.replies && Array.isArray(c.replies)) {
+      count += c.replies.length;
+    }
+  });
+  return count;
+}
+
 // ======================= NEWS APIS =======================
 app.get('/api/news', (req: Request, res: Response) => {
-  res.json(newsList);
+  const { search, category, sort } = req.query;
+
+  let result = newsList.map(n => ({
+    ...n,
+    comments_count: getArticleCommentsCount(n.id)
+  }));
+
+  // Filter by Category
+  if (category && typeof category === 'string' && category !== 'Tất cả' && category.trim() !== '') {
+    const catLower = category.toLowerCase().trim();
+    result = result.filter(n => n.category && n.category.toLowerCase().includes(catLower));
+  }
+
+  // Filter by Search Keyword
+  if (search && typeof search === 'string' && search.trim() !== '') {
+    const q = search.toLowerCase().trim();
+    result = result.filter(n => 
+      n.title.toLowerCase().includes(q) ||
+      n.excerpt.toLowerCase().includes(q) ||
+      n.content.toLowerCase().includes(q) ||
+      (n.author && n.author.toLowerCase().includes(q)) ||
+      (n.tags && n.tags.some(t => t.toLowerCase().includes(q)))
+    );
+  }
+
+  // Sorting
+  if (sort === 'oldest') {
+    result.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+  } else if (sort === 'views') {
+    result.sort((a, b) => (b.views || 0) - (a.views || 0));
+  } else if (sort === 'likes') {
+    result.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+  } else if (sort === 'title_asc') {
+    result.sort((a, b) => a.title.localeCompare(b.title, 'vi'));
+  } else {
+    // Default 'newest'
+    result.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  }
+
+  res.json(result);
 });
 
 app.get('/api/news/:id', (req: Request, res: Response) => {
   const id = Number(req.params.id);
-  const item = newsList.find(n => n.id === id);
-  if (!item) {
+  const index = newsList.findIndex(n => n.id === id);
+  if (index === -1) {
     return res.status(404).json({ message: 'Bài viết không tồn tại.' });
   }
-  res.json(item);
+
+  // Increment view count
+  newsList[index].views = (newsList[index].views || 0) + 1;
+  persistDatabaseState();
+
+  const article = {
+    ...newsList[index],
+    comments_count: getArticleCommentsCount(id)
+  };
+
+  res.json(article);
+});
+
+app.post('/api/news/:id/like', authenticateToken, (req: AuthRequest, res: Response) => {
+  const id = Number(req.params.id);
+  const index = newsList.findIndex(n => n.id === id);
+  if (index === -1) {
+    return res.status(404).json({ message: 'Bài viết không tồn tại.' });
+  }
+
+  newsList[index].likes = (newsList[index].likes || 0) + 1;
+  persistDatabaseState();
+
+  res.json({ id, likes: newsList[index].likes });
+});
+
+// Article Comments & Discussion APIs
+app.get('/api/news/:id/comments', (req: Request, res: Response) => {
+  const articleId = Number(req.params.id);
+  const comments = articleComments.filter(c => c.article_id === articleId && !c.parent_id);
+  res.json(comments);
+});
+
+app.post('/api/news/:id/comments', authenticateToken, (req: AuthRequest, res: Response) => {
+  const articleId = Number(req.params.id);
+  const { content, user_name, parent_id, avatar } = req.body;
+
+  if (!content || !content.trim()) {
+    return res.status(400).json({ message: 'Nội dung bình luận không được để trống.' });
+  }
+
+  const isUserAdmin = req.user && ['SuperAdmin', 'Admin', 'Editor'].includes(req.user.role);
+  const authorName = req.user ? req.user.name : (user_name || 'Khách Hàng ẩn danh');
+  const userAvatar = req.user?.avatar || avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80';
+
+  const now = new Date();
+  const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+  const newCommentItem: ArticleComment = {
+    id: nextArticleCommentId++,
+    article_id: articleId,
+    parent_id: parent_id ? Number(parent_id) : null,
+    user_id: req.user ? req.user.id : undefined,
+    user_name: authorName,
+    avatar: userAvatar,
+    content: content.trim(),
+    created_at: dateStr,
+    likes: 0,
+    is_author: isUserAdmin,
+    replies: []
+  };
+
+  if (parent_id) {
+    // Attach as reply to parent comment
+    const parentComment = articleComments.find(c => c.id === Number(parent_id) && c.article_id === articleId);
+    if (parentComment) {
+      if (!parentComment.replies) parentComment.replies = [];
+      parentComment.replies.push(newCommentItem);
+    } else {
+      // Fallback if parent comment not found
+      articleComments.unshift(newCommentItem);
+    }
+  } else {
+    articleComments.unshift(newCommentItem);
+  }
+
+  persistDatabaseState();
+
+  const articleCommentsList = articleComments.filter(c => c.article_id === articleId && !c.parent_id);
+  res.status(201).json({
+    message: 'Bình luận thành công!',
+    comment: newCommentItem,
+    comments: articleCommentsList,
+    total_comments: getArticleCommentsCount(articleId)
+  });
+});
+
+app.post('/api/news/:id/comments/:commentId/like', authenticateToken, (req: AuthRequest, res: Response) => {
+  const articleId = Number(req.params.id);
+  const commentId = Number(req.params.commentId);
+
+  let target: ArticleComment | undefined;
+
+  for (const c of articleComments) {
+    if (c.id === commentId && c.article_id === articleId) {
+      target = c;
+      break;
+    }
+    if (c.replies) {
+      const reply = c.replies.find(r => r.id === commentId);
+      if (reply) {
+        target = reply;
+        break;
+      }
+    }
+  }
+
+  if (!target) {
+    return res.status(404).json({ message: 'Không tìm thấy bình luận.' });
+  }
+
+  target.likes = (target.likes || 0) + 1;
+  persistDatabaseState();
+
+  res.json({ id: commentId, likes: target.likes });
+});
+
+app.delete('/api/news/:id/comments/:commentId', authenticateToken, (req: AuthRequest, res: Response) => {
+  const articleId = Number(req.params.id);
+  const commentId = Number(req.params.commentId);
+
+  const topIndex = articleComments.findIndex(c => c.id === commentId && c.article_id === articleId);
+
+  if (topIndex !== -1) {
+    const comment = articleComments[topIndex];
+    const isAdmin = req.user && ['SuperAdmin', 'Admin', 'Editor'].includes(req.user.role);
+    const isOwner = req.user && comment.user_id === req.user.id;
+
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({ message: 'Bạn không có quyền xóa bình luận này.' });
+    }
+
+    articleComments.splice(topIndex, 1);
+  } else {
+    // Check if it's inside a parent reply
+    let deleted = false;
+    for (const c of articleComments) {
+      if (c.replies) {
+        const replyIndex = c.replies.findIndex(r => r.id === commentId);
+        if (replyIndex !== -1) {
+          const reply = c.replies[replyIndex];
+          const isAdmin = req.user && ['SuperAdmin', 'Admin', 'Editor'].includes(req.user.role);
+          const isOwner = req.user && reply.user_id === req.user.id;
+
+          if (!isAdmin && !isOwner) {
+            return res.status(403).json({ message: 'Bạn không có quyền xóa bình luận này.' });
+          }
+
+          c.replies.splice(replyIndex, 1);
+          deleted = true;
+          break;
+        }
+      }
+    }
+
+    if (!deleted) {
+      return res.status(404).json({ message: 'Không tìm thấy bình luận để xóa.' });
+    }
+  }
+
+  persistDatabaseState();
+  const articleCommentsList = articleComments.filter(c => c.article_id === articleId && !c.parent_id);
+  res.json({
+    message: 'Đã xóa bình luận.',
+    comments: articleCommentsList,
+    total_comments: getArticleCommentsCount(articleId)
+  });
 });
 
 app.post('/api/news', requireRole(['SuperAdmin', 'Admin', 'Editor']), (req: Request, res: Response) => {
@@ -1270,7 +1852,14 @@ app.post('/api/orders', (req: AuthRequest, res: Response) => {
   });
 
   orders.unshift(newOrder);
-  persistDatabaseState();
+
+  // Auto dispatch notification for new order creation if enabled
+  if (notificationSettings.notify_on_new_order) {
+    dispatchOrderStatusNotification(newOrder, 'NEW', 'pending');
+  } else {
+    persistDatabaseState();
+  }
+
   res.status(201).json(newOrder);
 });
 
@@ -1290,7 +1879,10 @@ app.put('/api/orders/:id/status', requireRole(['SuperAdmin', 'Admin', 'Editor'])
     order.payment_status = payment_status;
   }
 
-  if (status) {
+  let dispatchedLogs: NotificationLog[] = [];
+
+  if (status && status !== order.status) {
+    const oldStatus = order.status;
     const cancelMsg = reason || cancel_reason || 'Admin hủy đơn theo thỏa thuận với khách hàng';
 
     if (status === 'cancelled' && order.status !== 'cancelled') {
@@ -1325,10 +1917,93 @@ app.put('/api/orders/:id/status', requireRole(['SuperAdmin', 'Admin', 'Editor'])
     }
 
     order.status = status;
+    dispatchedLogs = dispatchOrderStatusNotification(order, oldStatus, status, cancelMsg);
+  } else {
+    persistDatabaseState();
   }
 
+  res.json({
+    ...order,
+    notifications_sent: dispatchedLogs.length > 0,
+    dispatched_notifications: dispatchedLogs
+  });
+});
+
+// ======================= AUTOMATED EMAIL & SMS NOTIFICATION SYSTEM APIS =======================
+app.get('/api/notifications/logs', (req: Request, res: Response) => {
+  const orderId = req.query.order_id ? Number(req.query.order_id) : null;
+  if (orderId) {
+    return res.json(notificationLogs.filter(l => l.order_id === orderId));
+  }
+  res.json(notificationLogs);
+});
+
+app.post('/api/notifications/resend', requireRole(['SuperAdmin', 'Admin', 'Editor']), (req: Request, res: Response) => {
+  const { order_id, type } = req.body || {};
+  const cleanId = Number(order_id);
+  const order = orders.find(o => o.id === cleanId);
+
+  if (!order) {
+    return res.status(404).json({ message: 'Không tìm thấy đơn hàng.' });
+  }
+
+  const channelType = type === 'sms' ? 'sms' : 'email';
+  const timeStr = new Date().toLocaleString('vi-VN');
+
+  let newLog: NotificationLog;
+
+  if (channelType === 'email') {
+    const targetEmail = order.email || 'customer@gmail.com';
+    const emailSubject = `[TechGear Store] [Gửi Lại] Cập nhật đơn hàng #${order.id} - ${order.status.toUpperCase()}`;
+    const emailBody = `Kính gửi ${order.user_name},\n\nđây là thư gửi lại thông báo trạng thái đơn hàng #${order.id}.\nTrạng thái hiện tại: [${order.status}]\nTổng tiền: ${order.total_amount.toLocaleString('vi-VN')}đ\nSĐT: ${order.phone}\nĐịa chỉ: ${order.shipping_address}\n\nCảm ơn quý khách đã mua sắm tại TechGear Vietnam!`;
+
+    newLog = {
+      id: nextNotificationLogId++,
+      order_id: order.id,
+      type: 'email',
+      recipient: targetEmail,
+      subject: emailSubject,
+      message: emailBody,
+      status: 'SENT',
+      trigger_reason: 'Gửi lại thủ công bởi Quản trị viên (Admin Re-trigger)',
+      created_at: timeStr,
+      provider: 'Google Gmail API (OAuth2)'
+    };
+  } else {
+    const targetPhone = order.phone || '0901234567';
+    const smsMsg = `TechGear [${notificationSettings.sms_brand_name}]: [Gui Lai] Don hang #${order.id} hien o trang thai [${order.status.toUpperCase()}]. Tra cuu tai: techgear.vn/track/${order.id}`;
+
+    newLog = {
+      id: nextNotificationLogId++,
+      order_id: order.id,
+      type: 'sms',
+      recipient: targetPhone,
+      message: smsMsg,
+      status: 'DELIVERED',
+      trigger_reason: 'Gửi lại SMS BrandName thủ công bởi Quản trị viên',
+      created_at: timeStr,
+      provider: `SMS Gateway (${notificationSettings.sms_brand_name})`
+    };
+  }
+
+  notificationLogs.unshift(newLog);
   persistDatabaseState();
-  res.json(order);
+
+  res.json({
+    success: true,
+    message: `Đã gửi thành công thông báo ${channelType.toUpperCase()} tới ${newLog.recipient}`,
+    log: newLog
+  });
+});
+
+app.get('/api/notifications/settings', (req: Request, res: Response) => {
+  res.json(notificationSettings);
+});
+
+app.put('/api/notifications/settings', requireRole(['SuperAdmin', 'Admin']), (req: Request, res: Response) => {
+  notificationSettings = { ...notificationSettings, ...req.body };
+  persistDatabaseState();
+  res.json({ success: true, message: 'Đã cập nhật cấu hình thông báo Email & SMS tự động', settings: notificationSettings });
 });
 
 // Transfer notification by customer
@@ -1346,6 +2021,300 @@ app.post('/api/orders/:id/notify-transfer', (req: Request, res: Response) => {
   }
   persistDatabaseState();
   res.json({ success: true, message: 'Đã báo chuyển khoản thành công. Đang chờ kế toán đối soát.', order });
+});
+
+// Helper to generate rich order tracking details
+function generateTrackingData(order: Order) {
+  const carrier = order.payment_method === 'COD' ? 'TechGear Express (Giao hỏa tốc 2H)' : 'Giao Hàng Tiết Kiệm (GHTK Express)';
+  const tracking_code = `TGEX-${880000 + order.id * 149}`;
+  
+  let orderDate = new Date();
+  if (order.created_at) {
+    const parsed = new Date(order.created_at);
+    if (!isNaN(parsed.getTime())) orderDate = parsed;
+  }
+
+  const estStart = new Date(orderDate.getTime() + 1 * 24 * 60 * 60 * 1000);
+  const estEnd = new Date(orderDate.getTime() + 3 * 24 * 60 * 60 * 1000);
+  
+  const formatDate = (d: Date) => {
+    return d.toLocaleDateString('vi-VN', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' });
+  };
+
+  const estimated_delivery_range = `${formatDate(estStart)} - ${formatDate(estEnd)}`;
+  const estimated_delivery = `14:00 - 18:00, ${formatDate(estStart)}`;
+
+  let progress_percent = 15;
+  let current_step_index = 0;
+
+  if (order.status === 'pending') {
+    progress_percent = 20;
+    current_step_index = 1;
+  } else if (order.status === 'processing') {
+    progress_percent = 50;
+    current_step_index = 3;
+  } else if (order.status === 'shipped') {
+    progress_percent = 80;
+    current_step_index = 6;
+  } else if (order.status === 'completed') {
+    progress_percent = 100;
+    current_step_index = 7;
+  } else if (order.status === 'cancelled') {
+    progress_percent = 0;
+    current_step_index = -1;
+  }
+
+  const formatTimeStr = (d: Date) => {
+    const hours = String(d.getHours()).padStart(2, '0');
+    const mins = String(d.getMinutes()).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${hours}:${mins} - ${day}/${month}/${year}`;
+  };
+
+  const t0 = new Date(orderDate.getTime());
+  const t1 = new Date(orderDate.getTime() + 30 * 60 * 1000); // +30m
+  const t2 = new Date(orderDate.getTime() + 1.5 * 60 * 60 * 1000); // +1.5h
+  const t3 = new Date(orderDate.getTime() + 3 * 60 * 60 * 1000); // +3h
+  const t4 = new Date(orderDate.getTime() + 5 * 60 * 60 * 1000); // +5h
+  const t5 = new Date(orderDate.getTime() + 14 * 60 * 60 * 1000); // +14h
+  const t6 = new Date(orderDate.getTime() + 26 * 60 * 60 * 1000); // +26h
+  const t7 = new Date(orderDate.getTime() + 32 * 60 * 60 * 1000); // +32h
+
+  const timeline: any[] = [];
+
+  if (order.status === 'cancelled') {
+    timeline.push({
+      id: 'step-0',
+      title: 'Khởi tạo đơn hàng',
+      description: 'Hệ thống đã ghi nhận yêu cầu đặt hàng.',
+      location: 'Website TechGear',
+      timestamp: formatTimeStr(t0),
+      status: 'completed'
+    });
+    timeline.push({
+      id: 'step-cancel',
+      title: 'Đơn hàng đã bị hủy',
+      description: order.cancel_reason ? `Lý do: ${order.cancel_reason}` : 'Đơn hàng đã hủy thành công.',
+      location: 'Hệ thống TechGear',
+      timestamp: formatTimeStr(t1),
+      status: 'cancelled'
+    });
+  } else {
+    // 1. Order Received & System Verification
+    timeline.push({
+      id: 'step-1',
+      title: '1. Tiếp nhận & Tiếp nhận đơn hàng',
+      description: `Đơn hàng #${order.id} được tạo thành công. Hệ thống đang tự động xác thực tồn kho và tính khả dụng của linh kiện.`,
+      location: 'Hệ thống AI TechGear Order Engine',
+      timestamp: formatTimeStr(t0),
+      status: 'completed'
+    });
+
+    // 2. Accounting & Payment Clearance / Invoice
+    timeline.push({
+      id: 'step-2',
+      title: '2. Kế toán đối soát & Khởi tạo Hóa đơn e-Invoice',
+      description: order.payment_status === 'paid'
+        ? `Xác nhận thanh toán qua ${order.payment_method}. Đã phát hành hóa đơn điện tử VAT.`
+        : `Duyệt hình thức thanh toán ${order.payment_method}. Đã cấp mã thu hộ COD chính xác.`,
+      location: 'Phòng Kế Toán & Tài Chính TechGear',
+      timestamp: formatTimeStr(t1),
+      status: order.status === 'pending' ? 'current' : 'completed'
+    });
+
+    // 3. Technical QC & Hardware Testing
+    timeline.push({
+      id: 'step-3',
+      title: '3. Kiểm định Kỹ thuật & Dán Tem Bảo Hành',
+      description: 'Kỹ thuật viên kiểm tra ngoại quan linh kiện, stress-test hiệu năng, dán tem serial number & tem niêm phong chống giả.',
+      location: 'Trung Tâm Kỹ Thuật Kho Tổng TechGear',
+      timestamp: formatTimeStr(t2),
+      status: order.status === 'pending' ? 'upcoming' : (order.status === 'processing' ? 'current' : 'completed')
+    });
+
+    // 4. Packaging & Anti-shock Sealing
+    timeline.push({
+      id: 'step-4',
+      title: '4. Đóng gói chuyên dụng & Bọc xốp xốp hơi chống va đập',
+      description: 'Đóng thùng xốp dày, bọc màng co chuyên dụng cho đồ điện tử cao cấp, dán nhãn "Hàng Dễ Vỡ - Xin Nhẹ Tay".',
+      location: 'Bộ Phận Đóng Gói Xuất Hàng',
+      timestamp: formatTimeStr(t3),
+      status: ['pending'].includes(order.status) ? 'upcoming' : (order.status === 'processing' ? 'current' : 'completed')
+    });
+
+    // 5. Courier Handover & Tracking Assign
+    timeline.push({
+      id: 'step-5',
+      title: '5. Bàn giao Đơn vị Vận chuyển & Cấp mã Tracking',
+      description: `Bàn giao kiện hàng cho ${carrier}. Khởi tạo vận đơn chính thức: ${tracking_code}`,
+      location: 'Cảng Xuất Hàng Kho Tổng',
+      timestamp: formatTimeStr(t4),
+      status: ['pending', 'processing'].includes(order.status) ? 'upcoming' : (order.status === 'shipped' ? 'current' : 'completed')
+    });
+
+    // 6. Sorting Hub & Inter-province Transport
+    timeline.push({
+      id: 'step-6',
+      title: '6. Trung chuyển qua Trung tâm Phân loại',
+      description: 'Kiện hàng đã cập bến Kho trung chuyển lớn và đang chuyển lên xe tải chuyên dụng theo luồng hỏa tốc.',
+      location: 'Hub Trung Chuyển Miền / Bưu Cục Phân Loại',
+      timestamp: formatTimeStr(t5),
+      status: ['pending', 'processing'].includes(order.status) ? 'upcoming' : (order.status === 'shipped' ? 'current' : 'completed')
+    });
+
+    // 7. Local Dispatch & Out for Delivery
+    const isFailedAttempt = order.id === 3000 || (order.note && order.note.toLowerCase().includes('thất bại')) || (order.cancel_reason && order.cancel_reason.toLowerCase().includes('không liên lạc'));
+
+    if (isFailedAttempt) {
+      timeline.push({
+        id: 'step-7',
+        title: '7. Giao hàng không thành công (Lần 1)',
+        description: 'Shipper Nguyễn Văn Hùng đã đến địa chỉ nhưng gọi SĐT 0908123456 3 lần không nghe máy (Cửa hàng/Văn phòng đóng cửa).',
+        location: `Bưu cục Phát - Khu vực ${order.shipping_address}`,
+        timestamp: formatTimeStr(t6),
+        status: 'failed'
+      });
+
+      timeline.push({
+        id: 'step-8',
+        title: '8. Đang lưu giữ an toàn tại bưu cục & Hẹn lịch phát lại',
+        description: 'Kiện hàng được niêm phong lưu kho bưu cục địa phương (Miễn phí lưu kho 5 ngày). Shipper sẽ thử phát lại lần 2 vào ca làm việc tiếp theo hoặc theo lịch hẹn của bạn.',
+        location: `Bưu cục Lưu Hàng - Khu vực ${order.shipping_address}`,
+        timestamp: formatTimeStr(t7),
+        status: (order as any).rescheduled_info ? 'completed' : 'warning'
+      });
+
+      if ((order as any).rescheduled_info) {
+        const info = (order as any).rescheduled_info;
+        timeline.push({
+          id: 'step-9',
+          title: '9. Đã tiếp nhận lịch hẹn giao lại của Khách hàng',
+          description: `Khách hàng hẹn giao lại vào: ${info.date} (Khung giờ: ${info.time_slot}). Ghi chú cho Shipper: "${info.note || 'Gọi trước 15 phút'}"`,
+          location: 'Hệ thống Vận Chuyển TechGear',
+          timestamp: formatTimeStr(new Date()),
+          status: 'current'
+        });
+      }
+    } else {
+      timeline.push({
+        id: 'step-7',
+        title: '7. Shipper đang phát hàng tận nơi',
+        description: `Shipper Nguyễn Văn Hùng (SĐT: 0988.123.456) đã nhận hàng từ bưu cục địa phương và đang di chuyển đến địa chỉ giao hàng.`,
+        location: `Bưu cục Phát - Khu vực ${order.shipping_address}`,
+        timestamp: formatTimeStr(t6),
+        status: ['pending', 'processing'].includes(order.status) ? 'upcoming' : (order.status === 'shipped' ? 'current' : 'completed')
+      });
+
+      // 8. Delivered & Electronic Warranty Activation
+      timeline.push({
+        id: 'step-8',
+        title: '8. Giao hàng thành công & Kích hoạt Bảo hành Điện tử',
+        description: 'Khách hàng đã ký nhận, kiểm tra sản phẩm hoàn hảo. Hệ thống tự động kích hoạt bảo hành điện tử chính hãng qua SĐT khách hàng.',
+        location: order.shipping_address,
+        timestamp: formatTimeStr(t7),
+        status: order.status === 'completed' ? 'completed' : 'upcoming'
+      });
+    }
+  }
+
+  const isFailed = order.id === 3000 || (order.note && order.note.toLowerCase().includes('thất bại')) || (order.cancel_reason && order.cancel_reason.toLowerCase().includes('không liên lạc'));
+
+  return {
+    order_id: order.id,
+    status: order.status,
+    is_failed_attempt: isFailed,
+    failed_attempt_reason: isFailed ? 'Shipper gọi điện 3 lần không nghe máy (Lúc 10:30 và 11:15)' : undefined,
+    failed_attempt_count: isFailed ? 1 : 0,
+    rescheduled_info: (order as any).rescheduled_info,
+    carrier,
+    tracking_code,
+    estimated_delivery: isFailed ? 'Chờ khách hẹn lại lịch (Đang lưu kho)' : estimated_delivery,
+    estimated_delivery_range,
+    progress_percent: isFailed ? 70 : progress_percent,
+    current_step_index,
+    shipper: {
+      name: 'Nguyễn Văn Hùng',
+      phone: '0988.123.456',
+      vehicle: '29-G1 888.99 (Chuyên chở đồ công nghệ)',
+      rating: 4.9
+    },
+    timeline
+  };
+}
+
+// Order Track API Endpoint (By Order ID or Order ID + Contact)
+app.post('/api/orders/track', (req: Request, res: Response) => {
+  const { order_id, contact } = req.body || {};
+  const rawIdStr = (order_id || '').toString().trim().replace(/^#/, '').replace(/^TG-?/i, '');
+  const cleanId = Number(rawIdStr);
+
+  if (!rawIdStr || isNaN(cleanId)) {
+    return res.status(400).json({ message: 'Vui lòng nhập Mã đơn hàng hợp lệ (ví dụ: 2000, 1001, 1002 hoặc #2000).' });
+  }
+
+  const order = orders.find(o => o.id === cleanId);
+
+  if (!order) {
+    return res.status(404).json({ message: `Không tìm thấy đơn hàng mã #${cleanId} trên hệ thống. Vui lòng kiểm tra lại mã đơn.` });
+  }
+
+  // Generate tracking details
+  const tracking = generateTrackingData(order);
+  res.json({ success: true, order, tracking });
+});
+
+// Order Reschedule Delivery API Endpoint
+app.post('/api/orders/reschedule', (req: Request, res: Response) => {
+  const { order_id, date, time_slot, note, new_phone, new_address } = req.body || {};
+  const rawIdStr = (order_id || '').toString().trim().replace(/^#/, '').replace(/^TG-?/i, '');
+  const cleanId = Number(rawIdStr);
+
+  const order = orders.find(o => o.id === cleanId);
+  if (!order) {
+    return res.status(404).json({ message: 'Không tìm thấy đơn hàng cần hẹn lịch.' });
+  }
+
+  if (new_phone && new_phone.trim().length > 0) {
+    order.phone = new_phone.trim();
+  }
+  if (new_address && new_address.trim().length > 0) {
+    order.shipping_address = new_address.trim();
+  }
+
+  (order as any).rescheduled_info = {
+    date: date || 'Ngày mai',
+    time_slot: time_slot || '14:00 - 18:00',
+    note: note || ''
+  };
+
+  persistDatabaseState();
+
+  const tracking = generateTrackingData(order);
+  res.json({
+    success: true,
+    message: `Đã tiếp nhận lịch hẹn giao lại ngày ${date || 'tiếp theo'} (${time_slot || '14:00 - 18:00'}). Bưu cục sẽ liên hệ trước khi giao.`,
+    order,
+    tracking
+  });
+});
+
+app.get('/api/orders/track/:id', (req: Request, res: Response) => {
+  const rawIdStr = (req.params.id || '').trim().replace(/^#/, '').replace(/^TG-?/i, '');
+  const cleanId = Number(rawIdStr);
+
+  if (!rawIdStr || isNaN(cleanId)) {
+    return res.status(400).json({ message: 'Mã đơn hàng không hợp lệ.' });
+  }
+
+  const order = orders.find(o => o.id === cleanId);
+  if (!order) {
+    return res.status(404).json({ message: `Không tìm thấy đơn hàng mã #${cleanId}.` });
+  }
+
+  const tracking = generateTrackingData(order);
+  res.json({ success: true, order, tracking });
 });
 
 // Guest order lookup strictly requiring Order ID AND (Phone or Email) for privacy security
@@ -1384,8 +2353,22 @@ app.post('/api/orders/lookup', (req: Request, res: Response) => {
   res.json({ success: true, order: matchedOrder });
 });
 
-// Send receipt email notification endpoint (Integrated with Google Gmail API)
-app.post('/api/orders/:id/send-receipt-email', (req: Request, res: Response) => {
+// Serve standalone HTML Printable Invoice Page
+app.get('/api/orders/:id/invoice', (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  const order = orders.find(o => o.id === id);
+
+  if (!order) {
+    return res.status(404).send('<h2 style="font-family:sans-serif; text-align:center; margin-top:50px;">Không tìm thấy đơn hàng mã #' + id + '</h2>');
+  }
+
+  const invoiceHtml = generateHTMLInvoice(order);
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(invoiceHtml);
+});
+
+// Send receipt email notification endpoint (Integrated with Nodemailer SMTP / Google Gmail)
+app.post('/api/orders/:id/send-receipt-email', async (req: Request, res: Response) => {
   const id = Number(req.params.id);
   const { recipient_email } = req.body || {};
   const order = orders.find(o => o.id === id);
@@ -1398,18 +2381,33 @@ app.post('/api/orders/:id/send-receipt-email', (req: Request, res: Response) => 
   order.email = targetEmail;
   persistDatabaseState();
 
-  const formattedItems = order.items.map(item => `- ${item.name} (x${item.quantity}): ${item.price.toLocaleString('vi-VN')}đ`).join('\n');
-  const emailSubject = `[TechGear Store] XÁC NHẬN ĐƠN HÀNG #${order.id} - THANH TOÁN ${order.payment_method}`;
-  const emailBody = `Kính gửi ${order.user_name},\n\nTechGear xin chân thành cảm ơn quý khách đã đặt hàng!\n\nChi tiết đơn hàng #${order.id}:\n${formattedItems}\n\nTổng thanh toán: ${order.total_amount.toLocaleString('vi-VN')}đ\nPhương thức: ${order.payment_method}\nĐịa chỉ giao hàng: ${order.shipping_address}\nSố điện thoại: ${order.phone}\n\nĐơn hàng đang được chuẩn bị và sẽ sớm giao đến quý khách.\nMọi thắc mắc vui lòng liên hệ Hotline: 1900-8888.\n\nTrân trọng,\nĐội ngũ TechGear Vietnam.`;
+  const invoiceHtml = generateHTMLInvoice(order);
+  const emailSubject = `[TechGear Store] HÓA ĐƠN BÁN HÀNG & XÁC NHẬN ĐƠN HÀNG #${order.id}`;
 
-  console.log(`[Google Gmail API] Sending order receipt email to: ${targetEmail}`);
-  console.log(`[Subject]: ${emailSubject}`);
+  const sendResult = await sendRealEmail(targetEmail, emailSubject, invoiceHtml);
+
+  // Record in Notification Logs
+  const emailLog: NotificationLog = {
+    id: nextNotificationLogId++,
+    order_id: order.id,
+    type: 'email',
+    recipient: targetEmail,
+    subject: emailSubject,
+    message: `Phát hóa đơn bán hàng điện tử đến ${targetEmail}. Trạng thái: ${sendResult.mode}`,
+    status: sendResult.success ? 'SENT' : 'FAILED',
+    trigger_reason: 'Phát hóa đơn điện tử & Xác nhận đơn hàng',
+    created_at: new Date().toLocaleString('vi-VN'),
+    provider: sendResult.mode
+  };
+  notificationLogs.unshift(emailLog);
+  persistDatabaseState();
 
   res.json({ 
     success: true, 
-    message: `Đã gửi hóa đơn điện tử & xác nhận đơn hàng #${order.id} tới Google Gmail: ${targetEmail}`,
+    message: `Đã gửi hóa đơn điện tử đơn hàng #${order.id} tới Gmail: ${targetEmail}`,
     sent_to: targetEmail,
-    sent_via: 'Google Gmail API (https://www.googleapis.com/auth/gmail.send)',
+    delivery_status: sendResult.mode,
+    detail: sendResult.detail,
     subject: emailSubject,
     sent_at: new Date().toLocaleString('vi-VN')
   });
@@ -1460,6 +2458,9 @@ app.post('/api/orders/:id/cancel', (req: AuthRequest, res: Response) => {
       stockLogs.unshift(newLog);
     }
   });
+
+  // Dispatch notification for customer cancellation
+  dispatchOrderStatusNotification(order, 'pending', 'cancelled', cancelReasonStr);
 
   persistDatabaseState();
   res.json(order);

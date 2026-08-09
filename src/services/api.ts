@@ -11,7 +11,10 @@ import {
   Review,
   ReviewSummary,
   StockLogItem,
-  AnalyticsReportData
+  AnalyticsReportData,
+  TrackingInfo,
+  NotificationLog,
+  NotificationSettings
 } from '../types';
 
 const getAuthHeaders = (): HeadersInit => {
@@ -351,6 +354,39 @@ export async function notifyTransfer(orderId: number, receiptUrl?: string): Prom
   return res.json();
 }
 
+export async function trackOrder(orderId: string | number, contact?: string): Promise<{ order: Order; tracking: TrackingInfo }> {
+  const res = await fetch('/api/orders/track', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ order_id: orderId, contact })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || 'Không tìm thấy thông tin vận chuyển cho đơn hàng này');
+  }
+  return res.json();
+}
+
+export async function rescheduleDelivery(data: {
+  order_id: string | number;
+  date: string;
+  time_slot: string;
+  note?: string;
+  new_phone?: string;
+  new_address?: string;
+}): Promise<{ success: boolean; message: string; order: Order; tracking: TrackingInfo }> {
+  const res = await fetch('/api/orders/reschedule', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || 'Không thể gửi yêu cầu hẹn lịch giao lại');
+  }
+  return res.json();
+}
+
 export async function lookupOrders(orderId: string | number, contact: string): Promise<Order> {
   const res = await fetch('/api/orders/lookup', {
     method: 'POST',
@@ -374,6 +410,45 @@ export async function sendReceiptEmail(orderId: number, recipientEmail?: string)
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.message || 'Lỗi gửi email hóa đơn');
+  }
+  return res.json();
+}
+
+export async function fetchNotificationLogs(orderId?: number): Promise<NotificationLog[]> {
+  const url = orderId ? `/api/notifications/logs?order_id=${orderId}` : '/api/notifications/logs';
+  const res = await fetch(url, { headers: getAuthHeaders() });
+  if (!res.ok) throw new Error('Lỗi tải nhật ký thông báo');
+  return res.json();
+}
+
+export async function resendNotification(orderId: number, type: 'email' | 'sms'): Promise<{ success: boolean; message: string; log: NotificationLog }> {
+  const res = await fetch('/api/notifications/resend', {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ order_id: orderId, type })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || 'Lỗi gửi lại thông báo');
+  }
+  return res.json();
+}
+
+export async function fetchNotificationSettings(): Promise<NotificationSettings> {
+  const res = await fetch('/api/notifications/settings', { headers: getAuthHeaders() });
+  if (!res.ok) throw new Error('Lỗi tải cấu hình thông báo');
+  return res.json();
+}
+
+export async function updateNotificationSettings(settings: Partial<NotificationSettings>): Promise<{ success: boolean; message: string; settings: NotificationSettings }> {
+  const res = await fetch('/api/notifications/settings', {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(settings)
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || 'Lỗi cập nhật cấu hình thông báo');
   }
   return res.json();
 }

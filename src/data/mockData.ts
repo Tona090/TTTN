@@ -431,27 +431,143 @@ export const initialNews: NewsArticle[] = [
     title: 'Top 5 Bàn Phím Cơ Đáng Mua Nhất Cho Lập Trình Viên Năm 2026',
     image: 'https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?auto=format&fit=crop&w=800&q=80',
     excerpt: 'Khám phá những mẫu bàn phím cơ 75% và TKL giúp tăng tốc độ gõ code và giảm mỏi cổ tay hiệu quả.',
-    content: 'Khi gõ code hàng giờ liền, bàn phím cơ chất lượng cao với thiết kế Gasket Mount và Switch được lube sẵn sẽ đem lại trải nghiệm hoàn toàn khác biệt. Cùng TechGear phân tích các yếu tố hành trình phím, layout compact và khả năng custom switch.',
+    content: `Khi gõ code hàng giờ liền, bàn phím cơ chất lượng cao với thiết kế Gasket Mount và Switch được lube sẵn sẽ đem lại trải nghiệm hoàn toàn khác biệt. Cùng TechGear phân tích các yếu tố hành trình phím, layout compact và khả năng custom switch.
+
+1. Keychron Q1 Pro - Khung nhôm CNC nguyên khối, kết nối không dây Bluetooth 5.1 và mạch Hot-swap.
+2. NuPhy Air75 V2 - Thiết kế Low-Profile mỏng nhẹ, thích hợp di chuyển làm việc cafe.
+3. MonsGeek M1W - Giá rẻ phân khúc nhập môn nhưng có âm gõ cực ấm nịnh tai.
+4. Akko MOD007 V3 - Mạch HE từ tính hỗ trợ Rapid Trigger cho gamer & coder.
+5. Zoom75 SE - Siêu phẩm custom bàn phím cơ đỉnh cao giới hạn.`,
     created_at: '2026-07-20',
-    author: 'Admin TechGear'
+    author: 'Admin TechGear',
+    category: 'Đánh giá Gear',
+    views: 1420,
+    likes: 89,
+    comments_count: 3,
+    tags: ['Bàn phím cơ', 'Keychron', 'NuPhy', 'Desk setup', 'Coder']
   },
   {
     id: 2,
     title: 'Hướng Dẫn Setup Góc Làm Việc Minimalist Tối Ưu Tăng 200% Sức Tập Trung',
     image: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=800&q=80',
     excerpt: 'Cách sắp xếp dây cáp ẩn, chọn đèn màn hình chống mỏi mắt và kết hợp phụ kiện không dây.',
-    content: 'Góc làm việc gọn gàng quyết định lớn đến sự sáng tạo. Bài viết chia sẻ bí quyết giấu dây thông minh, lựa chọn arm màn hình nâng hạ nhẹ nhàng và trang bị lót chuột da thật bền bỉ.',
+    content: `Góc làm việc gọn gàng quyết định lớn đến sự sáng tạo. Bài viết chia sẻ bí quyết giấu dây thông minh, lựa chọn arm màn hình nâng hạ nhẹ nhàng và trang bị lót chuột da thật bền bỉ.
+
+- Sắp xếp cáp điện: Sử dụng khay giấu dây dưới mặt bàn và ống quấn dây co giãn.
+- Ánh sáng chống mỏi mắt: Trang bị đèn treo màn hình BenQ ScreenBar Halo không gây phản chiếu gương.
+- Phụ kiện không dây: Chuyển sang bàn phím và chuột Bluetooth/2.4Ghz để bàn làm việc luôn sạch sẽ.`,
     created_at: '2026-07-18',
-    author: 'Editor Minh'
+    author: 'Editor Minh',
+    category: 'Hướng dẫn Setup',
+    views: 980,
+    likes: 64,
+    comments_count: 2,
+    tags: ['Setup', 'Minimalist', 'BenQ', 'Làm việc']
   },
   {
     id: 3,
     title: 'So Sánh Chi Tiết Tai Nghe Sony WH-1000XM5 vs Bose QuietComfort Ultra',
     image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80',
     excerpt: 'Hai gã khổng lồ âm thanh đối đầu: Mẫu tai nghe chống ồn ANC nào dành riêng cho bạn?',
-    content: 'Nếu bạn thường xuyên làm việc tại quán cafe hoặc văn phòng mở, tai nghe chống ồn là thiết bị không thể thiếu. Chúng tôi đã thử nghiệm thực tế mức độ triệt tiêu tiếng ồn môi trường và chất âm acoustic giữa hai siêu phẩm.',
+    content: `Nếu bạn thường xuyên làm việc tại quán cafe hoặc văn phòng mở, tai nghe chống ồn là thiết bị không thể thiếu. Chúng tôi đã thử nghiệm thực tế mức độ triệt tiêu tiếng ồn môi trường và chất âm acoustic giữa hai siêu phẩm.
+
+- Sony WH-1000XM5: Dải bass ấm áp, micro đàm thoại lọc gió thông minh, ứng dụng điều chỉnh EQ chi tiết.
+- Bose QC Ultra: Khả năng chống ồn vô địch, đệm tai da protein siêu êm cho cảm giác đeo suốt 8 tiếng không bị ép tai.`,
     created_at: '2026-07-15',
-    author: 'Editor Hoàng'
+    author: 'Editor Hoàng',
+    category: 'Đánh giá Gear',
+    views: 2150,
+    likes: 128,
+    comments_count: 4,
+    tags: ['Tai nghe', 'Sony', 'Bose', 'Chống ồn ANC']
+  },
+  {
+    id: 4,
+    title: 'Giải Mã Cảm Biến Focus Pro 35K & Tần Số Polling Rate 8000Hz Trên Chuột Gaming',
+    image: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=800&q=80',
+    excerpt: 'Lợi thế thực sự của chuột eSports siêu nhẹ và tốc độ phản hồi 0.125ms trong các trận đấu FPS kịch tính.',
+    content: `Tần số quét 8000Hz có thực sự mang lại trải nghiệm khác biệt so với 1000Hz truyền thống?
+Bài viết đánh giá đo đạc bằng máy hiện sóng và màn hình 240Hz/360Hz giúp game thủ hiểu rõ gia tốc và độ mịn tâm súng khi ngắm bắn CS2 hay Valorant.`,
+    created_at: '2026-08-01',
+    author: 'Admin TechGear',
+    category: 'Tin Công Nghệ',
+    views: 850,
+    likes: 45,
+    comments_count: 1,
+    tags: ['Chuột Gaming', 'Razer', 'FPS', '8000Hz']
+  },
+  {
+    id: 5,
+    title: 'Kinh Nghiệm Bảo Quản & Vệ Sinh Bàn Phím Cơ Đúng Cách Tại Nhà',
+    image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=800&q=80',
+    excerpt: 'Các bước tháo keycap, làm sạch bụi bẩn mạch PCB và tra dầu lube switch giữ độ êm mượt trọn đời.',
+    content: `Bàn phím cơ sử dụng lâu ngày sẽ bám bụi, gầu tóc và thức ăn rơi vãi. Hãy cùng chuyên gia TechGear thực hiện quy trình 4 bước làm sạch chuyên nghiệp:
+1. Tháo keycap bằng Wire Keycap Puller tránh làm trầy nhựa ABS/PBT.
+2. Dùng bóng xịt bụi và cọ lông mềm làm sạch khe Switch.
+3. Ngâm rửa keycap bằng nước ấm xà phòng dịu nhẹ.
+4. Tra dầu Lube Krytox 205g0 cho Stabilizer để loại bỏ tiếng rít cọt kẹt.`,
+    created_at: '2026-08-05',
+    author: 'Editor Minh',
+    category: 'Kinh Nghiệm',
+    views: 1120,
+    likes: 76,
+    comments_count: 2,
+    tags: ['Bảo quản', 'Vệ sinh', 'Custom Keyboard', 'Lube Switch']
+  }
+];
+
+export const initialArticleComments = [
+  {
+    id: 1,
+    article_id: 1,
+    parent_id: null,
+    user_id: 4,
+    user_name: 'Nguyễn Minh Toàn',
+    avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80',
+    content: 'Đang dùng Keychron Q1 Pro gõ code React rất sướng tay. Âm gõ đầm, kết nối Bluetooth chuyển đổi nhanh giữa Macbook và PC.',
+    created_at: '2026-07-21 09:15',
+    likes: 12,
+    is_author: false,
+    replies: [
+      {
+        id: 2,
+        article_id: 1,
+        parent_id: 1,
+        user_id: 1,
+        user_name: 'Admin TechGear',
+        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80',
+        content: 'Cảm ơn bạn Toàn đã chia sẻ! Q1 Pro thực sự là huyền thoại bàn phím cơ nhôm đúc cho anh em Developer.',
+        created_at: '2026-07-21 10:00',
+        likes: 5,
+        is_author: true
+      }
+    ]
+  },
+  {
+    id: 3,
+    article_id: 1,
+    parent_id: null,
+    user_id: 2,
+    user_name: 'Trần Hoài Nam',
+    avatar: '',
+    content: 'Mẫu NuPhy Air75 V2 mỏng nhẹ mang đi cafe làm việc tiện lắm, gõ ít mỏi cổ tay hơn phím cao.',
+    created_at: '2026-07-22 14:30',
+    likes: 8,
+    is_author: false,
+    replies: []
+  },
+  {
+    id: 4,
+    article_id: 2,
+    parent_id: null,
+    user_id: 3,
+    user_name: 'Lê Thanh Bình',
+    avatar: '',
+    content: 'Đèn BenQ Halo xài buổi đêm không bị chói mắt chút nào. Đáng đồng tiền bát gạo!',
+    created_at: '2026-07-19 20:00',
+    likes: 15,
+    is_author: false,
+    replies: []
   }
 ];
 
@@ -489,6 +605,20 @@ export const initialOrders: Order[] = [
     created_at: '2026-07-23 09:15',
     shipping_address: 'Thành phố Thủ Đức, TP. Hồ Chí Minh',
     phone: '0908123456'
+  },
+  {
+    id: 3000,
+    user_id: 4,
+    user_name: 'Nguyễn Minh Toàn',
+    items: [
+      { product_id: 102, name: 'Bàn Phím Cơ Keychron Q1 Pro Custom Aluminum', price: 4290000, quantity: 1, image: 'https://images.unsplash.com/photo-1595225476474-87563907a212?auto=format&fit=crop&w=800&q=80' }
+    ],
+    total_amount: 4290000,
+    status: 'shipped',
+    created_at: '2026-08-01 10:15',
+    shipping_address: 'Số 88 Lê Lợi, Bến Nghé, Quận 1, TP. Hồ Chí Minh',
+    phone: '0908123456',
+    note: 'Giao giờ hành chính - Giao thất bại lần 1 do không liên lạc được'
   }
 ];
 

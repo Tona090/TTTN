@@ -16,6 +16,7 @@ import { ProductDetailPage } from './components/Client/ProductDetailPage';
 import { CartDrawer } from './components/Client/CartDrawer';
 import { NewsList } from './components/Client/NewsList';
 import { OrdersList } from './components/Client/OrdersList';
+import { OrderTracker } from './components/Client/OrderTracker';
 import { PcBuilder } from './components/Client/PcBuilder';
 import { AuthPage } from './components/Client/AuthPage';
 import { AIChatAssistant } from './components/Client/AIChatAssistant';
@@ -270,6 +271,8 @@ export default function App() {
                 onAddToCart={handleAddToCart}
                 onSelectProduct={handleSelectProduct}
                 onOpenCart={() => setIsCartOpen(true)}
+                user={user}
+                onRequireAuth={() => setIsAuthOpen(true)}
               />
             )}
 
@@ -278,11 +281,18 @@ export default function App() {
                 news={news}
                 selectedArticle={selectedNewsArticle}
                 onSelectArticle={setSelectedNewsArticle}
+                user={user}
+                onRefreshNews={loadInitialData}
+                onRequireAuth={() => setIsAuthOpen(true)}
               />
             )}
 
             {clientTab === 'orders' && (
               <OrdersList user={user} />
+            )}
+
+            {clientTab === 'order-tracking' && (
+              <OrderTracker onBack={() => setClientTab('orders')} userPhoneOrEmail={user?.phone || user?.email} />
             )}
 
             {clientTab === 'pcbuilder' && (

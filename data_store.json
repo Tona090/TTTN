@@ -40,7 +40,7 @@
       "image": "https://www.phongcachxanh.vn/cdn/shop/files/razer-viper-v4-pro-chu-t-khong-day-d-i-x-ng-8khz-1229087475.jpg?v=1774415888&width=800",
       "price": 4000000,
       "sale_price": 2900000,
-      "quantity": 20,
+      "quantity": 15,
       "description": "**Verdict:** Mẫu chuột gaming không dây đối xứng chuẩn thi đấu 8KHz với trọng lượng tối ưu và mắt đọc quang học chuẩn xác nhất của Razer.\n\n**Best for:**\nGame thủ FPS hard-core yêu thích form chuột đối xứng gọn gàng và cần khả năng phản hồi chuột tức thì ở tốc độ cao.\n\n**Not recommended for:**\nNgười dùng tìm kiếm chuột yên tĩnh hoặc thích form chuột công thái học to nghiêng về bên phải.\n\n**Real gaming scenarios:**\nThi đấu xuất sắc trong Valorant, CS2, Overwatch 2 với những cú flick quay 180 độ chính xác từng pixel.\n\n**Pros:**\n- Hỗ trợ Polling Rate 8000Hz không dây mượt mà\n- Switch quang học Gen-3 không bao giờ bị lỗi double click\n- Pin dung lượng tốt lên tới 90h ở mức 1000Hz\n\n**Cons:**\n- Giá thành cao cho phân khúc chuột flag-ship\n- Không hỗ trợ đèn RGB để tiết kiệm tối đa trọng lượng\n\n**Expert opinion:**\n\"Viper V4 Pro tinh chỉnh phần hông chuột bám tay hơn hẳn thế hệ trước. Khi đi kèm lót chuột vải mịn, cảm giác ngắm bắn tự tin hơn rõ rệt.\"",
       "is_new": true,
       "is_sale": false,
@@ -57,7 +57,7 @@
       "image": "https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=800&q=80",
       "price": 3200000,
       "sale_price": 2890000,
-      "quantity": 45,
+      "quantity": 41,
       "description": "**Verdict:** Chiếc bàn phím cơ low-profile 75% phản hồi siêu nhanh cho người dùng cần sự linh hoạt giữa làm việc di động và gaming phản xạ cao.\n\n**Best for:**\nLập trình viên, gamer hay di chuyển, và bất kỳ ai muốn góc máy mỏng gọn nhưng vẫn thích cảm giác gõ đầm tay của switch cơ.\n\n**Not recommended for:**\nNgười thích gõ switch hành trình sâu 4.0mm truyền thống hoặc bàn tay cực lớn thích phím full-size có phím số.\n\n**Real gaming scenarios:**\nThích hợp đánh Valorant, CS2 và combat Liên Minh nhờ độ trễ 2.4GHz 1000Hz cực thấp, lướt phím liên tục không mỏi ngón.\n\n**Pros:**\n- Layout 75% tối ưu không gian, switch Gateron Low Profile V2 gõ cực mượt\n- Hỗ trợ QMK/VIA keymap tự do và kết nối 3 mode siêu ổn định\n- Pin 4000mAh dùng bền bỉ cả tuần làm việc\n\n**Cons:**\n- Keycap low-profile khó thay thế chuẩn MX profile thông thường\n- Khung phím mỏng nên tiếng bottom-out đanh hơn phím nhôm đúc dày\n\n**Expert opinion:**\n\"Air75 V2 xử lý triệt để nhược điểm hoạ tiết và nhòe tiếng của bản V1. Đội ngũ TechGear đã mod thử lube lại stab và thấy đầm hơn rõ rệt. Đây là lựa chọn hàng đầu cho laptop setup.\"",
       "is_new": true,
       "is_sale": true,
@@ -383,49 +383,157 @@
   ],
   "orders": [
     {
-      "id": 1001,
-      "user_id": 4,
+      "id": 2004,
+      "user_id": 0,
       "user_name": "Nguyễn Minh Toàn",
       "items": [
+        {
+          "product_id": 200,
+          "name": "Viper V4 Pro",
+          "price": 4000000,
+          "quantity": 1,
+          "image": ""
+        }
+      ],
+      "total_amount": 4000000,
+      "status": "pending",
+      "payment_status": "unpaid",
+      "created_at": "18:01:56 9/8/2026",
+      "shipping_address": "115 Ỷ Lan, Phú Thạnh, Tân Phú, TP HCM",
+      "phone": "0398933652",
+      "email": "nguyenminhtoan212@gmail.com",
+      "payment_method": "COD",
+      "note": "Kiểm thử gửi Email Hóa đơn tự động qua Gmail SMTP",
+      "voucher_code": "",
+      "discount_amount": 0
+    },
+    {
+      "id": 2003,
+      "user_id": 0,
+      "user_name": "Nguyễn Minh Toàn",
+      "items": [
+        {
+          "product_id": 200,
+          "name": "Viper V4 Pro",
+          "price": 4000000,
+          "quantity": 1,
+          "image": ""
+        },
         {
           "product_id": 101,
           "name": "Bàn Phím Cơ NuPhy Air75 V2 Wireless RGB",
-          "price": 2890000,
+          "price": 3200000,
           "quantity": 1,
-          "image": "https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=800&q=80"
-        },
-        {
-          "product_id": 103,
-          "name": "Chuột Không Dây Logitech MX Master 3S",
-          "price": 2450000,
-          "quantity": 1,
-          "image": "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?auto=format&fit=crop&w=800&q=80"
+          "image": ""
         }
       ],
-      "total_amount": 5340000,
+      "total_amount": 7200000,
       "status": "completed",
-      "created_at": "2026-07-22 14:30",
-      "shipping_address": "Quận 1, Thành phố Hồ Chí Minh",
-      "phone": "0908123456"
+      "payment_status": "paid",
+      "created_at": "17:42:32 9/8/2026",
+      "shipping_address": "115 Ỷ Lan, Phú Thạnh, Tân Phú, TP HCM",
+      "phone": "0398933652",
+      "email": "nguyenminhtoan212@gmail.com",
+      "payment_method": "COD",
+      "note": "Giao giờ hành chính, gọi trước 15 phút",
+      "voucher_code": "",
+      "discount_amount": 0
     },
     {
-      "id": 1002,
-      "user_id": 4,
+      "id": 2002,
+      "user_id": 0,
       "user_name": "Nguyễn Minh Toàn",
       "items": [
         {
-          "product_id": 105,
-          "name": "Tai Nghe Chống Ồn Sony WH-1000XM5",
-          "price": 7490000,
+          "product_id": 200,
+          "name": "Viper V4 Pro",
+          "price": 4000000,
           "quantity": 1,
-          "image": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80"
+          "image": ""
+        },
+        {
+          "product_id": 101,
+          "name": "Bàn Phím Cơ NuPhy Air75 V2 Wireless RGB",
+          "price": 3200000,
+          "quantity": 1,
+          "image": ""
         }
       ],
-      "total_amount": 7490000,
-      "status": "shipped",
-      "created_at": "2026-07-23 09:15",
-      "shipping_address": "Thành phố Thủ Đức, TP. Hồ Chí Minh",
-      "phone": "0908123456"
+      "total_amount": 7200000,
+      "status": "completed",
+      "payment_status": "paid",
+      "created_at": "17:42:02 9/8/2026",
+      "shipping_address": "115 Ỷ Lan, Phú Thạnh, Tân Phú, TP HCM",
+      "phone": "0398933652",
+      "email": "nguyenminhtoan212@gmail.com",
+      "payment_method": "COD",
+      "note": "Giao giờ hành chính, gọi trước 15 phút",
+      "voucher_code": "",
+      "discount_amount": 0
+    },
+    {
+      "id": 2001,
+      "user_id": 0,
+      "user_name": "Nguyễn Minh Toàn",
+      "items": [
+        {
+          "product_id": 200,
+          "name": "Viper V4 Pro",
+          "price": 4000000,
+          "quantity": 1,
+          "image": ""
+        },
+        {
+          "product_id": 101,
+          "name": "Bàn Phím Cơ NuPhy Air75 V2 Wireless RGB",
+          "price": 3200000,
+          "quantity": 1,
+          "image": ""
+        }
+      ],
+      "total_amount": 7200000,
+      "status": "completed",
+      "payment_status": "paid",
+      "created_at": "17:41:35 9/8/2026",
+      "shipping_address": "115 Ỷ Lan, Phú Thạnh, Tân Phú, TP HCM",
+      "phone": "0398933652",
+      "email": "nguyenminhtoan212@gmail.com",
+      "payment_method": "COD",
+      "note": "Giao giờ hành chính, gọi trước 15 phút",
+      "voucher_code": "",
+      "discount_amount": 0
+    },
+    {
+      "id": 2000,
+      "user_id": 0,
+      "user_name": "Nguyễn Minh Toàn",
+      "items": [
+        {
+          "product_id": 200,
+          "name": "Viper V4 Pro",
+          "price": 4000000,
+          "quantity": 1,
+          "image": ""
+        },
+        {
+          "product_id": 101,
+          "name": "Bàn Phím Cơ NuPhy Air75 V2 Wireless RGB",
+          "price": 3200000,
+          "quantity": 1,
+          "image": ""
+        }
+      ],
+      "total_amount": 7200000,
+      "status": "pending",
+      "payment_status": "unpaid",
+      "created_at": "17:40:59 9/8/2026",
+      "shipping_address": "115 Ỷ Lan, Phú Thạnh, Tân Phú, TP HCM",
+      "phone": "0398933652",
+      "email": "nguyenminhtoan212@gmail.com",
+      "payment_method": "COD",
+      "note": "Giao giờ hành chính, gọi trước 15 phút",
+      "voucher_code": "",
+      "discount_amount": 0
     }
   ],
   "siteSettings": {
@@ -512,6 +620,114 @@
   ],
   "stockLogs": [
     {
+      "id": 1012,
+      "product_id": 200,
+      "product_name": "Viper V4 Pro",
+      "sku": "SKU-200",
+      "type": "out",
+      "quantity_change": -1,
+      "new_quantity": 15,
+      "note": "Xuất kho tự động cho đơn hàng #2004",
+      "created_at": "18:01:56 9/8/2026",
+      "created_by": "Khách Đặt Hàng"
+    },
+    {
+      "id": 1011,
+      "product_id": 101,
+      "product_name": "Bàn Phím Cơ NuPhy Air75 V2 Wireless RGB",
+      "sku": "KB-NUPHY-A75V2",
+      "type": "out",
+      "quantity_change": -1,
+      "new_quantity": 41,
+      "note": "Xuất kho tự động cho đơn hàng #2003",
+      "created_at": "17:42:32 9/8/2026",
+      "created_by": "Khách Đặt Hàng"
+    },
+    {
+      "id": 1010,
+      "product_id": 200,
+      "product_name": "Viper V4 Pro",
+      "sku": "SKU-200",
+      "type": "out",
+      "quantity_change": -1,
+      "new_quantity": 16,
+      "note": "Xuất kho tự động cho đơn hàng #2003",
+      "created_at": "17:42:32 9/8/2026",
+      "created_by": "Khách Đặt Hàng"
+    },
+    {
+      "id": 1009,
+      "product_id": 101,
+      "product_name": "Bàn Phím Cơ NuPhy Air75 V2 Wireless RGB",
+      "sku": "KB-NUPHY-A75V2",
+      "type": "out",
+      "quantity_change": -1,
+      "new_quantity": 42,
+      "note": "Xuất kho tự động cho đơn hàng #2002",
+      "created_at": "17:42:02 9/8/2026",
+      "created_by": "Khách Đặt Hàng"
+    },
+    {
+      "id": 1008,
+      "product_id": 200,
+      "product_name": "Viper V4 Pro",
+      "sku": "SKU-200",
+      "type": "out",
+      "quantity_change": -1,
+      "new_quantity": 17,
+      "note": "Xuất kho tự động cho đơn hàng #2002",
+      "created_at": "17:42:02 9/8/2026",
+      "created_by": "Khách Đặt Hàng"
+    },
+    {
+      "id": 1007,
+      "product_id": 101,
+      "product_name": "Bàn Phím Cơ NuPhy Air75 V2 Wireless RGB",
+      "sku": "KB-NUPHY-A75V2",
+      "type": "out",
+      "quantity_change": -1,
+      "new_quantity": 43,
+      "note": "Xuất kho tự động cho đơn hàng #2001",
+      "created_at": "17:41:35 9/8/2026",
+      "created_by": "Khách Đặt Hàng"
+    },
+    {
+      "id": 1006,
+      "product_id": 200,
+      "product_name": "Viper V4 Pro",
+      "sku": "SKU-200",
+      "type": "out",
+      "quantity_change": -1,
+      "new_quantity": 18,
+      "note": "Xuất kho tự động cho đơn hàng #2001",
+      "created_at": "17:41:35 9/8/2026",
+      "created_by": "Khách Đặt Hàng"
+    },
+    {
+      "id": 1005,
+      "product_id": 101,
+      "product_name": "Bàn Phím Cơ NuPhy Air75 V2 Wireless RGB",
+      "sku": "KB-NUPHY-A75V2",
+      "type": "out",
+      "quantity_change": -1,
+      "new_quantity": 44,
+      "note": "Xuất kho tự động cho đơn hàng #2000",
+      "created_at": "17:40:59 9/8/2026",
+      "created_by": "Khách Đặt Hàng"
+    },
+    {
+      "id": 1004,
+      "product_id": 200,
+      "product_name": "Viper V4 Pro",
+      "sku": "SKU-200",
+      "type": "out",
+      "quantity_change": -1,
+      "new_quantity": 19,
+      "note": "Xuất kho tự động cho đơn hàng #2000",
+      "created_at": "17:40:59 9/8/2026",
+      "created_by": "Khách Đặt Hàng"
+    },
+    {
       "id": 1001,
       "product_id": 101,
       "product_name": "Bàn Phím Cơ NuPhy Air75 V2 Wireless RGB",
@@ -548,13 +764,406 @@
       "created_by": "Trần Nhân Viên (Editor)"
     }
   ],
+  "notificationLogs": [
+    {
+      "id": 5033,
+      "order_id": 2004,
+      "type": "email",
+      "recipient": "nguyenminhtoan212@gmail.com",
+      "subject": "[TechGear Store] HÓA ĐƠN BÁN HÀNG & XÁC NHẬN ĐƠN HÀNG #2004",
+      "message": "Phát hóa đơn bán hàng điện tử đến nguyenminhtoan212@gmail.com. Trạng thái: Đã gửi Email thật tới hộp thư Gmail khách hàng thành công!",
+      "status": "SENT",
+      "trigger_reason": "Phát hóa đơn điện tử & Xác nhận đơn hàng",
+      "created_at": "18:07:05 9/8/2026",
+      "provider": "Đã gửi Email thật tới hộp thư Gmail khách hàng thành công!"
+    },
+    {
+      "id": 5032,
+      "order_id": 2004,
+      "type": "email",
+      "recipient": "nguyenminhtoan212@gmail.com",
+      "subject": "[TechGear Store] HÓA ĐƠN BÁN HÀNG & XÁC NHẬN ĐƠN HÀNG #2004",
+      "message": "Phát hóa đơn bán hàng điện tử đến nguyenminhtoan212@gmail.com. Trạng thái: Đã gửi Email thật tới hộp thư Gmail khách hàng thành công!",
+      "status": "SENT",
+      "trigger_reason": "Phát hóa đơn điện tử & Xác nhận đơn hàng",
+      "created_at": "18:01:59 9/8/2026",
+      "provider": "Đã gửi Email thật tới hộp thư Gmail khách hàng thành công!"
+    },
+    {
+      "id": 5031,
+      "order_id": 2004,
+      "type": "sms",
+      "recipient": "0398933652",
+      "message": "TechGear [TECHGEAR]: Don hang #2004 da chuyen sang [Chờ Xác Nhận].",
+      "status": "DELIVERED",
+      "trigger_reason": "Tự động SMS BrandName: NEW ➔ pending",
+      "created_at": "18:01:56 9/8/2026",
+      "provider": "SMS Gateway (TECHGEAR)"
+    },
+    {
+      "id": 5030,
+      "order_id": 2004,
+      "type": "email",
+      "recipient": "nguyenminhtoan212@gmail.com",
+      "subject": "[TechGear Store] Cập nhật đơn hàng #2004 ➔ [Chờ Xác Nhận]",
+      "message": "Kính gửi Nguyễn Minh Toàn,\n\nTechGear xin thông báo đơn hàng #2004 của quý khách vừa được cập nhật trạng thái từ \"NEW\" sang [Chờ Xác Nhận].\n\nCHI TIẾT ĐƠN HÀNG #2004:\n- Danh mục sản phẩm: Viper V4 Pro (x1)\n- Tổng tiền thanh toán: 4.000.000đ (COD)\n- Địa chỉ nhận hàng: 115 Ỷ Lan, Phú Thạnh, Tân Phú, TP HCM\n- SĐT liên hệ: 0398933652\n\n\nTrân trọng,\nĐội ngũ Quản trị TechGear Vietnam.",
+      "status": "SENT",
+      "trigger_reason": "Chuyển trạng thái đơn hàng: NEW ➔ pending",
+      "created_at": "18:01:56 9/8/2026",
+      "provider": "Nodemailer SMTP / Google Gmail"
+    },
+    {
+      "id": 5029,
+      "order_id": 2000,
+      "type": "email",
+      "recipient": "nguyenminhtoan212@gmail.com",
+      "subject": "[TechGear Store] HÓA ĐƠN BÁN HÀNG & XÁC NHẬN ĐƠN HÀNG #2000",
+      "message": "Phát hóa đơn bán hàng điện tử đến nguyenminhtoan212@gmail.com. Trạng thái: Hệ thống đã lưu & hiển thị Nhật Ký Email (Môi trường Demo)",
+      "status": "SENT",
+      "trigger_reason": "Phát hóa đơn điện tử & Xác nhận đơn hàng",
+      "created_at": "17:53:52 9/8/2026",
+      "provider": "Hệ thống đã lưu & hiển thị Nhật Ký Email (Môi trường Demo)"
+    },
+    {
+      "id": 5028,
+      "order_id": 2003,
+      "type": "sms",
+      "recipient": "0398933652",
+      "message": "TechGear [TECHGEAR]: Don hang #2003 da chuyen sang [Giao Hàng Thành Công]. Giao thanh cong. Kich hoat Bao Hanh Dien Tu theo SDT 0398933652. Cam on ban!",
+      "status": "DELIVERED",
+      "trigger_reason": "Tự động SMS BrandName: shipped ➔ completed",
+      "created_at": "17:42:32 9/8/2026",
+      "provider": "SMS Gateway (TECHGEAR)"
+    },
+    {
+      "id": 5027,
+      "order_id": 2003,
+      "type": "email",
+      "recipient": "nguyenminhtoan212@gmail.com",
+      "subject": "[TechGear Store] Cập nhật đơn hàng #2003 ➔ [Giao Hàng Thành Công]",
+      "message": "Kính gửi Nguyễn Minh Toàn,\n\nTechGear xin thông báo đơn hàng #2003 của quý khách vừa được cập nhật trạng thái từ \"Đang Vận Chuyển Giao Hàng\" sang [Giao Hàng Thành Công].\n\nCHI TIẾT ĐƠN HÀNG #2003:\n- Danh mục sản phẩm: Viper V4 Pro (x1), Bàn Phím Cơ NuPhy Air75 V2 Wireless RGB (x1)\n- Tổng tiền thanh toán: 7.200.000đ (COD)\n- Địa chỉ nhận hàng: 115 Ỷ Lan, Phú Thạnh, Tân Phú, TP HCM\n- SĐT liên hệ: 0398933652\n\n🎉 Đơn hàng đã được giao thành công! Thẻ bảo hành điện tử (E-Warranty) 12 tháng chính hãng TechGear đã tự động kích hoạt theo SĐT 0398933652.\n\nTrân trọng,\nĐội ngũ Quản trị TechGear Vietnam.",
+      "status": "SENT",
+      "trigger_reason": "Chuyển trạng thái đơn hàng: shipped ➔ completed",
+      "created_at": "17:42:32 9/8/2026",
+      "provider": "Google Gmail API (OAuth2)"
+    },
+    {
+      "id": 5026,
+      "order_id": 2003,
+      "type": "sms",
+      "recipient": "0398933652",
+      "message": "TechGear [TECHGEAR]: Don hang #2003 da chuyen sang [Đang Vận Chuyển Giao Hàng]. Dang giao hang. Tra cuu tai: techgear.vn/track/2003",
+      "status": "DELIVERED",
+      "trigger_reason": "Tự động SMS BrandName: processing ➔ shipped",
+      "created_at": "17:42:32 9/8/2026",
+      "provider": "SMS Gateway (TECHGEAR)"
+    },
+    {
+      "id": 5025,
+      "order_id": 2003,
+      "type": "email",
+      "recipient": "nguyenminhtoan212@gmail.com",
+      "subject": "[TechGear Store] Cập nhật đơn hàng #2003 ➔ [Đang Vận Chuyển Giao Hàng]",
+      "message": "Kính gửi Nguyễn Minh Toàn,\n\nTechGear xin thông báo đơn hàng #2003 của quý khách vừa được cập nhật trạng thái từ \"Đã Xác Nhận / Đang Xử Lý & Đóng Gói\" sang [Đang Vận Chuyển Giao Hàng].\n\nCHI TIẾT ĐƠN HÀNG #2003:\n- Danh mục sản phẩm: Viper V4 Pro (x1), Bàn Phím Cơ NuPhy Air75 V2 Wireless RGB (x1)\n- Tổng tiền thanh toán: 7.200.000đ (COD)\n- Địa chỉ nhận hàng: 115 Ỷ Lan, Phú Thạnh, Tân Phú, TP HCM\n- SĐT liên hệ: 0398933652\n\n🚚 Đơn hàng đã xuất kho và giao cho đối tác vận chuyển giao nhanh. Shipper sẽ liên hệ quý khách trước khi giao.\nTra cứu hành trình real-time: https://techgear.vn/order-tracker?id=2003\n\nTrân trọng,\nĐội ngũ Quản trị TechGear Vietnam.",
+      "status": "SENT",
+      "trigger_reason": "Chuyển trạng thái đơn hàng: processing ➔ shipped",
+      "created_at": "17:42:32 9/8/2026",
+      "provider": "Google Gmail API (OAuth2)"
+    },
+    {
+      "id": 5024,
+      "order_id": 2003,
+      "type": "sms",
+      "recipient": "0398933652",
+      "message": "TechGear [TECHGEAR]: Don hang #2003 da chuyen sang [Đã Xác Nhận / Đang Xử Lý & Đóng Gói]. Kiem dinh & dong goi tai kho. Hotline 19008888.",
+      "status": "DELIVERED",
+      "trigger_reason": "Tự động SMS BrandName: pending ➔ processing",
+      "created_at": "17:42:32 9/8/2026",
+      "provider": "SMS Gateway (TECHGEAR)"
+    },
+    {
+      "id": 5023,
+      "order_id": 2003,
+      "type": "email",
+      "recipient": "nguyenminhtoan212@gmail.com",
+      "subject": "[TechGear Store] Cập nhật đơn hàng #2003 ➔ [Đã Xác Nhận / Đang Xử Lý & Đóng Gói]",
+      "message": "Kính gửi Nguyễn Minh Toàn,\n\nTechGear xin thông báo đơn hàng #2003 của quý khách vừa được cập nhật trạng thái từ \"Chờ Xác Nhận\" sang [Đã Xác Nhận / Đang Xử Lý & Đóng Gói].\n\nCHI TIẾT ĐƠN HÀNG #2003:\n- Danh mục sản phẩm: Viper V4 Pro (x1), Bàn Phím Cơ NuPhy Air75 V2 Wireless RGB (x1)\n- Tổng tiền thanh toán: 7.200.000đ (COD)\n- Địa chỉ nhận hàng: 115 Ỷ Lan, Phú Thạnh, Tân Phú, TP HCM\n- SĐT liên hệ: 0398933652\n\n📦 Đơn hàng đã được bộ phận kho duyệt, kỹ thuật viên kiểm tra niêm phong và đóng gói cẩn thận.\n\nTrân trọng,\nĐội ngũ Quản trị TechGear Vietnam.",
+      "status": "SENT",
+      "trigger_reason": "Chuyển trạng thái đơn hàng: pending ➔ processing",
+      "created_at": "17:42:32 9/8/2026",
+      "provider": "Google Gmail API (OAuth2)"
+    },
+    {
+      "id": 5022,
+      "order_id": 2003,
+      "type": "sms",
+      "recipient": "0398933652",
+      "message": "TechGear [TECHGEAR]: Don hang #2003 da chuyen sang [Chờ Xác Nhận].",
+      "status": "DELIVERED",
+      "trigger_reason": "Tự động SMS BrandName: NEW ➔ pending",
+      "created_at": "17:42:32 9/8/2026",
+      "provider": "SMS Gateway (TECHGEAR)"
+    },
+    {
+      "id": 5021,
+      "order_id": 2003,
+      "type": "email",
+      "recipient": "nguyenminhtoan212@gmail.com",
+      "subject": "[TechGear Store] Cập nhật đơn hàng #2003 ➔ [Chờ Xác Nhận]",
+      "message": "Kính gửi Nguyễn Minh Toàn,\n\nTechGear xin thông báo đơn hàng #2003 của quý khách vừa được cập nhật trạng thái từ \"NEW\" sang [Chờ Xác Nhận].\n\nCHI TIẾT ĐƠN HÀNG #2003:\n- Danh mục sản phẩm: Viper V4 Pro (x1), Bàn Phím Cơ NuPhy Air75 V2 Wireless RGB (x1)\n- Tổng tiền thanh toán: 7.200.000đ (COD)\n- Địa chỉ nhận hàng: 115 Ỷ Lan, Phú Thạnh, Tân Phú, TP HCM\n- SĐT liên hệ: 0398933652\n\n\nTrân trọng,\nĐội ngũ Quản trị TechGear Vietnam.",
+      "status": "SENT",
+      "trigger_reason": "Chuyển trạng thái đơn hàng: NEW ➔ pending",
+      "created_at": "17:42:32 9/8/2026",
+      "provider": "Google Gmail API (OAuth2)"
+    },
+    {
+      "id": 5020,
+      "order_id": 2002,
+      "type": "sms",
+      "recipient": "0398933652",
+      "message": "TechGear [TECHGEAR]: Don hang #2002 da chuyen sang [Giao Hàng Thành Công]. Giao thanh cong. Kich hoat Bao Hanh Dien Tu theo SDT 0398933652. Cam on ban!",
+      "status": "DELIVERED",
+      "trigger_reason": "Tự động SMS BrandName: shipped ➔ completed",
+      "created_at": "17:42:02 9/8/2026",
+      "provider": "SMS Gateway (TECHGEAR)"
+    },
+    {
+      "id": 5019,
+      "order_id": 2002,
+      "type": "email",
+      "recipient": "nguyenminhtoan212@gmail.com",
+      "subject": "[TechGear Store] Cập nhật đơn hàng #2002 ➔ [Giao Hàng Thành Công]",
+      "message": "Kính gửi Nguyễn Minh Toàn,\n\nTechGear xin thông báo đơn hàng #2002 của quý khách vừa được cập nhật trạng thái từ \"Đang Vận Chuyển Giao Hàng\" sang [Giao Hàng Thành Công].\n\nCHI TIẾT ĐƠN HÀNG #2002:\n- Danh mục sản phẩm: Viper V4 Pro (x1), Bàn Phím Cơ NuPhy Air75 V2 Wireless RGB (x1)\n- Tổng tiền thanh toán: 7.200.000đ (COD)\n- Địa chỉ nhận hàng: 115 Ỷ Lan, Phú Thạnh, Tân Phú, TP HCM\n- SĐT liên hệ: 0398933652\n\n🎉 Đơn hàng đã được giao thành công! Thẻ bảo hành điện tử (E-Warranty) 12 tháng chính hãng TechGear đã tự động kích hoạt theo SĐT 0398933652.\n\nTrân trọng,\nĐội ngũ Quản trị TechGear Vietnam.",
+      "status": "SENT",
+      "trigger_reason": "Chuyển trạng thái đơn hàng: shipped ➔ completed",
+      "created_at": "17:42:02 9/8/2026",
+      "provider": "Google Gmail API (OAuth2)"
+    },
+    {
+      "id": 5018,
+      "order_id": 2002,
+      "type": "sms",
+      "recipient": "0398933652",
+      "message": "TechGear [TECHGEAR]: Don hang #2002 da chuyen sang [Đang Vận Chuyển Giao Hàng]. Dang giao hang. Tra cuu tai: techgear.vn/track/2002",
+      "status": "DELIVERED",
+      "trigger_reason": "Tự động SMS BrandName: processing ➔ shipped",
+      "created_at": "17:42:02 9/8/2026",
+      "provider": "SMS Gateway (TECHGEAR)"
+    },
+    {
+      "id": 5017,
+      "order_id": 2002,
+      "type": "email",
+      "recipient": "nguyenminhtoan212@gmail.com",
+      "subject": "[TechGear Store] Cập nhật đơn hàng #2002 ➔ [Đang Vận Chuyển Giao Hàng]",
+      "message": "Kính gửi Nguyễn Minh Toàn,\n\nTechGear xin thông báo đơn hàng #2002 của quý khách vừa được cập nhật trạng thái từ \"Đã Xác Nhận / Đang Xử Lý & Đóng Gói\" sang [Đang Vận Chuyển Giao Hàng].\n\nCHI TIẾT ĐƠN HÀNG #2002:\n- Danh mục sản phẩm: Viper V4 Pro (x1), Bàn Phím Cơ NuPhy Air75 V2 Wireless RGB (x1)\n- Tổng tiền thanh toán: 7.200.000đ (COD)\n- Địa chỉ nhận hàng: 115 Ỷ Lan, Phú Thạnh, Tân Phú, TP HCM\n- SĐT liên hệ: 0398933652\n\n🚚 Đơn hàng đã xuất kho và giao cho đối tác vận chuyển giao nhanh. Shipper sẽ liên hệ quý khách trước khi giao.\nTra cứu hành trình real-time: https://techgear.vn/order-tracker?id=2002\n\nTrân trọng,\nĐội ngũ Quản trị TechGear Vietnam.",
+      "status": "SENT",
+      "trigger_reason": "Chuyển trạng thái đơn hàng: processing ➔ shipped",
+      "created_at": "17:42:02 9/8/2026",
+      "provider": "Google Gmail API (OAuth2)"
+    },
+    {
+      "id": 5016,
+      "order_id": 2002,
+      "type": "sms",
+      "recipient": "0398933652",
+      "message": "TechGear [TECHGEAR]: Don hang #2002 da chuyen sang [Đã Xác Nhận / Đang Xử Lý & Đóng Gói]. Kiem dinh & dong goi tai kho. Hotline 19008888.",
+      "status": "DELIVERED",
+      "trigger_reason": "Tự động SMS BrandName: pending ➔ processing",
+      "created_at": "17:42:02 9/8/2026",
+      "provider": "SMS Gateway (TECHGEAR)"
+    },
+    {
+      "id": 5015,
+      "order_id": 2002,
+      "type": "email",
+      "recipient": "nguyenminhtoan212@gmail.com",
+      "subject": "[TechGear Store] Cập nhật đơn hàng #2002 ➔ [Đã Xác Nhận / Đang Xử Lý & Đóng Gói]",
+      "message": "Kính gửi Nguyễn Minh Toàn,\n\nTechGear xin thông báo đơn hàng #2002 của quý khách vừa được cập nhật trạng thái từ \"Chờ Xác Nhận\" sang [Đã Xác Nhận / Đang Xử Lý & Đóng Gói].\n\nCHI TIẾT ĐƠN HÀNG #2002:\n- Danh mục sản phẩm: Viper V4 Pro (x1), Bàn Phím Cơ NuPhy Air75 V2 Wireless RGB (x1)\n- Tổng tiền thanh toán: 7.200.000đ (COD)\n- Địa chỉ nhận hàng: 115 Ỷ Lan, Phú Thạnh, Tân Phú, TP HCM\n- SĐT liên hệ: 0398933652\n\n📦 Đơn hàng đã được bộ phận kho duyệt, kỹ thuật viên kiểm tra niêm phong và đóng gói cẩn thận.\n\nTrân trọng,\nĐội ngũ Quản trị TechGear Vietnam.",
+      "status": "SENT",
+      "trigger_reason": "Chuyển trạng thái đơn hàng: pending ➔ processing",
+      "created_at": "17:42:02 9/8/2026",
+      "provider": "Google Gmail API (OAuth2)"
+    },
+    {
+      "id": 5014,
+      "order_id": 2002,
+      "type": "sms",
+      "recipient": "0398933652",
+      "message": "TechGear [TECHGEAR]: Don hang #2002 da chuyen sang [Chờ Xác Nhận].",
+      "status": "DELIVERED",
+      "trigger_reason": "Tự động SMS BrandName: NEW ➔ pending",
+      "created_at": "17:42:02 9/8/2026",
+      "provider": "SMS Gateway (TECHGEAR)"
+    },
+    {
+      "id": 5013,
+      "order_id": 2002,
+      "type": "email",
+      "recipient": "nguyenminhtoan212@gmail.com",
+      "subject": "[TechGear Store] Cập nhật đơn hàng #2002 ➔ [Chờ Xác Nhận]",
+      "message": "Kính gửi Nguyễn Minh Toàn,\n\nTechGear xin thông báo đơn hàng #2002 của quý khách vừa được cập nhật trạng thái từ \"NEW\" sang [Chờ Xác Nhận].\n\nCHI TIẾT ĐƠN HÀNG #2002:\n- Danh mục sản phẩm: Viper V4 Pro (x1), Bàn Phím Cơ NuPhy Air75 V2 Wireless RGB (x1)\n- Tổng tiền thanh toán: 7.200.000đ (COD)\n- Địa chỉ nhận hàng: 115 Ỷ Lan, Phú Thạnh, Tân Phú, TP HCM\n- SĐT liên hệ: 0398933652\n\n\nTrân trọng,\nĐội ngũ Quản trị TechGear Vietnam.",
+      "status": "SENT",
+      "trigger_reason": "Chuyển trạng thái đơn hàng: NEW ➔ pending",
+      "created_at": "17:42:02 9/8/2026",
+      "provider": "Google Gmail API (OAuth2)"
+    },
+    {
+      "id": 5012,
+      "order_id": 2001,
+      "type": "sms",
+      "recipient": "0398933652",
+      "message": "TechGear [TECHGEAR]: Don hang #2001 da chuyen sang [Giao Hàng Thành Công]. Giao thanh cong. Kich hoat Bao Hanh Dien Tu theo SDT 0398933652. Cam on ban!",
+      "status": "DELIVERED",
+      "trigger_reason": "Tự động SMS BrandName: shipped ➔ completed",
+      "created_at": "17:41:35 9/8/2026",
+      "provider": "SMS Gateway (TECHGEAR)"
+    },
+    {
+      "id": 5011,
+      "order_id": 2001,
+      "type": "email",
+      "recipient": "nguyenminhtoan212@gmail.com",
+      "subject": "[TechGear Store] Cập nhật đơn hàng #2001 ➔ [Giao Hàng Thành Công]",
+      "message": "Kính gửi Nguyễn Minh Toàn,\n\nTechGear xin thông báo đơn hàng #2001 của quý khách vừa được cập nhật trạng thái từ \"Đang Vận Chuyển Giao Hàng\" sang [Giao Hàng Thành Công].\n\nCHI TIẾT ĐƠN HÀNG #2001:\n- Danh mục sản phẩm: Viper V4 Pro (x1), Bàn Phím Cơ NuPhy Air75 V2 Wireless RGB (x1)\n- Tổng tiền thanh toán: 7.200.000đ (COD)\n- Địa chỉ nhận hàng: 115 Ỷ Lan, Phú Thạnh, Tân Phú, TP HCM\n- SĐT liên hệ: 0398933652\n\n🎉 Đơn hàng đã được giao thành công! Thẻ bảo hành điện tử (E-Warranty) 12 tháng chính hãng TechGear đã tự động kích hoạt theo SĐT 0398933652.\n\nTrân trọng,\nĐội ngũ Quản trị TechGear Vietnam.",
+      "status": "SENT",
+      "trigger_reason": "Chuyển trạng thái đơn hàng: shipped ➔ completed",
+      "created_at": "17:41:35 9/8/2026",
+      "provider": "Google Gmail API (OAuth2)"
+    },
+    {
+      "id": 5010,
+      "order_id": 2001,
+      "type": "sms",
+      "recipient": "0398933652",
+      "message": "TechGear [TECHGEAR]: Don hang #2001 da chuyen sang [Đang Vận Chuyển Giao Hàng]. Dang giao hang. Tra cuu tai: techgear.vn/track/2001",
+      "status": "DELIVERED",
+      "trigger_reason": "Tự động SMS BrandName: processing ➔ shipped",
+      "created_at": "17:41:35 9/8/2026",
+      "provider": "SMS Gateway (TECHGEAR)"
+    },
+    {
+      "id": 5009,
+      "order_id": 2001,
+      "type": "email",
+      "recipient": "nguyenminhtoan212@gmail.com",
+      "subject": "[TechGear Store] Cập nhật đơn hàng #2001 ➔ [Đang Vận Chuyển Giao Hàng]",
+      "message": "Kính gửi Nguyễn Minh Toàn,\n\nTechGear xin thông báo đơn hàng #2001 của quý khách vừa được cập nhật trạng thái từ \"Đã Xác Nhận / Đang Xử Lý & Đóng Gói\" sang [Đang Vận Chuyển Giao Hàng].\n\nCHI TIẾT ĐƠN HÀNG #2001:\n- Danh mục sản phẩm: Viper V4 Pro (x1), Bàn Phím Cơ NuPhy Air75 V2 Wireless RGB (x1)\n- Tổng tiền thanh toán: 7.200.000đ (COD)\n- Địa chỉ nhận hàng: 115 Ỷ Lan, Phú Thạnh, Tân Phú, TP HCM\n- SĐT liên hệ: 0398933652\n\n🚚 Đơn hàng đã xuất kho và giao cho đối tác vận chuyển giao nhanh. Shipper sẽ liên hệ quý khách trước khi giao.\nTra cứu hành trình real-time: https://techgear.vn/order-tracker?id=2001\n\nTrân trọng,\nĐội ngũ Quản trị TechGear Vietnam.",
+      "status": "SENT",
+      "trigger_reason": "Chuyển trạng thái đơn hàng: processing ➔ shipped",
+      "created_at": "17:41:35 9/8/2026",
+      "provider": "Google Gmail API (OAuth2)"
+    },
+    {
+      "id": 5008,
+      "order_id": 2001,
+      "type": "sms",
+      "recipient": "0398933652",
+      "message": "TechGear [TECHGEAR]: Don hang #2001 da chuyen sang [Đã Xác Nhận / Đang Xử Lý & Đóng Gói]. Kiem dinh & dong goi tai kho. Hotline 19008888.",
+      "status": "DELIVERED",
+      "trigger_reason": "Tự động SMS BrandName: pending ➔ processing",
+      "created_at": "17:41:35 9/8/2026",
+      "provider": "SMS Gateway (TECHGEAR)"
+    },
+    {
+      "id": 5007,
+      "order_id": 2001,
+      "type": "email",
+      "recipient": "nguyenminhtoan212@gmail.com",
+      "subject": "[TechGear Store] Cập nhật đơn hàng #2001 ➔ [Đã Xác Nhận / Đang Xử Lý & Đóng Gói]",
+      "message": "Kính gửi Nguyễn Minh Toàn,\n\nTechGear xin thông báo đơn hàng #2001 của quý khách vừa được cập nhật trạng thái từ \"Chờ Xác Nhận\" sang [Đã Xác Nhận / Đang Xử Lý & Đóng Gói].\n\nCHI TIẾT ĐƠN HÀNG #2001:\n- Danh mục sản phẩm: Viper V4 Pro (x1), Bàn Phím Cơ NuPhy Air75 V2 Wireless RGB (x1)\n- Tổng tiền thanh toán: 7.200.000đ (COD)\n- Địa chỉ nhận hàng: 115 Ỷ Lan, Phú Thạnh, Tân Phú, TP HCM\n- SĐT liên hệ: 0398933652\n\n📦 Đơn hàng đã được bộ phận kho duyệt, kỹ thuật viên kiểm tra niêm phong và đóng gói cẩn thận.\n\nTrân trọng,\nĐội ngũ Quản trị TechGear Vietnam.",
+      "status": "SENT",
+      "trigger_reason": "Chuyển trạng thái đơn hàng: pending ➔ processing",
+      "created_at": "17:41:35 9/8/2026",
+      "provider": "Google Gmail API (OAuth2)"
+    },
+    {
+      "id": 5006,
+      "order_id": 2001,
+      "type": "sms",
+      "recipient": "0398933652",
+      "message": "TechGear [TECHGEAR]: Don hang #2001 da chuyen sang [Chờ Xác Nhận].",
+      "status": "DELIVERED",
+      "trigger_reason": "Tự động SMS BrandName: NEW ➔ pending",
+      "created_at": "17:41:35 9/8/2026",
+      "provider": "SMS Gateway (TECHGEAR)"
+    },
+    {
+      "id": 5005,
+      "order_id": 2001,
+      "type": "email",
+      "recipient": "nguyenminhtoan212@gmail.com",
+      "subject": "[TechGear Store] Cập nhật đơn hàng #2001 ➔ [Chờ Xác Nhận]",
+      "message": "Kính gửi Nguyễn Minh Toàn,\n\nTechGear xin thông báo đơn hàng #2001 của quý khách vừa được cập nhật trạng thái từ \"NEW\" sang [Chờ Xác Nhận].\n\nCHI TIẾT ĐƠN HÀNG #2001:\n- Danh mục sản phẩm: Viper V4 Pro (x1), Bàn Phím Cơ NuPhy Air75 V2 Wireless RGB (x1)\n- Tổng tiền thanh toán: 7.200.000đ (COD)\n- Địa chỉ nhận hàng: 115 Ỷ Lan, Phú Thạnh, Tân Phú, TP HCM\n- SĐT liên hệ: 0398933652\n\n\nTrân trọng,\nĐội ngũ Quản trị TechGear Vietnam.",
+      "status": "SENT",
+      "trigger_reason": "Chuyển trạng thái đơn hàng: NEW ➔ pending",
+      "created_at": "17:41:35 9/8/2026",
+      "provider": "Google Gmail API (OAuth2)"
+    },
+    {
+      "id": 5004,
+      "order_id": 2000,
+      "type": "sms",
+      "recipient": "0398933652",
+      "message": "TechGear [TECHGEAR]: Don hang #2000 da chuyen sang [Chờ Xác Nhận].",
+      "status": "DELIVERED",
+      "trigger_reason": "Tự động SMS BrandName: NEW ➔ pending",
+      "created_at": "17:40:59 9/8/2026",
+      "provider": "SMS Gateway (TECHGEAR)"
+    },
+    {
+      "id": 5003,
+      "order_id": 2000,
+      "type": "email",
+      "recipient": "nguyenminhtoan212@gmail.com",
+      "subject": "[TechGear Store] Cập nhật đơn hàng #2000 ➔ [Chờ Xác Nhận]",
+      "message": "Kính gửi Nguyễn Minh Toàn,\n\nTechGear xin thông báo đơn hàng #2000 của quý khách vừa được cập nhật trạng thái từ \"NEW\" sang [Chờ Xác Nhận].\n\nCHI TIẾT ĐƠN HÀNG #2000:\n- Danh mục sản phẩm: Viper V4 Pro (x1), Bàn Phím Cơ NuPhy Air75 V2 Wireless RGB (x1)\n- Tổng tiền thanh toán: 7.200.000đ (COD)\n- Địa chỉ nhận hàng: 115 Ỷ Lan, Phú Thạnh, Tân Phú, TP HCM\n- SĐT liên hệ: 0398933652\n\n\nTrân trọng,\nĐội ngũ Quản trị TechGear Vietnam.",
+      "status": "SENT",
+      "trigger_reason": "Chuyển trạng thái đơn hàng: NEW ➔ pending",
+      "created_at": "17:40:59 9/8/2026",
+      "provider": "Google Gmail API (OAuth2)"
+    },
+    {
+      "id": 5001,
+      "order_id": 2000,
+      "type": "email",
+      "recipient": "nguyen.a@gmail.com",
+      "subject": "[TechGear Store] XÁC NHẬN ĐƠN HÀNG #2000 - ĐANG XỬ LÝ",
+      "message": "Kính gửi Nguyễn Văn A, đơn hàng #2000 của bạn đã được tiếp nhận và đang đóng gói kiểm định.",
+      "status": "SENT",
+      "trigger_reason": "Tự động gửi email khi tạo đơn hàng mới",
+      "created_at": "2026-08-05 14:30",
+      "provider": "Google Gmail API"
+    },
+    {
+      "id": 5002,
+      "order_id": 2000,
+      "type": "sms",
+      "recipient": "0901234567",
+      "message": "TechGear [TECHGEAR]: Don hang #2000 da tao thanh cong. Chung toi dang chuan bi hang va se giao som nhat!",
+      "status": "DELIVERED",
+      "trigger_reason": "Tự động gửi SMS BrandName xác nhận đơn",
+      "created_at": "2026-08-05 14:30",
+      "provider": "SMS Gateway (TECHGEAR)"
+    }
+  ],
+  "notificationSettings": {
+    "email_enabled": true,
+    "sms_enabled": true,
+    "sms_brand_name": "TECHGEAR",
+    "admin_copy_email": "admin@techgear.vn",
+    "admin_copy_phone": "0988.123.456",
+    "notify_on_status_change": true,
+    "notify_on_new_order": true
+  },
   "nextProductId": 201,
   "nextCategoryId": 10,
   "nextBannerId": 10,
   "nextNewsId": 10,
   "nextUserId": 10,
-  "nextOrderId": 2000,
+  "nextOrderId": 2005,
   "nextReviewId": 100,
-  "nextStockLogId": 1004,
-  "updatedAt": "2026-08-04T09:42:10.197Z"
+  "nextStockLogId": 1013,
+  "nextNotificationLogId": 5034,
+  "updatedAt": "2026-08-09T18:07:05.040Z"
 }

@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { 
   Package, Clock, CheckCircle2, Truck, XCircle, ChevronDown, ChevronUp, 
   Search, FileText, Download, ShieldCheck, MapPin, Phone, User as UserIcon, AlertCircle, RefreshCw, CreditCard,
-  Mail, Send, Loader2, Image as ImageIcon
+  Mail, Send, Loader2, Image as ImageIcon, Navigation
 } from 'lucide-react';
 import { Order, User } from '../../types';
 import { fetchOrders, cancelCustomerOrder, lookupOrders, sendReceiptEmail } from '../../services/api';
 import { useLanguage } from '../../context/LanguageContext';
+import { OrderTracker } from './OrderTracker';
 
 interface Props {
   user: User | null;
@@ -19,6 +20,7 @@ export const OrdersList: React.FC<Props> = ({ user }) => {
   const [expandedOrderId, setExpandedOrderId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeStatusFilter, setActiveStatusFilter] = useState<string>('all');
+  const [trackingOrderId, setTrackingOrderId] = useState<number | string | null>(null);
 
   // Cancel order modal for customer
   const [cancelModalOrderId, setCancelModalOrderId] = useState<number | null>(null);
@@ -282,6 +284,16 @@ Cảm ơn quý khách đã mua sắm tại TechGear!
     return matchesSearch && matchesStatus;
   });
 
+  if (trackingOrderId !== null) {
+    return (
+      <OrderTracker
+        initialOrderId={trackingOrderId}
+        onBack={() => setTrackingOrderId(null)}
+        userPhoneOrEmail={user?.phone || user?.email}
+      />
+    );
+  }
+
   return (
     <div className="space-y-6 pb-16">
       
@@ -408,9 +420,18 @@ Cảm ơn quý khách đã mua sắm tại TechGear!
                     <span className="block text-[11px] text-slate-400">Ngày đặt: {searchedOrder.created_at}</span>
                   </div>
 
-                  <span className="font-extrabold text-orange-600 dark:text-orange-400 text-base">
-                    {formatVND(searchedOrder.total_amount)}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setTrackingOrderId(searchedOrder.id)}
+                      className="px-3.5 py-1.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-slate-950 font-black text-xs rounded-xl flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                    >
+                      <Truck className="w-3.5 h-3.5 stroke-[2.5]" />
+                      <span>Theo Dõi Vận Chuyển Real-Time</span>
+                    </button>
+                    <span className="font-extrabold text-orange-600 dark:text-orange-400 text-base">
+                      {formatVND(searchedOrder.total_amount)}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="p-4 space-y-4 text-xs">
@@ -604,7 +625,20 @@ Cảm ơn quý khách đã mua sắm tại TechGear!
                     <span className="block text-[11px] text-slate-400">Ngày đặt: {order.created_at}</span>
                   </div>
 
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2 sm:space-x-3">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setTrackingOrderId(order.id);
+                      }}
+                      className="px-3 py-1.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-slate-950 font-black text-xs rounded-xl flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
+                    >
+                      <Truck className="w-3.5 h-3.5 stroke-[2.5]" />
+                      <span className="hidden sm:inline">Theo Dõi Real-Time</span>
+                      <span className="sm:hidden">Theo Dõi</span>
+                    </button>
+
                     <span className="font-extrabold text-orange-600 dark:text-orange-400 text-sm">
                       {formatVND(order.total_amount)}
                     </span>

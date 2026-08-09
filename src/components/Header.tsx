@@ -99,13 +99,13 @@ export const Header: React.FC<Props> = ({
             <button
               onClick={() => {
                 setActiveView('client');
-                setCurrentTab('orders');
+                setCurrentTab('order-tracking');
               }}
-              className="hover:text-slate-900 dark:hover:text-white flex items-center gap-1 transition-colors font-medium text-blue-600 dark:text-blue-400"
-              title="Tra cứu đơn hàng vãng lai hoặc tài khoản"
+              className="hover:text-slate-900 dark:hover:text-white flex items-center gap-1 transition-colors font-medium text-orange-600 dark:text-orange-400 font-bold"
+              title="Theo dõi & Tra cứu đơn hàng theo thời gian thực"
             >
-              <PackageCheck className="w-3.5 h-3.5 text-blue-500" />
-              <span>{t('nav.track_order', 'Tra Cứu Đơn Hàng')}</span>
+              <PackageCheck className="w-3.5 h-3.5 text-orange-500" />
+              <span>{t('nav.track_order', 'Theo Dõi Đơn Hàng')}</span>
             </button>
 
             {/* Language Switcher */}

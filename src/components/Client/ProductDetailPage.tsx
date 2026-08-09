@@ -4,9 +4,9 @@ import {
   Sparkles, Star, ThumbsUp, MessageSquare, Clock, Cpu, Share2, 
   Heart, Zap, HelpCircle, CheckCircle2, ChevronRight, Layers, CreditCard,
   Maximize2, Plus, Minus, Sliders, Calculator, Copy, Tag, Eye, Info,
-  CheckSquare, Square, Gift, PhoneCall
+  CheckSquare, Square, Gift, PhoneCall, User as UserIcon
 } from 'lucide-react';
-import { Product, Review, ReviewSummary } from '../../types';
+import { User, Product, Review, ReviewSummary } from '../../types';
 import { fetchProductById, fetchProductReviews, submitProductReview, deleteProductReview } from '../../services/api';
 import { useLanguage } from '../../context/LanguageContext';
 import { ProductReviewCard } from './ProductReviewCard';
@@ -17,6 +17,8 @@ interface Props {
   onAddToCart: (p: Product, qty: number) => void;
   onSelectProduct: (p: Product) => void;
   onOpenCart?: () => void;
+  user?: User | null;
+  onRequireAuth?: () => void;
 }
 
 export const ProductDetailPage: React.FC<Props> = ({
@@ -24,7 +26,9 @@ export const ProductDetailPage: React.FC<Props> = ({
   onBack,
   onAddToCart,
   onSelectProduct,
-  onOpenCart
+  onOpenCart,
+  user,
+  onRequireAuth
 }) => {
   const [product, setProduct] = useState<Product | null>(initialProduct);
   const [related, setRelated] = useState<Product[]>([]);
@@ -200,6 +204,14 @@ export const ProductDetailPage: React.FC<Props> = ({
   const handleAddReview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!product) return;
+    if (!user) {
+      if (onRequireAuth) {
+        onRequireAuth();
+      } else {
+        alert(lang === 'vi' ? 'Vui lòng đăng nhập để viết đánh giá sản phẩm!' : 'Please log in to write a review!');
+      }
+      return;
+    }
     if (!reviewComment.trim()) return;
 
     setSubmittingReview(true);
@@ -209,7 +221,7 @@ export const ProductDetailPage: React.FC<Props> = ({
       const res = await submitProductReview(product.id, {
         rating: userRating,
         comment: reviewComment,
-        user_name: reviewAuthor
+        user_name: user.name || reviewAuthor
       });
 
       setReviewsList(res.summary.reviews || []);
@@ -251,6 +263,14 @@ export const ProductDetailPage: React.FC<Props> = ({
 
   const handleAskQa = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) {
+      if (onRequireAuth) {
+        onRequireAuth();
+      } else {
+        alert(lang === 'vi' ? 'Vui lòng đăng nhập để đặt câu hỏi!' : 'Please log in to ask a question!');
+      }
+      return;
+    }
     if (!newQuestion.trim()) return;
     setQaSubmitted(true);
     setTimeout(() => {
@@ -348,7 +368,17 @@ export const ProductDetailPage: React.FC<Props> = ({
                 <Maximize2 className="w-4 h-4" />
               </button>
               <button
-                onClick={() => setIsWishlisted(!isWishlisted)}
+                onClick={() => {
+                  if (!user) {
+                    if (onRequireAuth) {
+                      onRequireAuth();
+                    } else {
+                      alert(lang === 'vi' ? 'Vui lòng đăng nhập để thêm sản phẩm vào yêu thích!' : 'Please log in to add to wishlist!');
+                    }
+                    return;
+                  }
+                  setIsWishlisted(!isWishlisted);
+                }}
                 className="p-2 bg-slate-900/80 backdrop-blur-md rounded-xl text-white hover:text-red-500 transition-colors shadow-md"
                 title="Thêm vào danh sách yêu thích"
               >
@@ -1234,10 +1264,31 @@ export const ProductDetailPage: React.FC<Props> = ({
               </div>
 
               {/* Write Review Form */}
-              <form
-                onSubmit={handleAddReview}
-                className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm"
-              >
+              {!user ? (
+                <div className="p-6 rounded-2xl bg-orange-500/10 border border-orange-500/30 text-slate-800 dark:text-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs shadow-sm">
+                  <div className="space-y-1">
+                    <div className="font-extrabold text-sm text-orange-600 dark:text-orange-400 flex items-center gap-1.5">
+                      <Star className="w-4 h-4 fill-orange-500" />
+                      <span>{lang === 'vi' ? 'Đăng nhập để viết đánh giá sản phẩm' : 'Log in to write a review'}</span>
+                    </div>
+                    <p className="text-slate-500 dark:text-slate-400">
+                      {lang === 'vi'
+                        ? 'Bạn cần đăng nhập để chia sẻ đánh giá & trải nghiệm dùng sản phẩm.'
+                        : 'You need an account to write and share product reviews.'}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => onRequireAuth ? onRequireAuth() : alert('Vui lòng đăng nhập!')}
+                    className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all shrink-0"
+                  >
+                    {lang === 'vi' ? 'Đăng Nhập Ngay' : 'Log In Now'}
+                  </button>
+                </div>
+              ) : (
+                <form
+                  onSubmit={handleAddReview}
+                  className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm"
+                >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
                   <h4 className="font-extrabold text-slate-900 dark:text-white text-sm flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-orange-500" />
@@ -1347,6 +1398,7 @@ export const ProductDetailPage: React.FC<Props> = ({
                   </span>
                 </button>
               </form>
+              )}
 
             </div>
           )}
@@ -1389,29 +1441,44 @@ export const ProductDetailPage: React.FC<Props> = ({
               </div>
 
               {/* Submit Question */}
-              <form onSubmit={handleAskQa} className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-3">
-                <h4 className="font-extrabold text-slate-900 dark:text-white">Đặt Câu Hỏi Cho Kỹ Thuật Viên</h4>
-                {qaSubmitted && (
-                  <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 font-bold rounded-xl flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4" />
-                    <span>Câu hỏi của bạn đã được gửi. Kỹ thuật viên sẽ phản hồi trong 15 phút!</span>
+              {!user ? (
+                <div className="p-4 rounded-2xl bg-orange-500/10 border border-orange-500/30 text-slate-800 dark:text-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                  <div className="flex items-center gap-2">
+                    <UserIcon className="w-5 h-5 text-orange-500 shrink-0" />
+                    <span>Bạn cần <strong>Đăng Nhập</strong> để đặt câu hỏi cho kỹ thuật viên.</span>
                   </div>
-                )}
-                <input
-                  type="text"
-                  required
-                  value={newQuestion}
-                  onChange={(e) => setNewQuestion(e.target.value)}
-                  placeholder="Nhập thắc mắc của bạn về sản phẩm này..."
-                  className="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl"
-                />
-                <button
-                  type="submit"
-                  className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-slate-950 font-black rounded-xl transition-colors"
-                >
-                  GỬI CÂU HỎI
-                </button>
-              </form>
+                  <button
+                    onClick={() => onRequireAuth ? onRequireAuth() : alert('Vui lòng đăng nhập!')}
+                    className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-slate-950 font-bold rounded-xl shadow-md transition-all shrink-0"
+                  >
+                    Đăng Nhập Ngay
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleAskQa} className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-3">
+                  <h4 className="font-extrabold text-slate-900 dark:text-white">Đặt Câu Hỏi Cho Kỹ Thuật Viên</h4>
+                  {qaSubmitted && (
+                    <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 font-bold rounded-xl flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>Câu hỏi của bạn đã được gửi. Kỹ thuật viên sẽ phản hồi trong 15 phút!</span>
+                    </div>
+                  )}
+                  <input
+                    type="text"
+                    required
+                    value={newQuestion}
+                    onChange={(e) => setNewQuestion(e.target.value)}
+                    placeholder="Nhập thắc mắc của bạn về sản phẩm này..."
+                    className="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl"
+                  />
+                  <button
+                    type="submit"
+                    className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-slate-950 font-black rounded-xl transition-colors"
+                  >
+                    GỬI CÂU HỎI
+                  </button>
+                </form>
+              )}
             </div>
           )}
 
