@@ -22,7 +22,8 @@ import {
   PackageCheck,
   ShieldCheck,
   Globe,
-  Pin
+  Pin,
+  Tag
 } from 'lucide-react';
 import { User, SiteSettings, Category } from '../types';
 import { useLanguage } from '../context/LanguageContext';
@@ -148,12 +149,12 @@ export const Header: React.FC<Props> = ({
             </button>
           </div>
 
-          {/* Newegg-style Mega Search Bar */}
+          {/* Search Bar */}
           {activeView === 'client' && (
-            <div className="hidden md:flex flex-1 max-w-2xl items-center relative rounded-xl overflow-hidden border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus-within:border-orange-500 focus-within:ring-1 focus-within:ring-orange-500 focus-within:bg-white dark:focus-within:bg-slate-950 transition-all">
+            <div className="hidden md:flex flex-1 max-w-2xl items-center relative rounded-lg overflow-hidden border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 focus-within:border-orange-500 focus-within:ring-2 focus-within:ring-orange-500/20 transition-all shadow-2xs">
               
               {/* Category Dropdown Selector */}
-              <div className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs px-3 py-2.5 border-r border-slate-200 dark:border-slate-700 font-semibold flex items-center gap-1 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700">
+              <div className="bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 text-xs px-3 py-2.5 border-r border-slate-200 dark:border-slate-800 font-medium flex items-center gap-1 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800">
                 <select
                   value={selectedCategorySearch}
                   onChange={(e) => {
@@ -163,7 +164,7 @@ export const Header: React.FC<Props> = ({
                     }
                     if (currentTab !== 'products') setCurrentTab('products');
                   }}
-                  className="bg-transparent text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer font-semibold text-xs"
+                  className="bg-transparent text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer font-medium text-xs"
                 >
                   <option value="all" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">{lang === 'vi' ? 'Tất cả danh mục' : 'All Categories'}</option>
                   {categories.map(c => (
@@ -189,7 +190,7 @@ export const Header: React.FC<Props> = ({
                 onClick={() => {
                   if (currentTab !== 'products') setCurrentTab('products');
                 }}
-                className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-slate-950 font-extrabold text-xs flex items-center gap-1.5 transition-colors"
+                className="px-5 py-2.5 bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs flex items-center gap-1.5 transition-colors"
               >
                 <Search className="w-4 h-4 stroke-[2.5]" />
                 <span className="hidden lg:inline">{lang === 'vi' ? 'TÌM KIẾM' : 'SEARCH'}</span>
@@ -271,42 +272,16 @@ export const Header: React.FC<Props> = ({
                     </div>
 
                     {canAccessAdmin && (
-                      <>
-                        <button
-                          onClick={() => {
-                            setActiveView('admin');
-                            setUserDropdownOpen(false);
-                          }}
-                          className="w-full text-left px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center space-x-2 text-slate-700 dark:text-slate-200 font-semibold"
-                        >
-                          <LayoutDashboard className="w-4 h-4 text-orange-500" />
-                          <span>{t('nav.admin', 'Bảng Quản Trị')}</span>
-                        </button>
-
-                        {onOpenRoadmapModal && (
-                          <button
-                            onClick={() => {
-                              onOpenRoadmapModal();
-                              setUserDropdownOpen(false);
-                            }}
-                            className="w-full text-left px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center space-x-2 text-slate-700 dark:text-slate-200"
-                          >
-                            <Pin className="w-4 h-4 text-amber-500" />
-                            <span>📌 Ghim Lộ Trình</span>
-                          </button>
-                        )}
-
-                        <button
-                          onClick={() => {
-                            onOpenPdfModal();
-                            setUserDropdownOpen(false);
-                          }}
-                          className="w-full text-left px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center space-x-2 text-slate-700 dark:text-slate-200"
-                        >
-                          <FileText className="w-4 h-4 text-blue-500" />
-                          <span>📄 Báo Cáo Đồ Án PDF</span>
-                        </button>
-                      </>
+                      <button
+                        onClick={() => {
+                          setActiveView('admin');
+                          setUserDropdownOpen(false);
+                        }}
+                        className="w-full text-left px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center space-x-2 text-slate-700 dark:text-slate-200 font-semibold"
+                      >
+                        <LayoutDashboard className="w-4 h-4 text-orange-500" />
+                        <span>{t('nav.admin', 'Bảng Quản Trị')}</span>
+                      </button>
                     )}
 
                     <button
@@ -344,16 +319,16 @@ export const Header: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* 3. Secondary Nav Ribbon (Newegg Category Bar) */}
+      {/* 3. Secondary Nav Ribbon (Category & Quick Links) */}
       {activeView === 'client' && (
-        <div className="bg-slate-100/90 dark:bg-slate-800/90 border-t border-slate-200 dark:border-slate-700/60 hidden md:block text-xs font-bold">
+        <div className="bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 hidden md:block text-xs font-semibold">
           <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
             
             <div className="flex items-center space-x-1">
               {/* Category Picker Quick Dropdown */}
               <button
                 onClick={() => setCurrentTab('products')}
-                className="px-4 py-2.5 bg-orange-500 text-slate-950 font-black flex items-center gap-2 hover:bg-orange-600 transition-colors uppercase tracking-wider"
+                className="px-4 py-2.5 bg-orange-600 text-white font-bold flex items-center gap-2 hover:bg-orange-700 transition-colors tracking-wide rounded-t-sm"
               >
                 <Layers className="w-4 h-4" />
                 <span>{t('nav.all_categories', 'TẤT CẢ DANH MỤC')}</span>
@@ -361,8 +336,8 @@ export const Header: React.FC<Props> = ({
 
               <button
                 onClick={() => setCurrentTab('home')}
-                className={`px-3 py-2.5 hover:text-orange-600 dark:hover:text-orange-400 transition-colors ${
-                  currentTab === 'home' ? 'text-orange-600 dark:text-orange-400 border-b-2 border-orange-500' : 'text-slate-700 dark:text-slate-200'
+                className={`px-3.5 py-2.5 hover:text-orange-600 dark:hover:text-orange-400 transition-colors ${
+                  currentTab === 'home' ? 'text-orange-600 dark:text-orange-400 font-bold border-b-2 border-orange-500' : 'text-slate-700 dark:text-slate-300'
                 }`}
               >
                 {t('nav.home', 'TRANG CHỦ')}
@@ -370,8 +345,8 @@ export const Header: React.FC<Props> = ({
 
               <button
                 onClick={() => setCurrentTab('products')}
-                className={`px-3 py-2.5 hover:text-orange-600 dark:hover:text-orange-400 transition-colors ${
-                  currentTab === 'products' ? 'text-orange-600 dark:text-orange-400 border-b-2 border-orange-500' : 'text-slate-700 dark:text-slate-200'
+                className={`px-3.5 py-2.5 hover:text-orange-600 dark:hover:text-orange-400 transition-colors ${
+                  currentTab === 'products' ? 'text-orange-600 dark:text-orange-400 font-bold border-b-2 border-orange-500' : 'text-slate-700 dark:text-slate-300'
                 }`}
               >
                 {lang === 'vi' ? 'SẢN PHẨM & GEAR' : 'PRODUCTS & GEAR'}
@@ -379,26 +354,26 @@ export const Header: React.FC<Props> = ({
 
               <button
                 onClick={() => setCurrentTab('products')}
-                className="px-3 py-2.5 text-orange-600 dark:text-orange-400 hover:text-orange-500 flex items-center gap-1 font-bold"
+                className="px-3.5 py-2.5 text-red-600 dark:text-red-400 hover:text-red-700 flex items-center gap-1.5 font-bold"
               >
-                <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />
+                <Tag className="w-3.5 h-3.5" />
                 <span>KHUYẾN MÃI HOT</span>
               </button>
 
               <button
                 onClick={() => setCurrentTab('pcbuilder')}
-                className={`px-3 py-2.5 hover:text-blue-600 dark:hover:text-blue-300 flex items-center gap-1 transition-colors ${
-                  currentTab === 'pcbuilder' ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-500 font-extrabold' : 'text-blue-600 dark:text-blue-400 font-bold'
+                className={`px-3.5 py-2.5 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-1.5 transition-colors ${
+                  currentTab === 'pcbuilder' ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-500 font-bold' : 'text-slate-700 dark:text-slate-300'
                 }`}
               >
-                <Cpu className="w-4 h-4 text-blue-500" />
+                <Cpu className="w-3.5 h-3.5 text-blue-500" />
                 <span>{t('nav.pcbuilder', 'XÂY DỰNG PC')}</span>
               </button>
 
               <button
                 onClick={() => setCurrentTab('news')}
-                className={`px-3 py-2.5 hover:text-orange-600 dark:hover:text-orange-400 transition-colors ${
-                  currentTab === 'news' ? 'text-orange-600 dark:text-orange-400 border-b-2 border-orange-500' : 'text-slate-700 dark:text-slate-200'
+                className={`px-3.5 py-2.5 hover:text-orange-600 dark:hover:text-orange-400 transition-colors ${
+                  currentTab === 'news' ? 'text-orange-600 dark:text-orange-400 font-bold border-b-2 border-orange-500' : 'text-slate-700 dark:text-slate-300'
                 }`}
               >
                 {t('nav.news', 'TIN TỨC')}
@@ -406,19 +381,19 @@ export const Header: React.FC<Props> = ({
 
               <button
                 onClick={() => setCurrentTab('orders')}
-                className={`px-3 py-2.5 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-1.5 transition-colors ${
-                  currentTab === 'orders' ? 'text-emerald-600 dark:text-emerald-400 border-b-2 border-emerald-500 font-black' : 'text-emerald-600 dark:text-emerald-400 font-bold'
+                className={`px-3.5 py-2.5 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-1.5 transition-colors ${
+                  currentTab === 'orders' ? 'text-emerald-600 dark:text-emerald-400 border-b-2 border-emerald-500 font-bold' : 'text-slate-700 dark:text-slate-300'
                 }`}
               >
-                <PackageCheck className="w-4 h-4 text-emerald-500" />
+                <PackageCheck className="w-3.5 h-3.5 text-emerald-500" />
                 <span>TRA CỨU ĐƠN</span>
               </button>
 
             </div>
 
-            <div className="text-[11px] text-slate-400 flex items-center gap-2">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span>{lang === 'vi' ? 'Hàng Chính Hãng • Bảo Hành Uy Tín' : '100% Authentic • Full Warranty'}</span>
+            <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5 font-medium">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <span>{lang === 'vi' ? 'Cam kết chính hãng 100% • Bảo hành tận tâm' : '100% Authentic • Official Warranty'}</span>
             </div>
 
           </div>
@@ -427,76 +402,93 @@ export const Header: React.FC<Props> = ({
 
       {/* Mobile Nav Menu Drawer */}
       {mobileMenuOpen && activeView === 'client' && (
-        <div className="md:hidden py-4 px-4 bg-slate-900 border-t border-slate-800 space-y-3">
+        <div className="md:hidden py-4 px-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 space-y-3 shadow-lg transition-colors">
           
-          <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-            <span className="text-xs font-bold text-slate-400">{t('common.language', 'Ngôn ngữ')}:</span>
+          <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2.5">
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{t('common.language', 'Ngôn ngữ')}:</span>
             <button
               onClick={toggleLang}
-              className="px-3 py-1 rounded bg-slate-800 text-orange-400 font-bold flex items-center gap-1 text-xs"
+              className="px-3 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-orange-600 dark:text-orange-400 font-medium flex items-center gap-1.5 text-xs border border-slate-200 dark:border-slate-700"
             >
-              <Globe className="w-3.5 h-3.5" />
+              <Globe className="w-3 h-3" />
               <span>{lang === 'vi' ? '🇻🇳 Tiếng Việt' : '🇺🇸 English'}</span>
             </button>
           </div>
 
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              if (currentTab !== 'products') setCurrentTab('products');
-            }}
-            placeholder={t('nav.search_placeholder', 'Tìm kiếm bàn phím, laptop, VGA...')}
-            className="w-full px-3 py-2 text-xs bg-slate-950 border border-slate-700 rounded-lg text-white mb-2"
-          />
-          <div className="flex flex-col space-y-1 text-xs font-bold">
+          <div className="relative">
+            <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                if (currentTab !== 'products') setCurrentTab('products');
+              }}
+              placeholder={t('nav.search_placeholder', 'Tìm kiếm bàn phím, laptop, VGA...')}
+              className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-orange-500"
+            />
+          </div>
+
+          <div className="flex flex-col space-y-1 text-xs font-semibold">
             <button
               onClick={() => { setCurrentTab('home'); setMobileMenuOpen(false); }}
-              className="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800 text-slate-200"
+              className={`text-left px-3 py-2.5 rounded-lg transition-colors ${
+                currentTab === 'home'
+                  ? 'bg-orange-50 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400 font-bold'
+                  : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200'
+              }`}
             >
               {t('nav.home', 'Trang Chủ')}
             </button>
             <button
               onClick={() => { setCurrentTab('products'); setMobileMenuOpen(false); }}
-              className="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800 text-slate-200"
+              className={`text-left px-3 py-2.5 rounded-lg transition-colors ${
+                currentTab === 'products'
+                  ? 'bg-orange-50 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400 font-bold'
+                  : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200'
+              }`}
             >
-              {lang === 'vi' ? 'Danh Mục Sản Phẩm & Gear' : 'Product Categories & Gear'}
+              {lang === 'vi' ? 'Sản Phẩm & Gear Gaming' : 'Products & Gaming Gear'}
             </button>
             <button
               onClick={() => { setCurrentTab('pcbuilder'); setMobileMenuOpen(false); }}
-              className="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800 text-blue-400 flex items-center gap-1.5"
+              className={`text-left px-3 py-2.5 rounded-lg transition-colors flex items-center gap-2 ${
+                currentTab === 'pcbuilder'
+                  ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-bold'
+                  : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200'
+              }`}
             >
-              <Cpu className="w-4 h-4 text-blue-400" />
+              <Cpu className="w-4 h-4 text-blue-500" />
               <span>{t('nav.pcbuilder', 'Xây Dựng Cấu Hình PC')}</span>
             </button>
             <button
-              onClick={() => { setCurrentTab('products'); setMobileMenuOpen(false); }}
-              className="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800 text-orange-400 flex items-center gap-1.5"
-            >
-              <Flame className="w-4 h-4 text-orange-500" />
-              <span>Shell Shocker deals</span>
-            </button>
-            <button
               onClick={() => { setCurrentTab('news'); setMobileMenuOpen(false); }}
-              className="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800 text-slate-200"
+              className={`text-left px-3 py-2.5 rounded-lg transition-colors ${
+                currentTab === 'news'
+                  ? 'bg-orange-50 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400 font-bold'
+                  : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200'
+              }`}
             >
-              {t('nav.news', 'Tin Tức & Đánh Giá')}
+              {t('nav.news', 'Tin Tức & Bài Viết')}
             </button>
             <button
               onClick={() => { setCurrentTab('orders'); setMobileMenuOpen(false); }}
-              className="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800 text-emerald-400 font-bold flex items-center gap-1.5"
+              className={`text-left px-3 py-2.5 rounded-lg transition-colors flex items-center gap-2 ${
+                currentTab === 'orders'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 font-bold'
+                  : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200'
+              }`}
             >
-              <PackageCheck className="w-4 h-4 text-emerald-400" />
+              <PackageCheck className="w-4 h-4 text-emerald-500" />
               <span>{t('nav.track_order', 'Tra Cứu Đơn Hàng')}</span>
             </button>
             {!user && (
               <button
                 onClick={() => { setActiveView('auth'); setMobileMenuOpen(false); }}
-                className="text-left px-3 py-2.5 rounded-lg hover:bg-slate-800 text-orange-400 font-bold flex items-center gap-1.5"
+                className="mt-2 text-center px-4 py-2.5 rounded-lg bg-orange-600 hover:bg-orange-700 text-white font-bold flex items-center justify-center gap-2 transition-colors shadow-2xs"
               >
-                <UserIcon className="w-4 h-4 text-orange-400" />
-                <span>{t('nav.login', 'Đăng Nhập')}</span>
+                <UserIcon className="w-4 h-4" />
+                <span>{t('nav.login', 'Đăng Nhập / Đăng Ký')}</span>
               </button>
             )}
           </div>

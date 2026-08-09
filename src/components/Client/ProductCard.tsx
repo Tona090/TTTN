@@ -30,21 +30,19 @@ export const ProductCard: React.FC<Props> = ({ product, onSelectProduct, onAddTo
       {/* Top Badges */}
       <div className="absolute top-2 left-2 z-10 flex flex-col gap-1">
         {product.is_sale && discountPercent > 0 && (
-          <span className="px-2 py-0.5 text-[10px] font-black text-slate-950 bg-orange-500 rounded shadow flex items-center gap-1 uppercase tracking-wider">
+          <span className="px-2 py-0.5 text-[10px] font-bold text-white bg-red-600 rounded shadow-xs flex items-center gap-1">
             <Tag className="w-3 h-3" />
-            {lang === 'vi' ? `TIẾT KIỆM ${discountPercent}%` : `SAVE ${discountPercent}%`}
+            {lang === 'vi' ? `Giảm ${discountPercent}%` : `-${discountPercent}%`}
           </span>
         )}
         {product.is_new && (
-          <span className="px-2 py-0.5 text-[10px] font-bold text-white bg-emerald-600 rounded shadow flex items-center gap-1">
-            <Sparkles className="w-3 h-3" />
-            {lang === 'vi' ? 'Mới' : 'NEW'}
+          <span className="px-2 py-0.5 text-[10px] font-bold text-white bg-emerald-600 rounded shadow-xs">
+            {lang === 'vi' ? 'Hàng mới' : 'NEW'}
           </span>
         )}
         {product.is_best && (
-          <span className="px-2 py-0.5 text-[10px] font-bold text-white bg-amber-600 rounded shadow flex items-center gap-1">
-            <Flame className="w-3 h-3 fill-white" />
-            SHELL SHOCKER
+          <span className="px-2 py-0.5 text-[10px] font-bold text-white bg-orange-600 rounded shadow-xs">
+            {lang === 'vi' ? 'Bán chạy' : 'BESTSELLER'}
           </span>
         )}
       </div>
@@ -136,11 +134,11 @@ export const ProductCard: React.FC<Props> = ({ product, onSelectProduct, onAddTo
 
           <button
             onClick={() => onAddToCart(product)}
-            className="px-3 py-1.5 bg-slate-900 hover:bg-orange-500 text-white hover:text-slate-950 font-extrabold text-xs rounded-lg transition-all flex items-center gap-1 shadow-sm border border-slate-800"
+            className="px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs rounded-md transition-colors flex items-center gap-1 shadow-2xs"
             title={lang === 'vi' ? 'Thêm vào giỏ hàng' : 'Add to cart'}
           >
             <ShoppingBag className="w-3.5 h-3.5" />
-            <span>{lang === 'vi' ? 'Mua ngay' : 'Buy now'}</span>
+            <span>{lang === 'vi' ? 'Thêm giỏ' : 'Add cart'}</span>
           </button>
         </div>
 

@@ -68,7 +68,8 @@ export const initialCategories: Category[] = [
   { id: 2, name: 'Chuột Gaming & Văn Phòng', description: 'Chuột siêu nhẹ, cảm biến Ergonomic chính xác', status: 'active' },
   { id: 3, name: 'Tai Nghe & Âm Thanh', description: 'Tai nghe chống ồn ANC, Loa Bluetooth Hi-Fi', status: 'active' },
   { id: 4, name: 'Màn Hình & Laptop', description: 'Màn hình Ultrawide, Laptop Gaming & UltraBook', status: 'active' },
-  { id: 5, name: 'Phụ Kiện Desk Setup', description: 'Giá đỡ, Đèn màn hình, Lót chuột màng da, Cáp sạc', status: 'active' }
+  { id: 5, name: 'Phụ Kiện Desk Setup', description: 'Giá đỡ, Đèn màn hình, Lót chuột màng da, Cáp sạc', status: 'active' },
+  { id: 6, name: 'Linh Kiện & Tản Nhiệt PC', description: 'Card đồ họa VGA, CPU, Mainboard, RAM, SSD, Nguồn PSU, Tản nhiệt', status: 'active' }
 ];
 
 export const initialProducts: Product[] = [
@@ -80,6 +81,12 @@ export const initialProducts: Product[] = [
     sku: 'KB-NUPHY-A75V2',
     cost_price: 2100000,
     image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=800&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1595225476474-87563907a212?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1541140590914-579f21e8b193?auto=format&fit=crop&w=800&q=80'
+    ],
     price: 3200000,
     sale_price: 2890000,
     quantity: 45,
@@ -108,7 +115,7 @@ Thích hợp đánh Valorant, CS2 và combat Liên Minh nhờ độ trễ 2.4GHz
     is_new: true,
     is_sale: true,
     is_best: true,
-    specs: { 'Layout': '75%', 'Switch': 'Gateron Low Profile V2', 'Pin': '4000mAh', 'Kết nối': '3 Modes' },
+    specs: { 'Layout': '75%', 'Switch': 'Gateron Low Profile V2', 'Pin': '4000mAh', 'Kết nối': '3 Modes (2.4G/BT5.1/USB-C)' },
     variants: [
       { name: 'Switch Type', options: ['Cowberry Linear', 'Aloe Light Linear', 'Moss Tactile'] },
       { name: 'Màu sắc', options: ['Ionic White', 'Basalt Black', 'Lunar Gray'] }
@@ -122,9 +129,15 @@ Thích hợp đánh Valorant, CS2 và combat Liên Minh nhờ độ trễ 2.4GHz
     sku: 'KB-KEYCHRON-Q1P',
     cost_price: 3300000,
     image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?auto=format&fit=crop&w=800&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1595225476474-87563907a212?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?auto=format&fit=crop&w=800&q=80'
+    ],
     price: 4500000,
     sale_price: null,
-    quantity: 4, // Low stock <= 5
+    quantity: 4,
     description: `**Verdict:** Khối nhôm CNC 6063 nặng 1.8kg mang lại âm gõ clack/thock tròn trịa và độ đầm chắc tuyệt đối cho bàn làm việc cố định.
 
 **Best for:**
@@ -150,11 +163,42 @@ Phù hợp cho các tựa game MOBA, RPG và sim đua xe cần sự chính xác 
     is_new: false,
     is_sale: false,
     is_best: true,
-    specs: { 'Chất liệu': 'Nhôm CNC 6063', 'Mount': 'Double Gasket', 'LED': 'RGB South-facing' },
+    specs: { 'Chất liệu': 'Nhôm CNC 6063', 'Mount': 'Double Gasket', 'LED': 'RGB South-facing', 'Khối lượng': '1.8 kg' },
     variants: [
       { name: 'Khung Nhôm', options: ['Carbon Black', 'Silver Grey', 'Navy Blue'] },
       { name: 'Switch', options: ['Keychron K Pro Red', 'Keychron K Pro Banana'] }
     ]
+  },
+  {
+    id: 109,
+    category_id: 1,
+    category_name: 'Bàn Phím Cơ',
+    name: 'Bàn Phím Cơ MelGeek Mojo84 Wireless Transparent Clear',
+    sku: 'KB-MELGEEK-MJ84',
+    cost_price: 3100000,
+    image: 'https://images.unsplash.com/photo-1595225476474-87563907a212?auto=format&fit=crop&w=800&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1595225476474-87563907a212?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1541140590914-579f21e8b193?auto=format&fit=crop&w=800&q=80'
+    ],
+    price: 4890000,
+    sale_price: 4390000,
+    quantity: 18,
+    description: `**Verdict:** Mẫu phím cơ trong suốt độc đáo với xốp tiêu âm Gasket Mount độc quyền mang lại tiếng gõ "marbly" nịnh tai nhất phân khúc.
+
+**Best for:**
+Enthusiast thích phong cách vỏ trong suốt xuyên LED RGB rực rỡ và tiếng gõ lạch cạch đầm tai.
+
+**Pros:**
+- Thiết kế trong suốt polycarbonate góc nét futuristic ấn tượng
+- Switch Kailh Custom pre-lubed cực kỳ trơn mượt
+- Hỗ trợ kết nối 3 mốt đồng thời 8 thiết bị`,
+    is_new: true,
+    is_sale: true,
+    is_best: false,
+    specs: { 'Layout': '84 Keys (75%)', 'Chất liệu': 'Polycarbonate Clear', 'Switch': 'Kailh Custom Linear' }
   },
   {
     id: 103,
@@ -164,6 +208,12 @@ Phù hợp cho các tựa game MOBA, RPG và sim đua xe cần sự chính xác 
     sku: 'MS-LOGI-MXM3S',
     cost_price: 1850000,
     image: 'https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?auto=format&fit=crop&w=800&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1629429408209-1f912961dbd8?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1613141411244-0e4ac259d217?auto=format&fit=crop&w=800&q=80'
+    ],
     price: 2790000,
     sale_price: 2450000,
     quantity: 60,
@@ -192,7 +242,7 @@ Chơi mượt các game chiến thuật 4X như Civilization VI, Total War hoặ
     is_new: false,
     is_sale: true,
     is_best: true,
-    specs: { 'Cảm biến': 'Darkfield 8000 DPI', 'Thời lượng pin': '70 ngày', 'Kết nối': 'Logi Bolt & Bluetooth' },
+    specs: { 'Cảm biến': 'Darkfield 8000 DPI', 'Thời lượng pin': '70 ngày', 'Kết nối': 'Logi Bolt & Bluetooth', 'Trọng lượng': '141g' },
     variants: [
       { name: 'Màu sắc', options: ['Graphite Black', 'Pale Grey', 'Space Black'] }
     ]
@@ -205,31 +255,24 @@ Chơi mượt các game chiến thuật 4X như Civilization VI, Total War hoặ
     sku: 'MS-RAZER-VP3PRO',
     cost_price: 2700000,
     image: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=800&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1629429408209-1f912961dbd8?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1613141411244-0e4ac259d217?auto=format&fit=crop&w=800&q=80'
+    ],
     price: 3990000,
     sale_price: 3590000,
-    quantity: 0, // Out of stock = 0
+    quantity: 15,
     description: `**Verdict:** Chuột eSports đối xứng siêu nhẹ 54g trang bị cảm biến Focus Pro 35K và Polling Rate 8000Hz cho độ chính xác ngắm bắn từng milimet.
 
 **Best for:**
 Game thủ FPS chuyên nghiệp (CS2, Valorant, Apex Legends) đòi hỏi gia tốc chuột tối đa và khả năng flick shot chính xác.
 
-**Not recommended for:**
-Người tìm kiếm chuột nặng đầm tay, chuột nhiều nút phụ macro văn phòng hoặc người có bàn tay quá to thích ôm trọn lòng bàn tay.
-
-**Real gaming scenarios:**
-Thống trị các trận đấu CS2 & Valorant kịch tính, phản xạ nhắm ngắm AWP và giữ tâm súng ổn định không bị delay dù ở nhịp độ cao nhất.
-
 **Pros:**
 - Trọng lượng siêu nhẹ 54 gram phân bổ trọng tâm hoàn hảo
 - Cảm biến Focus Pro 35K DPI kết hợp dongle Wireless 8000Hz siêu nhạy
-- Form dáng đối xứng được các tuyển thủ chuyên nghiệp kiểm chứng
-
-**Cons:**
-- Không có khe cất dongle USB tích hợp trên thân chuột
-- Lớp vỏ mờ bám mồ hôi tay nhẹ sau thời gian dài train game
-
-**Expert opinion:**
-"Viper V3 Pro là đỉnh cao của dòng chuột siêu nhẹ hiện nay. Team TechGear đã test 8000Hz trên màn 240Hz: tâm súng bám sát cử chỉ tay mà không hề có cảm giác khựng hay trễ bóng ghosting."`,
+- Form dáng đối xứng được các tuyển thủ chuyên nghiệp kiểm chứng`,
     is_new: true,
     is_sale: true,
     is_best: false,
@@ -239,6 +282,32 @@ Thống trị các trận đấu CS2 & Valorant kịch tính, phản xạ nhắm
     ]
   },
   {
+    id: 110,
+    category_id: 2,
+    category_name: 'Chuột Gaming & Văn Phòng',
+    name: 'Chuột Không Dây Logitech G PRO X SUPERLIGHT 2',
+    sku: 'MS-LOGI-GPS2',
+    cost_price: 2600000,
+    image: 'https://images.unsplash.com/photo-1629429408209-1f912961dbd8?auto=format&fit=crop&w=800&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1629429408209-1f912961dbd8?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1613141411244-0e4ac259d217?auto=format&fit=crop&w=800&q=80'
+    ],
+    price: 3890000,
+    sale_price: 3490000,
+    quantity: 28,
+    description: `**Verdict:** Thế hệ thứ 2 của dòng chuột thi đấu eSports thành công nhất lịch sử với Switch Quang Học Lai LIGHTFORCE và cảm biến HERO 2 32.000 DPI.
+
+**Best for:**
+Pro players và gamer hard-core tìm kiếm sự ổn định tuyệt đối và trọng lượng 60g chuẩn mực.`,
+    is_new: true,
+    is_sale: true,
+    is_best: true,
+    specs: { 'Cảm biến': 'HERO 2 32K DPI', 'Trọng lượng': '60g', 'Cổng sạc': 'USB Type-C', 'Pin': '95 giờ' }
+  },
+  {
     id: 105,
     category_id: 3,
     category_name: 'Tai Nghe & Âm Thanh',
@@ -246,6 +315,12 @@ Thống trị các trận đấu CS2 & Valorant kịch tính, phản xạ nhắm
     sku: 'AU-SONY-XM5',
     cost_price: 5800000,
     image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1484704849700-f032a568e944?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&fit=crop&w=800&q=80'
+    ],
     price: 8490000,
     sale_price: 7490000,
     quantity: 30,
@@ -254,23 +329,10 @@ Thống trị các trận đấu CS2 & Valorant kịch tính, phản xạ nhắm
 **Best for:**
 Người thường xuyên làm việc tại không gian ồn ào (văn phòng mở, quán cafe, máy bay) và đòi hỏi chất âm bass ấm áp đầy đặn.
 
-**Not recommended for:**
-Game thủ thi đấu FPS cần tai nghe có dây mic rời chuyên dụng hoặc người tập thể thao cường độ cao dễ đọng mồ hôi pad tai.
-
-**Real gaming scenarios:**
-Trải nghiệm hoàn hảo khi đắm chìm vào thế giới game nhập vai cốt truyện sâu như Black Myth: Wukong, Elden Ring hay Cyberpunk 2077 nhờ trường âm rộng và khả năng cách âm môi trường.
-
 **Pros:**
 - Chip HD QN1 triệt tiêu tiếng ồn môi trường dải tần thấp và trung xuất sắc
 - Driver 30mm màng sợi carbon cho dải âm trầm ấm và dải cao chi tiết
-- Micro AI thu âm đàm thoại cực rõ ngay cả trong gió lớn
-
-**Cons:**
-- Thiết kế earcup không gấp gọn vào trong được như đời XM4
-- Không kháng nước chuẩn IPX cao
-
-**Expert opinion:**
-"XM5 mang lại cảm giác đeo nhẹ tênh nhờ quai đeo bọc da nhân tạo mềm mại. Khi bật chống ồn, bạn gần như tách biệt hoàn toàn với thế giới xung quanh để vào trạng thái deep work."`,
+- Micro AI thu âm đàm thoại cực rõ ngay cả trong gió lớn`,
     is_new: false,
     is_sale: true,
     is_best: true,
@@ -287,31 +349,19 @@ Trải nghiệm hoàn hảo khi đắm chìm vào thế giới game nhập vai c
     sku: 'AU-MARSHALL-ST3',
     cost_price: 6900000,
     image: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=800&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80'
+    ],
     price: 9900000,
     sale_price: null,
     quantity: 12,
     description: `**Verdict:** Mẫu loa decor cao cấp kết hợp hoàn hảo giữa phong cách rock vintage biểu tượng và dải âm stereo rộng mở cho góc máy cá nhân.
 
 **Best for:**
-Enthusiast yêu thích góc setup đẹp mắt, muốn không gian tràn ngập âm thanh chi tiết và thích điều khiển cơ học núm xoay mạ đồng.
-
-**Not recommended for:**
-Người cần loa di động mang đi du lịch (loa chạy điện trực tiếp AC, không có pin) hoặc phòng nhạc cực lớn trên 50m2.
-
-**Real gaming scenarios:**
-Thích hợp nghe nhạc nền acoustic, lofi khi chill game nhẹ nhàng như Stardew Valley, Genshin Impact hoặc thưởng thức phim bom tấn tại bàn làm việc.
-
-**Pros:**
-- Thiết kế da bọc thủ công kết hợp phím vặn đồng thau sang trọng
-- Công suất 80W RMS với ống dẫn âm phản xạ trầm sâu lắng
-- Hỗ trợ Bluetooth 5.2 LE Audio thế hệ mới truyền tải âm thanh nén ít hơn
-
-**Cons:**
-- Cần cắm nguồn điện 220V trực tiếp, không có pin tích hợp
-- Giá thành phân khúc cao cấp
-
-**Expert opinion:**
-"Stanmore III cải tiến góc hướng âm của tweeter ra ngoài giúp không gian âm thanh rộng hơn rõ rệt so với đời II. Đây là mảnh ghép tạo điểm nhấn ấn tượng nhất cho góc làm việc decor."`,
+Enthusiast yêu thích góc setup đẹp mắt, muốn không gian tràn ngập âm thanh chi tiết và thích điều khiển cơ học núm xoay mạ đồng.`,
     is_new: true,
     is_sale: false,
     is_best: false,
@@ -321,6 +371,32 @@ Thích hợp nghe nhạc nền acoustic, lofi khi chill game nhẹ nhàng như S
     ]
   },
   {
+    id: 111,
+    category_id: 3,
+    category_name: 'Tai Nghe & Âm Thanh',
+    name: 'Tai Nghe Gaming SteelSeries Arctis Nova Pro Wireless',
+    sku: 'AU-STEEL-ANPW',
+    cost_price: 6800000,
+    image: 'https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&fit=crop&w=800&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1484704849700-f032a568e944?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=800&q=80'
+    ],
+    price: 9890000,
+    sale_price: 8990000,
+    quantity: 20,
+    description: `**Verdict:** Đỉnh cao tai nghe gaming không dây với bộ GameDAC OLED dock điều khiển âm thanh 2.4Ghz + Bluetooth kết nối song song 2 thiết bị.
+
+**Best for:**
+Gamer chuyên nghiệp cần chất âm tái tạo không gian 360 Spatial Audio chuẩn xác trong trò chơi FPS.`,
+    is_new: true,
+    is_sale: true,
+    is_best: true,
+    specs: { 'Dock điều khiển': 'GameDAC Gen 2 OLED', 'Pin': '2 Pin sạc thay nóng 44h', 'Chống ồn': 'Active Noise Cancellation' }
+  },
+  {
     id: 107,
     category_id: 4,
     category_name: 'Màn Hình & Laptop',
@@ -328,35 +404,77 @@ Thích hợp nghe nhạc nền acoustic, lofi khi chill game nhẹ nhàng như S
     sku: 'MN-LG-34OLED',
     cost_price: 17500000,
     image: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=800&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1547082299-de196ea013d6?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1585792180666-f7347c490ee2?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1517059224940-d4af9eec41b7?auto=format&fit=crop&w=800&q=80'
+    ],
     price: 24900000,
     sale_price: 21900000,
-    quantity: 3, // Low stock <= 5
+    quantity: 3,
     description: `**Verdict:** Màn hình cong WQHD OLED 34 inch mang lại độ tương phản tuyệt đối và tốc độ phản hồi 0.03ms cho trải nghiệm thị giác không đối thủ.
 
 **Best for:**
 Game thủ AAA cao cấp, streamer và creator làm công việc dựng phim chuyên nghiệp đòi hỏi dải màu DCI-P3 98.5%.
 
-**Not recommended for:**
-Người dùng văn phòng chỉ đọc tài liệu text tĩnh 10-12 tiếng/ngày (nguy cơ burn-in OLED) hoặc ngân sách tiết kiệm.
-
-**Real gaming scenarios:**
-Trải nghiệm gaming đắm chìm tuyệt đỉnh trong Forza Horizon 5, God of War và Cyberpunk 2077 với sắc đen sâu thẳm 0 nit và hiệu ứng HDR rực rỡ.
-
 **Pros:**
 - Tấm nền QD-OLED độ tương phản vô tận 1.500.000:1, đen sâu tuyệt đối
 - Tần số quét 175Hz và thời gian đáp ứng siêu tốc 0.03ms (GtG)
-- Độ cong 800R bao quát trọn vẹn tầm mắt người chơi
-
-**Cons:**
-- Cần chú ý tính năng bảo vệ tấm nền (Pixel Cleaning) tự động
-- Độ sáng toàn màn hình SDR thấp hơn màn hình Fast IPS cao cấp
-
-**Expert opinion:**
-"Một khi đã trải nghiệm màu đen của OLED và tốc độ 0.03ms, bạn sẽ không bao giờ muốn quay lại màn hình LCD truyền thống. Trải nghiệm đua xe và bay lượn trên siêu phẩm này là độc nhất."`,
+- Độ cong 800R bao quát trọn vẹn tầm mắt người chơi`,
     is_new: true,
     is_sale: true,
     is_best: true,
-    specs: { 'Độ phân giải': '3440 x 1440 OLED', 'Tần số quét': '175Hz', 'Độ cong': '800R' }
+    specs: { 'Độ phân giải': '3440 x 1440 OLED', 'Tần số quét': '175Hz', 'Độ cong': '800R', 'Thời gian phản hồi': '0.03ms' }
+  },
+  {
+    id: 112,
+    category_id: 4,
+    category_name: 'Màn Hình & Laptop',
+    name: 'Laptop Gaming ASUS ROG Zephyrus G16 OLED Intel Core Ultra 9',
+    sku: 'LT-ASUS-G16OLED',
+    cost_price: 52000000,
+    image: 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=800&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=80'
+    ],
+    price: 67900000,
+    sale_price: 64900000,
+    quantity: 8,
+    description: `**Verdict:** Laptop gaming mỏng nhẹ cao cấp nhất trang bị màn hình ROG Nebula OLED 240Hz, CPU Intel Core Ultra 9 và RTX 4080.
+
+**Best for:**
+Game thủ cần di chuyển liên tục, lập trình viên AI và nhà sản xuất nội dung đồ họa 3D.`,
+    is_new: true,
+    is_sale: true,
+    is_best: true,
+    specs: { 'CPU': 'Intel Core Ultra 9 185H', 'VGA': 'NVIDIA RTX 4080 12GB', 'Màn hình': '16" 2.5K OLED 240Hz', 'RAM': '32GB LPDDR5X' }
+  },
+  {
+    id: 113,
+    category_id: 4,
+    category_name: 'Màn Hình & Laptop',
+    name: 'Apple MacBook Pro 16 inch M3 Max 36GB RAM 1TB SSD',
+    sku: 'LT-APPLE-MBP16M3',
+    cost_price: 72000000,
+    image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=800&q=80'
+    ],
+    price: 89900000,
+    sale_price: 85900000,
+    quantity: 10,
+    description: `**Verdict:** Siêu máy tính di động cho lập trình viên full-stack, AI Engineer và đạo diễn phim với vi xử lý Apple Silicon M3 Max 16-core CPU, 40-core GPU.`,
+    is_new: true,
+    is_sale: true,
+    is_best: true,
+    specs: { 'Chip': 'Apple M3 Max 16-Core', 'RAM': '36GB Unified Memory', 'SSD': '1TB NVMe', 'Màn hình': '16.2" Liquid Retina XDR 120Hz' }
   },
   {
     id: 108,
@@ -366,35 +484,115 @@ Trải nghiệm gaming đắm chìm tuyệt đỉnh trong Forza Horizon 5, God o
     sku: 'ACC-BENQ-HALO',
     cost_price: 2900000,
     image: 'https://images.unsplash.com/photo-1517059224940-d4af9eec41b7?auto=format&fit=crop&w=800&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1517059224940-d4af9eec41b7?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=800&q=80'
+    ],
     price: 4200000,
     sale_price: null,
     quantity: 25,
     description: `**Verdict:** Đèn treo màn hình chống mỏi mắt hàng đầu thế giới với núm xoay remote không dây và hệ thống hắt sáng ngược Ambient Backlight.
 
 **Best for:**
-Coder, writer và gamer cày đêm muốn bảo vệ mắt, loại bỏ hoàn toàn hiện tượng phản chiếu ánh sáng lên bề mặt màn hình.
-
-**Not recommended for:**
-Người dùng màn hình quá mỏng không có viền bám hoặc bàn làm việc đã có hệ thống đèn phòng đủ sáng.
-
-**Real gaming scenarios:**
-Lý tưởng cho các buổi cày đêm muộn, cung cấp nguồn sáng dịu nhẹ tập trung vào bàn phím và mặt bàn mà không gây chói mắt hay lóa màn hình.
-
-**Pros:**
-- Remote cảm ứng dạng núm xoay wireless sang trọng, chỉnh độ sáng/nhiệt độ màu mượt mà
-- Đèn hắt tường phía sau (Ambient Light) cân bằng độ chói không gian tối
-- Kẹp tự điều chỉnh tương thích cả màn hình cong Ultrawide
-
-**Cons:**
-- Mức giá cao nhất trong phân khúc đèn treo màn hình
-- Remote dùng 3 viên pin AAA thay vì sạc Type-C
-
-**Expert opinion:**
-"BenQ ScreenBar Halo là giải pháp ánh sáng duy nhất xử lý triệt để hiện tượng bóng gõ phím và lóa mắt khi làm việc ban đêm. Phần remote cảm ứng xoay tròn đem lại cảm giác thao tác vô cùng cao cấp."`,
+Coder, writer và gamer cày đêm muốn bảo vệ mắt, loại bỏ hoàn toàn hiện tượng phản chiếu ánh sáng lên bề mặt màn hình.`,
     is_new: false,
     is_sale: false,
     is_best: true,
     specs: { 'Điều khiển': 'Remote Wireless Knob', 'Cảm biến': 'Tự điều chỉnh ánh sáng', 'Nguồn': 'USB 5V' }
+  },
+  {
+    id: 114,
+    category_id: 5,
+    category_name: 'Phụ Kiện Desk Setup',
+    name: 'Bảng Điều Khiển Streamer Elgato Stream Deck MK.2 White',
+    sku: 'ACC-ELGATO-SDMK2',
+    cost_price: 2800000,
+    image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1517059224940-d4af9eec41b7?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1547082299-de196ea013d6?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=800&q=80'
+    ],
+    price: 3990000,
+    sale_price: 3690000,
+    quantity: 14,
+    description: `**Verdict:** Thiết bị phím tắt tùy chỉnh 15 nút bấm màn hình LCD hỗ trợ streamer, video editor và lập trình viên tự động hóa thao tác phức tạp chỉ bằng 1 cú chạm.`,
+    is_new: true,
+    is_sale: true,
+    is_best: false,
+    specs: { 'Số phím': '15 Phím LCD', 'Giao tiếp': 'USB 2.0', 'Tương thích': 'Windows / macOS' }
+  },
+  {
+    id: 115,
+    category_id: 6,
+    category_name: 'Linh Kiện & Tản Nhiệt PC',
+    name: 'Card Đồ Họa ASUS ROG Strix GeForce RTX 4090 OC Edition 24GB GDDR6X',
+    sku: 'HW-ASUS-RTX4090',
+    cost_price: 48000000,
+    image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=800&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1587202372634-32705e3bf49c?auto=format&fit=crop&w=800&q=80'
+    ],
+    price: 58900000,
+    sale_price: 54900000,
+    quantity: 6,
+    description: `**Verdict:** Mẫu VGA mạnh nhất hành tinh dành cho PC gaming 4K Ray Tracing đỉnh cao và huấn luyện mô hình trí tuệ nhân tạo Deep Learning.`,
+    is_new: true,
+    is_sale: true,
+    is_best: true,
+    specs: { 'VRAM': '24GB GDDR6X', 'Cổng xuất hình': '2x HDMI 2.1a, 3x DisplayPort 1.4a', 'Công suất khuyến nghị': '850W - 1000W' }
+  },
+  {
+    id: 116,
+    category_id: 6,
+    category_name: 'Linh Kiện & Tản Nhiệt PC',
+    name: 'Bộ Vi Xử Lý Intel Core i9-14900K (Up to 6.0GHz, 24 Cores 32 Threads)',
+    sku: 'HW-INTEL-I914900K',
+    cost_price: 13200000,
+    image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?auto=format&fit=crop&w=800&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1562976540-1502c2145186?auto=format&fit=crop&w=800&q=80'
+    ],
+    price: 16290000,
+    sale_price: 15490000,
+    quantity: 12,
+    description: `**Verdict:** CPU flagship thế hệ 14 của Intel với xung nhịp turbo đạt 6.0GHz, tối ưu cho xử lý đồ họa nặng, render vray và gaming khung hình cực cao.`,
+    is_new: true,
+    is_sale: true,
+    is_best: true,
+    specs: { 'Số nhân/luồng': '24 Cores / 32 Threads', 'Socket': 'LGA1700', 'Xung nhịp': '3.2GHz ~ 6.0GHz', 'TDP': '125W - 253W' }
+  },
+  {
+    id: 117,
+    category_id: 6,
+    category_name: 'Linh Kiện & Tản Nhiệt PC',
+    name: 'Tản Nhiệt Nước AIO NZXT Kraken Elite 360 RGB Black',
+    sku: 'HW-NZXT-KR360',
+    cost_price: 6200000,
+    image: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=800&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1587202372634-32705e3bf49c?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80'
+    ],
+    price: 8290000,
+    sale_price: 7890000,
+    quantity: 9,
+    description: `**Verdict:** Tản nhiệt nước AIO cao cấp trang bị màn hình LCD IPS 2.36 inch hiển thị thông số nhiệt độ CPU/GPU thực tế hoặc ảnh GIF cá nhân cực ngầu.`,
+    is_new: true,
+    is_sale: true,
+    is_best: false,
+    specs: { 'Màn hình': '2.36" Wide Angle LCD', 'Kích thước Radiator': '360mm', 'Quạt': '3x F120 RGB Core Fans' }
   }
 ];
 
@@ -589,36 +787,162 @@ export const initialOrders: Order[] = [
     ],
     total_amount: 5340000,
     status: 'completed',
-    created_at: '2026-07-22 14:30',
+    created_at: '2026-07-15 10:30',
     shipping_address: 'Quận 1, Thành phố Hồ Chí Minh',
     phone: '0908123456'
   },
   {
     id: 1002,
+    user_id: 5,
+    user_name: 'Trần Văn Hoàng',
+    items: [
+      { product_id: 105, name: 'Tai Nghe Chống Ồn Sony WH-1000XM5', price: 7490000, quantity: 1, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80' },
+      { product_id: 108, name: 'Đèn Màn Hình BenQ ScreenBar Halo Remote', price: 4200000, quantity: 1, image: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=800&q=80' }
+    ],
+    total_amount: 11690000,
+    status: 'completed',
+    created_at: '2026-07-18 14:15',
+    shipping_address: 'Quận 3, TP. Hồ Chí Minh',
+    phone: '0912345678'
+  },
+  {
+    id: 1003,
+    user_id: 6,
+    user_name: 'Lê Thị Thu Thảo',
+    items: [
+      { product_id: 107, name: 'Màn Hình LG UltraGear 34 inch OLED Curved 175Hz', price: 21900000, quantity: 1, image: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=800&q=80' }
+    ],
+    total_amount: 21900000,
+    status: 'completed',
+    created_at: '2026-07-21 16:45',
+    shipping_address: 'Quận Bình Thạnh, TP. Hồ Chí Minh',
+    phone: '0987654321'
+  },
+  {
+    id: 1004,
+    user_id: 7,
+    user_name: 'Phạm Quốc Cường',
+    items: [
+      { product_id: 102, name: 'Bàn Phím Cơ Keychron Q1 Pro Custom Aluminum', price: 4290000, quantity: 1, image: 'https://images.unsplash.com/photo-1595225476474-87563907a212?auto=format&fit=crop&w=800&q=80' },
+      { product_id: 104, name: 'Chuột Gaming Razer Viper V3 Pro Ultra-light', price: 3590000, quantity: 1, image: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=800&q=80' },
+      { product_id: 114, name: 'Bảng Điều Khiển Streamer Elgato Stream Deck MK.2 White', price: 3690000, quantity: 1, image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80' }
+    ],
+    total_amount: 11570000,
+    status: 'completed',
+    created_at: '2026-07-24 11:20',
+    shipping_address: 'Quận Cầu Giấy, Hà Nội',
+    phone: '0934567890'
+  },
+  {
+    id: 1005,
+    user_id: 8,
+    user_name: 'Đặng Minh Đức',
+    items: [
+      { product_id: 115, name: 'Card Đồ Họa ASUS ROG Strix GeForce RTX 4090 OC Edition 24GB', price: 54900000, quantity: 1, image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=800&q=80' },
+      { product_id: 116, name: 'Bộ Vi Xử Lý Intel Core i9-14900K', price: 15490000, quantity: 1, image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?auto=format&fit=crop&w=800&q=80' },
+      { product_id: 117, name: 'Tản Nhiệt Nước AIO NZXT Kraken Elite 360 RGB Black', price: 7890000, quantity: 1, image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=800&q=80' }
+    ],
+    total_amount: 78280000,
+    status: 'completed',
+    created_at: '2026-07-27 09:30',
+    shipping_address: 'Quận Hải Châu, Đà Nẵng',
+    phone: '0978901234'
+  },
+  {
+    id: 1006,
     user_id: 4,
     user_name: 'Nguyễn Minh Toàn',
     items: [
-      { product_id: 105, name: 'Tai Nghe Chống Ồn Sony WH-1000XM5', price: 7490000, quantity: 1, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80' }
+      { product_id: 109, name: 'Bàn Phím Cơ MelGeek Mojo84 Wireless Transparent Clear', price: 4390000, quantity: 1, image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=800&q=80' },
+      { product_id: 110, name: 'Chuột Không Dây Logitech G PRO X SUPERLIGHT 2', price: 3490000, quantity: 1, image: 'https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?auto=format&fit=crop&w=800&q=80' }
     ],
-    total_amount: 7490000,
+    total_amount: 7880000,
     status: 'shipped',
-    created_at: '2026-07-23 09:15',
-    shipping_address: 'Thành phố Thủ Đức, TP. Hồ Chí Minh',
+    created_at: '2026-07-30 15:10',
+    shipping_address: 'Quận 7, TP. Hồ Chí Minh',
     phone: '0908123456'
   },
   {
     id: 3000,
-    user_id: 4,
-    user_name: 'Nguyễn Minh Toàn',
+    user_id: 9,
+    user_name: 'Vũ Hải Đăng',
     items: [
-      { product_id: 102, name: 'Bàn Phím Cơ Keychron Q1 Pro Custom Aluminum', price: 4290000, quantity: 1, image: 'https://images.unsplash.com/photo-1595225476474-87563907a212?auto=format&fit=crop&w=800&q=80' }
+      { product_id: 111, name: 'Tai Nghe Gaming SteelSeries Arctis Nova Pro Wireless', price: 8990000, quantity: 1, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80' }
     ],
-    total_amount: 4290000,
+    total_amount: 8990000,
     status: 'shipped',
     created_at: '2026-08-01 10:15',
     shipping_address: 'Số 88 Lê Lợi, Bến Nghé, Quận 1, TP. Hồ Chí Minh',
-    phone: '0908123456',
-    note: 'Giao giờ hành chính - Giao thất bại lần 1 do không liên lạc được'
+    phone: '0961234567',
+    note: 'Giao giờ hành chính'
+  },
+  {
+    id: 1008,
+    user_id: 10,
+    user_name: 'Bùi Thị Ngọc Mai',
+    items: [
+      { product_id: 112, name: 'Laptop Gaming ASUS ROG Zephyrus G16 OLED Intel Core Ultra 9', price: 64900000, quantity: 1, image: 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=800&q=80' }
+    ],
+    total_amount: 64900000,
+    status: 'processing',
+    created_at: '2026-08-05 13:40',
+    shipping_address: 'Quận Đống Đa, Hà Nội',
+    phone: '0945678901'
+  },
+  {
+    id: 1009,
+    user_id: 11,
+    user_name: 'Trịnh Quốc Bảo',
+    items: [
+      { product_id: 106, name: 'Loa Bluetooth Marshall Stanmore III Studio', price: 9900000, quantity: 1, image: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=800&q=80' },
+      { product_id: 108, name: 'Đèn Màn Hình BenQ ScreenBar Halo Remote', price: 4200000, quantity: 1, image: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=800&q=80' }
+    ],
+    total_amount: 14100000,
+    status: 'processing',
+    created_at: '2026-08-07 17:25',
+    shipping_address: 'Quận Phú Nhuận, TP. Hồ Chí Minh',
+    phone: '0918273645'
+  },
+  {
+    id: 1010,
+    user_id: 12,
+    user_name: 'Nguyễn Văn An',
+    items: [
+      { product_id: 101, name: 'Bàn Phím Cơ NuPhy Air75 V2 Wireless RGB', price: 2890000, quantity: 2, image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=800&q=80' },
+      { product_id: 103, name: 'Chuột Không Dây Logitech MX Master 3S', price: 2450000, quantity: 1, image: 'https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?auto=format&fit=crop&w=800&q=80' }
+    ],
+    total_amount: 8230000,
+    status: 'pending',
+    created_at: '2026-08-09 09:15',
+    shipping_address: 'Quận Tân Bình, TP. Hồ Chí Minh',
+    phone: '0903112233'
+  },
+  {
+    id: 1011,
+    user_id: 13,
+    user_name: 'Hoàng Kim Yến',
+    items: [
+      { product_id: 105, name: 'Tai Nghe Chống Ồn Sony WH-1000XM5', price: 7490000, quantity: 1, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80' }
+    ],
+    total_amount: 7490000,
+    status: 'pending',
+    created_at: '2026-08-09 11:30',
+    shipping_address: 'Quận 10, TP. Hồ Chí Minh',
+    phone: '0909887766'
+  },
+  {
+    id: 1012,
+    user_id: 14,
+    user_name: 'Đỗ Thành Vinh',
+    items: [
+      { product_id: 107, name: 'Màn Hình LG UltraGear 34 inch OLED Curved 175Hz', price: 21900000, quantity: 1, image: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=800&q=80' },
+      { product_id: 102, name: 'Bàn Phím Cơ Keychron Q1 Pro Custom Aluminum', price: 4290000, quantity: 1, image: 'https://images.unsplash.com/photo-1595225476474-87563907a212?auto=format&fit=crop&w=800&q=80' }
+    ],
+    total_amount: 26190000,
+    status: 'pending',
+    created_at: '2026-08-09 14:00',
+    shipping_address: 'Quận Hoàn Kiếm, Hà Nội',
+    phone: '0912998877'
   }
 ];
 

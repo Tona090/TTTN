@@ -16,26 +16,26 @@ export const Footer: React.FC<Props> = ({ settings, onNavigateTab }) => {
     <footer className="bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-800 text-xs select-none transition-colors">
       
       {/* Service Guarantees Strip */}
-      <div className="border-b border-slate-200 dark:border-slate-800/80 py-6 bg-slate-50/80 dark:bg-slate-900/60">
-        <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-          <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col items-center shadow-sm">
-            <Truck className="w-5 h-5 text-orange-500 mb-1.5" />
-            <span className="font-extrabold text-slate-900 dark:text-white text-xs">{lang === 'vi' ? 'Giao Hàng Hỏa Tốc 2H' : '2-Hour Express Delivery'}</span>
+      <div className="border-b border-slate-200 dark:border-slate-800 py-6 bg-slate-50 dark:bg-slate-900/50">
+        <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+          <div className="p-4 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col items-center shadow-2xs">
+            <Truck className="w-5 h-5 text-orange-600 mb-1.5" />
+            <span className="font-bold text-slate-900 dark:text-white text-xs">{lang === 'vi' ? 'Giao Hàng Hỏa Tốc 2H' : '2-Hour Express Delivery'}</span>
             <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">{lang === 'vi' ? 'Miễn phí cho đơn từ 2.000.000đ' : 'Free for orders over $100'}</span>
           </div>
-          <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col items-center shadow-sm">
-            <ShieldCheck className="w-5 h-5 text-emerald-500 mb-1.5" />
-            <span className="font-extrabold text-slate-900 dark:text-white text-xs">{lang === 'vi' ? 'Chính Hãng 100%' : '100% Authentic Products'}</span>
+          <div className="p-4 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col items-center shadow-2xs">
+            <ShieldCheck className="w-5 h-5 text-emerald-600 mb-1.5" />
+            <span className="font-bold text-slate-900 dark:text-white text-xs">{lang === 'vi' ? 'Chính Hãng 100%' : '100% Authentic Products'}</span>
             <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">{lang === 'vi' ? 'Bảo hành 24-36 tháng 1 đổi 1' : '24-36 months official warranty'}</span>
           </div>
-          <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col items-center shadow-sm">
-            <RotateCcw className="w-5 h-5 text-amber-500 mb-1.5" />
-            <span className="font-extrabold text-slate-900 dark:text-white text-xs">{lang === 'vi' ? '1 Đổi 1 Trong 30 Ngày' : '30-Day Easy Exchange'}</span>
+          <div className="p-4 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col items-center shadow-2xs">
+            <RotateCcw className="w-5 h-5 text-amber-600 mb-1.5" />
+            <span className="font-bold text-slate-900 dark:text-white text-xs">{lang === 'vi' ? '1 Đổi 1 Trong 30 Ngày' : '30-Day Easy Exchange'}</span>
             <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">{lang === 'vi' ? 'Đổi trả siêu tốc nếu lỗi NSX' : 'Fast replacement for defect items'}</span>
           </div>
-          <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col items-center shadow-sm">
-            <Headphones className="w-5 h-5 text-purple-500 mb-1.5" />
-            <span className="font-extrabold text-slate-900 dark:text-white text-xs">{lang === 'vi' ? 'Hỗ Trợ Kỹ Thuật 24/7' : '24/7 Technical Support'}</span>
+          <div className="p-4 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col items-center shadow-2xs">
+            <Headphones className="w-5 h-5 text-blue-600 mb-1.5" />
+            <span className="font-bold text-slate-900 dark:text-white text-xs">{lang === 'vi' ? 'Hỗ Trợ Kỹ Thuật 24/7' : '24/7 Technical Support'}</span>
             <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">{lang === 'vi' ? 'Tư vấn setup & build PC chuyên nghiệp' : 'Professional PC setup & build advice'}</span>
           </div>
         </div>

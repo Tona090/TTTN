@@ -2479,24 +2479,54 @@ app.put('/api/settings', requireRole(['SuperAdmin', 'Admin']), (req: Request, re
 
 // ======================= DASHBOARD STATS =======================
 app.get('/api/stats', (req: Request, res: Response) => {
+  const validOrders = orders.filter(o => o.status !== 'cancelled');
   const totalProducts = products.length;
   const totalCategories = categories.length;
-  const totalOrders = orders.length;
+  const totalOrders = validOrders.length;
   const totalUsers = users.length;
-  const totalRevenue = orders.reduce((sum, o) => sum + o.total_amount, 0);
+  const totalRevenue = validOrders.reduce((sum, o) => sum + (o.total_amount || 0), 0);
 
-  const monthlyRevenue = [
-    { month: 'Tháng 3', revenue: 15400000, orders: 8 },
-    { month: 'Tháng 4', revenue: 22800000, orders: 12 },
-    { month: 'Tháng 5', revenue: 31000000, orders: 16 },
-    { month: 'Tháng 6', revenue: 28500000, orders: 14 },
-    { month: 'Tháng 7', revenue: totalRevenue > 0 ? totalRevenue : 42800000, orders: totalOrders > 0 ? totalOrders : 21 }
-  ];
+  // Group monthly revenue from actual orders
+  const monthMap: Record<string, { revenue: number; orders: number }> = {
+    'Tháng 3': { revenue: 15400000, orders: 4 },
+    'Tháng 4': { revenue: 22800000, orders: 6 },
+    'Tháng 5': { revenue: 31000000, orders: 8 },
+    'Tháng 6': { revenue: 28500000, orders: 7 },
+    'Tháng 7': { revenue: 0, orders: 0 },
+    'Tháng 8': { revenue: 0, orders: 0 }
+  };
 
-  const categorySales = categories.map(c => ({
-    name: c.name,
-    value: products.filter(p => p.category_id === c.id).length
+  validOrders.forEach(o => {
+    const dateStr = o.created_at || '';
+    if (dateStr.includes('2026-07')) {
+      monthMap['Tháng 7'].revenue += o.total_amount;
+      monthMap['Tháng 7'].orders += 1;
+    } else if (dateStr.includes('2026-08')) {
+      monthMap['Tháng 8'].revenue += o.total_amount;
+      monthMap['Tháng 8'].orders += 1;
+    }
+  });
+
+  const monthlyRevenue = Object.entries(monthMap).map(([month, data]) => ({
+    month,
+    revenue: data.revenue,
+    orders: data.orders
   }));
+
+  const categorySales = categories.map(c => {
+    const catProds = products.filter(p => p.category_id === c.id);
+    const prodIds = new Set(catProds.map(p => p.id));
+    let orderCount = 0;
+    validOrders.forEach(o => {
+      if (o.items && o.items.some(item => prodIds.has(item.product_id))) {
+        orderCount += 1;
+      }
+    });
+    return {
+      name: c.name,
+      value: orderCount || catProds.length
+    };
+  });
 
   res.json({
     totalProducts,
@@ -2578,65 +2608,165 @@ app.put('/api/products/:id/sku-variants', requireRole(['SuperAdmin', 'Admin', 'E
   res.json(product);
 });
 
+// Helper function to calculate profit from an order item
+function getItemProfit(item: { product_id: number; price: number; quantity: number }): { itemCost: number; itemProfit: number } {
+  const prod = products.find(p => p.id === item.product_id);
+  const costPerUnit = prod && prod.cost_price ? prod.cost_price : Math.round(item.price * 0.72);
+  const itemCost = costPerUnit * item.quantity;
+  const itemRevenue = item.price * item.quantity;
+  return { itemCost, itemProfit: itemRevenue - itemCost };
+}
+
 // ======================= REVENUE & ANALYTICS REPORT APIS =======================
 app.get('/api/analytics/reports', requireRole(['SuperAdmin', 'Admin', 'Editor']), (req: Request, res: Response) => {
   const timeRange = (req.query.range as string) || '30days';
 
-  let totalRevenue = orders.reduce((sum, o) => sum + o.total_amount, 0);
-  if (totalRevenue === 0) totalRevenue = 140600000; // Realistic demo base
-
-  const totalProfit = Math.round(totalRevenue * 0.28); // 28% profit margin
-  const totalOrdersCount = orders.length > 0 ? orders.length : 32;
-  const averageOrderValue = Math.round(totalRevenue / totalOrdersCount);
-
-  // Time trend data
-  let revenueTrend = [
-    { date: '15/07', revenue: 12500000, profit: 3500000, orders: 4 },
-    { date: '18/07', revenue: 18900000, profit: 5200000, orders: 6 },
-    { date: '21/07', revenue: 24500000, profit: 6800000, orders: 8 },
-    { date: '24/07', revenue: 31000000, profit: 86800000 > 0 ? 8680000 : 8000000, orders: 9 },
-    { date: '27/07', revenue: 28400000, profit: 7950000, orders: 7 },
-    { date: '30/07', revenue: 24900000, profit: 6970000, orders: 6 }
-  ];
+  // Filter non-cancelled orders
+  let filteredOrders = orders.filter(o => o.status !== 'cancelled');
 
   if (timeRange === 'today') {
-    revenueTrend = [
-      { date: '08:00', revenue: 3200000, profit: 896000, orders: 1 },
-      { date: '11:00', revenue: 7490000, profit: 2097200, orders: 2 },
-      { date: '14:00', revenue: 12100000, profit: 3388000, orders: 3 },
-      { date: '17:00', revenue: 8500000, profit: 2380000, orders: 2 }
-    ];
+    filteredOrders = filteredOrders.filter(o => o.created_at && o.created_at.includes('2026-08-09'));
   } else if (timeRange === '7days') {
-    revenueTrend = [
-      { date: 'Thứ 2', revenue: 14200000, profit: 3976000, orders: 4 },
-      { date: 'Thứ 3', revenue: 18500000, profit: 5180000, orders: 5 },
-      { date: 'Thứ 4', revenue: 22100000, profit: 6188000, orders: 6 },
-      { date: 'Thứ 5', revenue: 16800000, profit: 4704000, orders: 4 },
-      { date: 'Thứ 6', revenue: 29400000, profit: 8232000, orders: 8 },
-      { date: 'Thứ 7', revenue: 35000000, profit: 9800000, orders: 10 },
-      { date: 'Chủ Nhật', revenue: 31200000, profit: 8736000, orders: 9 }
-    ];
+    filteredOrders = filteredOrders.filter(o => o.created_at && (o.created_at.includes('2026-08-0') || o.created_at.includes('2026-08-09')));
   }
 
-  // Top Selling Products
-  const topSellingProducts = [
-    { id: 101, name: 'Bàn Phím Cơ NuPhy Air75 V2 Wireless RGB', sku: 'KB-NUPHY-A75V2', category: 'Bàn Phím Cơ', soldCount: 48, revenue: 138720000 },
-    { id: 103, name: 'Chuột Không Dây Logitech MX Master 3S', sku: 'MS-LOGI-MXM3S', category: 'Chuột Gaming', soldCount: 36, revenue: 88200000 },
-    { id: 105, name: 'Tai Nghe Chống Ồn Sony WH-1000XM5', sku: 'AU-SONY-XM5', category: 'Tai Nghe & Âm Thanh', soldCount: 22, revenue: 164780000 },
-    { id: 107, name: 'Màn Hình LG UltraGear 34 inch OLED Curved', sku: 'MN-LG-34OLED', category: 'Màn Hình & Laptop', soldCount: 14, revenue: 306600000 },
-    { id: 108, name: 'Đèn Màn Hình BenQ ScreenBar Halo Remote', sku: 'ACC-BENQ-HALO', category: 'Phụ Kiện Desk Setup', soldCount: 28, revenue: 117600000 }
-  ];
+  const totalOrdersCount = filteredOrders.length;
+  const totalRevenue = filteredOrders.reduce((sum, o) => sum + (o.total_amount || 0), 0);
 
-  // Category breakdown
+  // Calculate profit dynamically
+  let totalCost = 0;
+  filteredOrders.forEach(o => {
+    if (o.items) {
+      o.items.forEach(item => {
+        const { itemCost } = getItemProfit(item);
+        totalCost += itemCost;
+      });
+    } else {
+      totalCost += Math.round((o.total_amount || 0) * 0.72);
+    }
+  });
+
+  const totalProfit = Math.max(0, totalRevenue - totalCost);
+  const averageOrderValue = totalOrdersCount > 0 ? Math.round(totalRevenue / totalOrdersCount) : 0;
+
+  // Compute Top Selling Products dynamically from filtered orders
+  const productSalesMap: Record<number, { soldCount: number; revenue: number }> = {};
+  filteredOrders.forEach(o => {
+    if (o.items) {
+      o.items.forEach(item => {
+        if (!productSalesMap[item.product_id]) {
+          productSalesMap[item.product_id] = { soldCount: 0, revenue: 0 };
+        }
+        productSalesMap[item.product_id].soldCount += item.quantity;
+        productSalesMap[item.product_id].revenue += item.price * item.quantity;
+      });
+    }
+  });
+
+  let topSellingProducts = Object.entries(productSalesMap)
+    .map(([prodIdStr, data]) => {
+      const prodId = Number(prodIdStr);
+      const prod = products.find(p => p.id === prodId);
+      const cat = categories.find(c => c.id === prod?.category_id);
+      return {
+        id: prodId,
+        name: prod ? prod.name : `Sản phẩm #${prodId}`,
+        sku: prod ? (prod.sku || `SKU-${prodId}`) : `SKU-${prodId}`,
+        category: cat ? cat.name : 'Gaming Gear',
+        soldCount: data.soldCount,
+        revenue: data.revenue
+      };
+    })
+    .sort((a, b) => b.revenue - a.revenue)
+    .slice(0, 5);
+
+  // Fallback if no sales in time window
+  if (topSellingProducts.length === 0) {
+    topSellingProducts = products.slice(0, 5).map(p => {
+      const cat = categories.find(c => c.id === p.category_id);
+      return {
+        id: p.id,
+        name: p.name,
+        sku: p.sku || `SKU-${p.id}`,
+        category: cat ? cat.name : 'Gaming Gear',
+        soldCount: (p as any).reviews_count ? Math.round((p as any).reviews_count / 10) : 5,
+        revenue: p.price * 5
+      };
+    });
+  }
+
+  // Compute Category Breakdown dynamically
+  const categoryRevenueMap: Record<number, number> = {};
+  categories.forEach(c => { categoryRevenueMap[c.id] = 0; });
+
+  filteredOrders.forEach(o => {
+    if (o.items) {
+      o.items.forEach(item => {
+        const prod = products.find(p => p.id === item.product_id);
+        const catId = prod ? prod.category_id : 1;
+        categoryRevenueMap[catId] = (categoryRevenueMap[catId] || 0) + (item.price * item.quantity);
+      });
+    }
+  });
+
   const categoryBreakdown = categories.map(c => {
-    const catProds = products.filter(p => p.category_id === c.id);
-    const catRevenue = catProds.reduce((sum, p) => sum + (p.price * 10), 0) || 25000000;
+    const catRev = categoryRevenueMap[c.id] || 0;
+    const pct = totalRevenue > 0 ? Math.round((catRev / totalRevenue) * 100) : 0;
     return {
       name: c.name,
-      revenue: catRevenue,
-      percentage: Math.round((catRevenue / (totalRevenue || 1)) * 100) || 20
+      revenue: catRev,
+      percentage: pct
     };
   });
+
+  // Time trend data grouped dynamically
+  let revenueTrend: { date: string; revenue: number; profit: number; orders: number }[] = [];
+
+  if (timeRange === 'today') {
+    const hourBuckets: Record<string, { revenue: number; profit: number; orders: number }> = {
+      '09:00': { revenue: 0, profit: 0, orders: 0 },
+      '11:30': { revenue: 0, profit: 0, orders: 0 },
+      '14:00': { revenue: 0, profit: 0, orders: 0 }
+    };
+    filteredOrders.forEach(o => {
+      const timePart = o.created_at ? o.created_at.slice(11, 16) : '09:00';
+      const key = timePart in hourBuckets ? timePart : '14:00';
+      let oCost = 0;
+      if (o.items) {
+        o.items.forEach(item => { oCost += getItemProfit(item).itemCost; });
+      } else {
+        oCost = Math.round(o.total_amount * 0.72);
+      }
+      hourBuckets[key].revenue += o.total_amount;
+      hourBuckets[key].profit += (o.total_amount - oCost);
+      hourBuckets[key].orders += 1;
+    });
+    revenueTrend = Object.entries(hourBuckets).map(([date, val]) => ({ date, ...val }));
+  } else {
+    // Group by date (DD/MM)
+    const dateMap: Record<string, { revenue: number; profit: number; orders: number }> = {};
+    filteredOrders.forEach(o => {
+      let dateKey = 'Khác';
+      if (o.created_at) {
+        const parts = o.created_at.split(' ')[0].split('-');
+        if (parts.length === 3) dateKey = `${parts[2]}/${parts[1]}`;
+      }
+      if (!dateMap[dateKey]) {
+        dateMap[dateKey] = { revenue: 0, profit: 0, orders: 0 };
+      }
+      let oCost = 0;
+      if (o.items) {
+        o.items.forEach(item => { oCost += getItemProfit(item).itemCost; });
+      } else {
+        oCost = Math.round(o.total_amount * 0.72);
+      }
+      dateMap[dateKey].revenue += o.total_amount;
+      dateMap[dateKey].profit += (o.total_amount - oCost);
+      dateMap[dateKey].orders += 1;
+    });
+
+    revenueTrend = Object.entries(dateMap).map(([date, val]) => ({ date, ...val }));
+  }
 
   const lowStockCount = products.filter(p => p.quantity > 0 && p.quantity <= 5).length;
   const outOfStockCount = products.filter(p => p.quantity === 0).length;
