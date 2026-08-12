@@ -442,6 +442,11 @@ export const OrderManager: React.FC = () => {
                             <span className="px-2 py-0.5 rounded text-[9px] font-extrabold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 block w-fit">
                               ✓ Đã Thanh Toán
                             </span>
+                            {order.payment_transaction_id && (
+                              <span className="text-[9px] font-mono text-emerald-600 dark:text-emerald-400 font-bold block" title={order.payment_gateway_name}>
+                                ⚡ {order.payment_transaction_id}
+                              </span>
+                            )}
                             {order.payment_receipt_url && (
                               <button
                                 type="button"

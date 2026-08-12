@@ -6,7 +6,7 @@ import {
   Printer, QrCode, Compass, Eye, ShieldAlert, Award, Bell, Smartphone
 } from 'lucide-react';
 import { Order, TrackingInfo, NotificationLog } from '../../types';
-import { trackOrder, sendReceiptEmail, rescheduleDelivery, fetchNotificationLogs } from '../../services/api';
+import { trackOrder, sendReceiptEmail, rescheduleDelivery, fetchNotificationLogs, triggerAutoPayment } from '../../services/api';
 import { useLanguage } from '../../context/LanguageContext';
 
 interface Props {
@@ -46,6 +46,23 @@ export const OrderTracker: React.FC<Props> = ({ initialOrderId, onBack, userPhon
   const [showPrintModal, setShowPrintModal] = useState<boolean>(false);
   const [showGpsMap, setShowGpsMap] = useState<boolean>(false);
   const [showEWarrantyModal, setShowEWarrantyModal] = useState<boolean>(false);
+
+  const [autoPayLoading, setAutoPayLoading] = useState<boolean>(false);
+
+  const handleAutoPayInTracker = async () => {
+    if (!orderData?.id) return;
+    setAutoPayLoading(true);
+    try {
+      const res = await triggerAutoPayment(orderData.id, orderData.payment_method);
+      if (res.success) {
+        setOrderData(res.order);
+      }
+    } catch (err: any) {
+      alert(err.message || 'Lỗi xác thực thanh toán');
+    } finally {
+      setAutoPayLoading(false);
+    }
+  };
 
   const handleTrack = async (idToTrack?: string | number, contactToTrack?: string) => {
     const queryId = (idToTrack !== undefined ? idToTrack : searchId).toString().trim();
@@ -875,10 +892,55 @@ export const OrderTracker: React.FC<Props> = ({ initialOrderId, onBack, userPhon
                 </div>
                 <div>
                   <span className="text-slate-500 dark:text-slate-400">Thanh toán:</span>{' '}
-                  <span className="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 font-bold text-slate-800 dark:text-slate-200">
-                    {orderData.payment_method} ({orderData.payment_status === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán'})
+                  <span className={`px-2 py-0.5 rounded font-bold text-xs ${
+                    orderData.payment_status === 'paid' 
+                      ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' 
+                      : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                  }`}>
+                    {orderData.payment_method} ({orderData.payment_status === 'paid' ? '✓ ĐÃ THANH TOÁN' : '⏳ CHƯA THANH TOÁN'})
                   </span>
                 </div>
+
+                {orderData.payment_status === 'paid' && orderData.payment_transaction_id && (
+                  <div className="p-2.5 bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-800 rounded-xl text-[11px] space-y-1">
+                    <p className="font-extrabold text-emerald-800 dark:text-emerald-300 flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> Xác thực tự động bởi Cổng Payment Auto
+                    </p>
+                    <p className="font-mono text-[10px] text-emerald-700 dark:text-emerald-400">
+                      Mã GD: {orderData.payment_transaction_id} {orderData.paid_at && `• ${orderData.paid_at}`}
+                    </p>
+                  </div>
+                )}
+
+                {orderData.payment_status !== 'paid' && orderData.payment_method !== 'COD' && (
+                  <div className="p-3 bg-slate-50 dark:bg-slate-900/90 rounded-xl border border-blue-200 dark:border-blue-900/60 space-y-2 shadow-2xs">
+                    <div className="flex items-center justify-between text-xs font-bold">
+                      <span className="flex items-center gap-1.5 text-slate-800 dark:text-slate-100">
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
+                        </span>
+                        Tự động đối soát thanh toán 24/7
+                      </span>
+                      <span className="text-[10px] font-medium bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded-full border border-blue-200 dark:border-blue-800">
+                        VietQR Auto Check
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-tight">
+                      Ngay khi chuyển khoản thành công, hệ thống ngân hàng sẽ tự động cập nhật trạng thái đơn hàng.
+                    </p>
+                    <button
+                      type="button"
+                      disabled={autoPayLoading}
+                      onClick={handleAutoPayInTracker}
+                      className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1.5 transition-all shadow-2xs active:scale-95 disabled:opacity-50 cursor-pointer"
+                    >
+                      {autoPayLoading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5 text-amber-300" />}
+                      <span>{autoPayLoading ? 'Đang đối soát...' : 'Kiểm tra & Khớp lệnh ngay'}</span>
+                    </button>
+                  </div>
+                )}
+
                 {orderData.note && (
                   <div className="text-slate-600 dark:text-slate-300 italic border-t border-slate-200 dark:border-slate-800 pt-1 mt-1">
                     Ghi chú: "{orderData.note}"

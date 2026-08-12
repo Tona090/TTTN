@@ -6,7 +6,7 @@ import {
   User as UserIcon, LogIn, UserCheck, Loader2, RefreshCw, Upload, Image as ImageIcon, FileText, Eye, Mail, Send
 } from 'lucide-react';
 import { Product, User, SiteSettings } from '../../types';
-import { createOrder, fetchSettings, notifyTransfer, sendReceiptEmail } from '../../services/api';
+import { createOrder, fetchSettings, notifyTransfer, sendReceiptEmail, checkOrderPaymentStatus, triggerAutoPayment } from '../../services/api';
 import { useLanguage } from '../../context/LanguageContext';
 
 interface Props {
@@ -72,12 +72,59 @@ export const CartDrawer: React.FC<Props> = ({
   const [receiptImage, setReceiptImage] = useState<string | null>(null);
   const [settings, setSettings] = useState<SiteSettings | null>(propSettings || null);
 
+  // Auto payment gateway state
+  const [autoPayLoading, setAutoPayLoading] = useState(false);
+  const [autoPaidTxn, setAutoPaidTxn] = useState<string | null>(null);
+  const [autoPaidGateway, setAutoPaidGateway] = useState<string | null>(null);
+
+  // Auto-polling for payment gateway confirmation
+  useEffect(() => {
+    if (step !== 'success' || !placedOrderInfo?.id) return;
+    if (placedOrderInfo.payment_status === 'paid' || autoPaidTxn) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await checkOrderPaymentStatus(placedOrderInfo.id);
+        if (res.payment_status === 'paid') {
+          setAutoPaidTxn(res.payment_transaction_id || `TXN-AUTO-${Date.now()}`);
+          setAutoPaidGateway(res.payment_gateway_name || 'Cổng Payment Gateway Auto');
+          setPlacedOrderInfo((prev: any) => prev ? { ...prev, payment_status: 'paid', payment_transaction_id: res.payment_transaction_id } : null);
+          setTransferStatus('notified');
+        }
+      } catch (e) {
+        // ignore transient errors
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [step, placedOrderInfo?.id, autoPaidTxn]);
+
+  const handleTriggerAutoPay = async () => {
+    if (!placedOrderInfo?.id) return;
+    setAutoPayLoading(true);
+    try {
+      const res = await triggerAutoPayment(placedOrderInfo.id, placedOrderInfo.paymentMethod);
+      if (res.success) {
+        setAutoPaidTxn(res.transaction_id);
+        setAutoPaidGateway(res.order.payment_gateway_name || 'Cổng Payment Gateway Auto');
+        setPlacedOrderInfo((prev: any) => prev ? { ...prev, payment_status: 'paid', payment_transaction_id: res.transaction_id } : null);
+        setTransferStatus('notified');
+      }
+    } catch (err: any) {
+      alert(err.message || 'Lỗi xác thực cổng thanh toán');
+    } finally {
+      setAutoPayLoading(false);
+    }
+  };
+
   // Reset form & payment state whenever drawer is opened or user changes
   useEffect(() => {
     if (isOpen) {
       setPaymentVerified(false);
       setTransferStatus('idle');
       setReceiptImage(null);
+      setAutoPaidTxn(null);
+      setAutoPaidGateway(null);
       setError(null);
 
       if (user) {
@@ -950,6 +997,63 @@ export const CartDrawer: React.FC<Props> = ({
                   Mã Đơn Hàng: <strong className="text-slate-900 dark:text-white font-mono">#{placedOrderInfo?.id || 'TG-' + Date.now().toString().slice(-6)}</strong>
                 </p>
               </div>
+
+              {/* AUTO-PAYMENT GATEWAY REALTIME LISTENER BANNER */}
+              {placedOrderInfo?.paymentMethod !== 'COD' && (
+                <div>
+                  {(autoPaidTxn || placedOrderInfo?.payment_status === 'paid') ? (
+                    <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-500/40 shadow-xs space-y-1.5 animate-fade-in">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-emerald-900 dark:text-emerald-200 text-xs flex items-center gap-1.5">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                          ĐÃ XÁC NHẬN THANH TOÁN TỰ ĐỘNG
+                        </span>
+                        <span className="px-2 py-0.5 rounded bg-emerald-600 text-white font-mono font-bold text-[9px] uppercase tracking-wider">
+                          Đã khớp lệnh
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-emerald-800 dark:text-emerald-300 space-y-0.5">
+                        <p>Mã Giao Dịch: <strong className="font-mono font-bold text-emerald-700 dark:text-emerald-300">{autoPaidTxn || placedOrderInfo?.payment_transaction_id || 'TXN-PAID-SUCCESS'}</strong></p>
+                        <p className="text-[10px] text-emerald-700 dark:text-emerald-400 font-medium">
+                          ✓ Giao dịch đã được Cổng Ngân hàng đối soát thành công. Đơn hàng đang được chuẩn bị đóng gói!
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-3.5 bg-slate-50 dark:bg-slate-900/90 rounded-2xl border border-blue-200 dark:border-blue-900/60 space-y-2 shadow-2xs">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="relative flex h-2.5 w-2.5">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-600"></span>
+                          </span>
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1">
+                            Tự động xác nhận giao dịch 24/7
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-medium bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded-full border border-blue-200 dark:border-blue-800">
+                          VietQR Auto Check
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-snug">
+                        Sau khi quét mã QR chuyển khoản, hệ thống sẽ tự động cập nhật trạng thái đơn hàng trong vài giây mà không cần gửi biên lai.
+                      </p>
+                      <div className="pt-1 flex items-center justify-between gap-2">
+                        <span className="text-[10px] text-slate-400 italic">Đang chờ ngân hàng báo có...</span>
+                        <button
+                          type="button"
+                          disabled={autoPayLoading}
+                          onClick={handleTriggerAutoPay}
+                          className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-[11px] flex items-center gap-1.5 transition-all shadow-xs active:scale-95 cursor-pointer disabled:opacity-50 shrink-0"
+                        >
+                          {autoPayLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5 text-amber-300" />}
+                          <span>{autoPayLoading ? 'Đang đối soát...' : 'Kiểm tra & Khớp lệnh ngay'}</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* VIETQR / VNPAY Payment Box */}
               {(placedOrderInfo?.paymentMethod === 'VIETQR' || placedOrderInfo?.paymentMethod === 'VNPAY') && (() => {

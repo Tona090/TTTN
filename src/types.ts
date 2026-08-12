@@ -129,6 +129,9 @@ export interface Order {
   payment_method?: 'COD' | 'VIETQR' | 'MOMO' | 'VNPAY' | 'CARD' | 'INSTALLMENT' | string;
   payment_status?: 'unpaid' | 'pending_verification' | 'paid' | 'refunding';
   payment_receipt_url?: string;
+  payment_transaction_id?: string;
+  payment_gateway_name?: string;
+  paid_at?: string;
   installment_months?: number;
   note?: string;
   voucher_code?: string;

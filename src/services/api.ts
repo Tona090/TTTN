@@ -354,6 +354,25 @@ export async function notifyTransfer(orderId: number, receiptUrl?: string): Prom
   return res.json();
 }
 
+export async function checkOrderPaymentStatus(orderId: number): Promise<{ id: number; payment_status: string; status: string; payment_transaction_id?: string; paid_at?: string; payment_gateway_name?: string }> {
+  const res = await fetch(`/api/orders/${orderId}/payment-status`);
+  if (!res.ok) throw new Error('Lỗi kiểm tra trạng thái thanh toán');
+  return res.json();
+}
+
+export async function triggerAutoPayment(orderId: number, gateway?: string): Promise<{ success: boolean; message: string; order: Order; transaction_id: string }> {
+  const res = await fetch(`/api/orders/${orderId}/auto-pay`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ gateway })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || 'Lỗi thanh toán tự động');
+  }
+  return res.json();
+}
+
 export async function trackOrder(orderId: string | number, contact?: string): Promise<{ order: Order; tracking: TrackingInfo }> {
   const res = await fetch('/api/orders/track', {
     method: 'POST',

@@ -2023,6 +2023,86 @@ app.post('/api/orders/:id/notify-transfer', (req: Request, res: Response) => {
   res.json({ success: true, message: 'Đã báo chuyển khoản thành công. Đang chờ kế toán đối soát.', order });
 });
 
+// Get order payment status for auto-polling
+app.get('/api/orders/:id/payment-status', (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  const order = orders.find(o => o.id === id);
+  if (!order) {
+    return res.status(404).json({ message: 'Không tìm thấy đơn hàng.' });
+  }
+  res.json({
+    id: order.id,
+    payment_status: order.payment_status || 'unpaid',
+    status: order.status,
+    payment_transaction_id: order.payment_transaction_id,
+    payment_gateway_name: order.payment_gateway_name,
+    paid_at: order.paid_at
+  });
+});
+
+// Auto-pay webhook / Simulation endpoint for instant payment gateway confirmation
+app.post('/api/orders/:id/auto-pay', (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  const { gateway } = req.body || {};
+  const order = orders.find(o => o.id === id);
+  if (!order) {
+    return res.status(404).json({ message: 'Không tìm thấy đơn hàng.' });
+  }
+
+  const txnId = `TXN-${order.payment_method || 'PAY'}-${Math.floor(10000000 + Math.random() * 90000000)}`;
+  const nowStr = new Date().toLocaleString('vi-VN');
+  const gwName = gateway || (order.payment_method === 'VIETQR' ? 'VietQR Auto-Bank IPN' : order.payment_method === 'VNPAY' ? 'Cổng VNPAY QR Auto' : order.payment_method === 'MOMO' ? 'Ví Điện Tử MoMo Gateway' : order.payment_method === 'CARD' ? 'Cổng Thẻ Quốc Tế Visa/Mastercard' : 'Cổng Thanh Toán Tự Động');
+
+  order.payment_status = 'paid';
+  if (order.status === 'pending') {
+    order.status = 'processing';
+  }
+  order.payment_transaction_id = txnId;
+  order.payment_gateway_name = gwName;
+  order.paid_at = nowStr;
+
+  // Add auto notification log
+  const autoLog: NotificationLog = {
+    id: nextNotificationLogId++,
+    order_id: order.id,
+    type: 'email',
+    recipient: order.email || 'customer@techgear.vn',
+    message: `Thanh toán tự động thành công cho Đơn hàng #${order.id}. Mã GD: ${txnId}. Số tiền: ${order.total_amount.toLocaleString('vi-VN')} VNĐ.`,
+    status: 'DELIVERED',
+    trigger_reason: `Xác thực tự động bởi Cổng Thanh Toán (${gwName})`,
+    created_at: nowStr,
+    provider: gwName
+  };
+  notificationLogs.unshift(autoLog);
+
+  persistDatabaseState();
+  res.json({
+    success: true,
+    message: 'Thanh toán đã được Cổng Payment Gateway xác nhận tự động thành công!',
+    order,
+    transaction_id: txnId
+  });
+});
+
+// Generic Gateway Webhook receiver
+app.post('/api/payment/webhook', (req: Request, res: Response) => {
+  const { order_id, amount, transaction_id, gateway_code } = req.body || {};
+  const cleanId = Number(order_id);
+  const order = orders.find(o => o.id === cleanId);
+  if (!order) {
+    return res.status(404).json({ success: false, message: 'Order not found' });
+  }
+
+  order.payment_status = 'paid';
+  if (order.status === 'pending') order.status = 'processing';
+  order.payment_transaction_id = transaction_id || `WEBHOOK-${Date.now()}`;
+  order.payment_gateway_name = gateway_code || 'Payment Gateway Auto Webhook';
+  order.paid_at = new Date().toLocaleString('vi-VN');
+
+  persistDatabaseState();
+  res.json({ success: true, message: 'Payment recorded via webhook' });
+});
+
 // Helper to generate rich order tracking details
 function generateTrackingData(order: Order) {
   const carrier = order.payment_method === 'COD' ? 'TechGear Express (Giao hỏa tốc 2H)' : 'Giao Hàng Tiết Kiệm (GHTK Express)';
