@@ -513,6 +513,7 @@ export const CartDrawer: React.FC<Props> = ({
                           🎉 {lang === 'vi' ? 'Đã áp dụng voucher:' : 'Voucher applied:'} <strong>{appliedVoucher.code}</strong>
                         </span>
                         <button
+                          type="button"
                           onClick={() => { setAppliedVoucher(null); setVoucherCode(''); }}
                           className="text-red-500 font-bold hover:underline"
                         >
