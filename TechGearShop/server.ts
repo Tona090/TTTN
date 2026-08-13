@@ -600,13 +600,15 @@ const authenticateToken = (req: AuthRequest, res: Response, next: NextFunction) 
   const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) {
-    // If no token provided, we allow guest access, but req.user remains undefined
+    // If no token provided, allow guest access, req.user remains undefined
     return next();
   }
 
   jwt.verify(token, JWT_SECRET, (err, decoded) => {
     if (err) {
-      return res.status(403).json({ message: 'Token không hợp lệ hoặc đã hết hạn.' });
+      // If token is invalid or expired, clear req.user and allow guest access for optional routes
+      req.user = undefined;
+      return next();
     }
     req.user = decoded as User;
     next();
