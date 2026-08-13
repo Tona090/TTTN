@@ -527,30 +527,6 @@ export const HomePage: React.FC<Props> = ({
         </section>
       )}
 
-      {/* 8. Store Unique Selling Points (USPs) */}
-      <section className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-2xs grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-center divide-y sm:divide-y-0 sm:divide-x divide-slate-100 dark:divide-slate-800">
-        {storeMeta.usps.map((usp, idx) => {
-          const iconsMap: Record<string, React.FC<{ className?: string }>> = {
-            Award: Award,
-            Truck: Truck,
-            ShieldCheck: ShieldCheck,
-            Wrench: Headphones,
-            Headphones: Headphones,
-            RotateCcw: RotateCcw
-          };
-          const IconComp = iconsMap[usp.icon] || ShieldCheck;
-          return (
-            <div key={usp.id || idx} className="flex flex-col items-center pt-4 sm:pt-0 first:pt-0 sm:px-2">
-              <div className="p-2.5 rounded-full bg-orange-50 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400 mb-2.5">
-                <IconComp className="w-5 h-5" />
-              </div>
-              <h4 className="font-bold text-xs text-slate-900 dark:text-slate-100">{usp.title}</h4>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-snug">{usp.desc}</p>
-            </div>
-          );
-        })}
-      </section>
-
     </div>
   );
 };
